@@ -21,7 +21,7 @@ Request type: GET
 }]
 ```
 **NOTES:**
-* Only taxi driver allowed to perform operation
+* Only taxi driver is allowed to perform operation
 
 **_2. Get order with specific id_**
 ```
@@ -54,7 +54,7 @@ Request type: **GET**
 }
 ```
 **NOTES**
-* TaxiDriver can be empty or null if status is NEW.
+* taxiDriver can be empty or null if status is NEW.
 * If user is a customer, it must be the owner of the order. 
 
 **_3. Add request_**
