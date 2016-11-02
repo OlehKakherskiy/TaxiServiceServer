@@ -21,7 +21,7 @@ Request type: GET
 }]
 ```
 **NOTES:**
-* Only taxi driver is allowed to perform operation
+* Only a taxi driver is allowed to perform operation
 
 **_2. Get order with specific id_**
 ```
@@ -59,14 +59,14 @@ Request type: **GET**
 
 **_3. Add request_**
 ```
-/order/{id}/{user_id}
+/order
 ```
 Request type: **POST**
 <p>Request body:</p>
 
 ```json
 {
-  "orderId" : "Long",
+  "customerId" : "Long",
   "startTime" : "DateTime",
   "startPoint" : "String",
   "endPoint" : "String",
