@@ -6,7 +6,7 @@ server RESTful app developed using Spring framework
 ###Order API
 **_1. Get all orders (by type)_**
 ```
-/order/all/{order_type}
+/order/{order_type}
 ```
 Request type: GET
 <p>Response:</p>
@@ -14,7 +14,7 @@ Request type: GET
 ```json
 [{
     "orderId" : "Long",
-    "startTime": "DateTime",
+    "startTime" : "DateTime",
     "startPoint" : "String",
     "endPoint" : "String",
     "price" : "Double"
@@ -25,7 +25,7 @@ Request type: GET
 
 **_2. Get order with specific id_**
 ```
-/order/{id}
+/order/{order_id}
 ```
 Request type: **GET**
 <p>Response:</p>
@@ -48,8 +48,8 @@ Request type: **GET**
     "price" : "Double",
     "additionalRequirements" : [
         {"id" : "Integer",
-        "name":"String",
-        "description":"String"
+        "name" : "String",
+        "description" : "String"
         }]
 }
 ```
@@ -57,7 +57,7 @@ Request type: **GET**
 * taxiDriver can be empty or null if status is NEW.
 * If user is a customer, it must be the owner of the order. 
 
-**_3. Add request_**
+**_3. Add order_**
 ```
 /order
 ```
@@ -70,14 +70,18 @@ Request type: **POST**
   "startTime" : "DateTime",
   "startPoint" : "String",
   "endPoint" : "String",
-  "additionalRequirements":["id_1","id_2"]
+  "additionalRequirements" : [{
+      "reqId" : "Integer",
+      "reqValueId" : "Integer"
+  }]
 }
 ```
-<b>Note_1:</b>Only customer can perform operation
+**NOTES:**
+* Only customer can perform operation
 
-**_4. AcceptOrder / CancelOrder / MarkAsDone_**
+**_4. Accept order / Refuse order / Mark as done_**
 ```
-/order/{id}
+/order/{order_id}/status
 ```
 Request type: **PUT**
 <p>Request body:</p>
@@ -92,3 +96,30 @@ Request type: **PUT**
 * Customer, that not an owner of the order, can't perform this operation.
 * Customer-owner of the order can only cancel the order.
 * Taxi driver can mark order as done only after accepting its servicing.
+
+**_5. Delete order_**
+```
+/order/{order_id}
+```
+Request type: **DELETE**
+
+**NOTES**
+* Can be performed only by customer-owner.
+
+**_6. Update order_**
+```
+/order/{order_id}
+```
+Request type: **PUT**
+<p>Request body:</p>
+
+```json
+{
+  "startTime" : "DateTime",
+  "startPoint" : "String",
+  "endPoint" : "String",
+  "additionalRequirements": [{
+      "reqId" : "Integer",
+      "reqValueId" : "Integer"
+  }]
+}
