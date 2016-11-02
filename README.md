@@ -2,14 +2,109 @@
 server RESTful app developed using Spring framework
 
 ##Public API
+###User API
+
+**_1. Register_**
+```
+/user
+```
+RequestType: **POST**
+
+Request body:
+```json
+{
+  "name": "String",
+  "email" : "String",
+  "password" : "String",
+  "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
+  "userType" : "CUSTOMER/TAXI_DRIVER",
+  "car" : {
+    "manufacturer" : "String",
+    "model" : "String",
+    "plateNumber" : "String",
+    "seatsNumber" : "Integer",
+    "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+  }
+}
+```
+**NOTES**
+* If userType is TAXI_DRIVER, car object **MUST** contain all fields.
+* If userType is CUSTOMER, car object will be omitted even if it exists.
+
+**_2. Recovery password_** (could be reviewed)
+```
+/user/{userId}/password/
+```
+RequestType: **PUT**
+
+Request body:
+```json
+{
+    "email" : "String",
+    "password" : "String"
+}
+```
+
+**_3. Get user profile_**
+```
+/user/{userId}
+```
+RequestType: **GET**
+
+Response:
+```json
+{
+  "name": "String",
+  "email" : "String",
+  "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
+  "userType" : "CUSTOMER/TAXI_DRIVER",
+  "car" : {
+    "manufacturer" : "String",
+    "model" : "String",
+    "plateNumber" : "String",
+    "seatsNumber" : "Integer",
+    "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+  }
+}
+```
+
+**_4. Update user profile_**
+```
+/user/{userId}
+```
+
+RequestType: **PUT**
+
+Request body:
+```json
+{
+  "name": "String",
+  "email" : "String",
+  "password" : "String",
+  "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
+  "userType" : "CUSTOMER/TAXI_DRIVER",
+  "car" : {
+    "manufacturer" : "String",
+    "model" : "String",
+    "plateNumber" : "String",
+    "seatsNumber" : "Integer",
+    "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+  }
+}
+```
+
+**NOTES:**
+* If car object is null - no changes will be performed with it.
+* Car object will be omitted if userType = CUSTOMER. 
 
 ###Order API
 **_1. Get all orders (by type)_**
 ```
-/order/{order_type}
+/order/{orderStatus}
 ```
 Request type: GET
-<p>Response:</p>
+
+Response:
 
 ```json
 [{
@@ -25,10 +120,11 @@ Request type: GET
 
 **_2. Get order with specific id_**
 ```
-/order/{order_id}
+/order/{orderId}
 ```
 Request type: **GET**
-<p>Response:</p>
+
+Response:
 
 ```json
 {
@@ -62,7 +158,8 @@ Request type: **GET**
 /order
 ```
 Request type: **POST**
-<p>Request body:</p>
+
+Request body:
 
 ```json
 {
@@ -81,10 +178,11 @@ Request type: **POST**
 
 **_4. Accept order / Refuse order / Mark as done_**
 ```
-/order/{order_id}/status
+/order/{orderId}/status
 ```
 Request type: **PUT**
-<p>Request body:</p>
+
+Request body:
 
 ```json
 {
@@ -99,7 +197,7 @@ Request type: **PUT**
 
 **_5. Delete order_**
 ```
-/order/{order_id}
+/order/{orderId}
 ```
 Request type: **DELETE**
 
@@ -108,10 +206,11 @@ Request type: **DELETE**
 
 **_6. Update order_**
 ```
-/order/{order_id}
+/order/{orderId}
 ```
 Request type: **PUT**
-<p>Request body:</p>
+
+Request body:
 
 ```json
 {
