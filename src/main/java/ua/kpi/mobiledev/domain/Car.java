@@ -1,33 +1,42 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
 /**
  * Created by Oleg on 05.11.2016.
  */
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString
+@EqualsAndHashCode
 @Entity
 public class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idCar")
     private Integer id;
 
     @Column(name = "model")
+    @NonNull
     private String model;
 
     @Column(name = "manufacturer")
+    @NonNull
     private String manufacturer;
 
     @Column(name = "plateNumber")
+    @NonNull
     private String plateNumber;
 
     @Column(name = "seatNumber")
+    @NonNull
     private Integer seatNumber;
 
-    private enum CarType {
+    public enum CarType {
 
         TRUCK,
 
@@ -38,5 +47,6 @@ public class Car {
 
     @Column(name = "carType")
     @Enumerated(EnumType.ORDINAL)
+    @NonNull
     private CarType carType;
 }

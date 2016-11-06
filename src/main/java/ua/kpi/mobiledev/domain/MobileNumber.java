@@ -1,15 +1,16 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 /**
  * Created by Oleg on 05.11.2016.
  */
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString(exclude = "user")
 @Setter(AccessLevel.NONE)
 @Entity
 public class MobileNumber {
@@ -20,6 +21,7 @@ public class MobileNumber {
     private Integer id;
 
     @Column(name = "mobileNumber")
+    @NonNull
     private String mobileNumber;
 
     @ManyToOne

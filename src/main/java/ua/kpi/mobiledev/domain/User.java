@@ -1,8 +1,7 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import com.sun.istack.internal.NotNull;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,7 +9,11 @@ import java.util.List;
 /**
  * Created by Oleg on 05.11.2016.
  */
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 @Setter(AccessLevel.NONE)
 @Entity
 @Table(name = "User")
@@ -25,9 +28,11 @@ public class User {
     private Integer id;
 
     @Column(name = "name")
+    @NonNull
     private String name;
 
     @Column(name = "email")
+    @NotNull
     private String email;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
