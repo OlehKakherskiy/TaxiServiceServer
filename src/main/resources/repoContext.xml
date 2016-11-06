@@ -10,6 +10,8 @@
 
     <context:property-placeholder system-properties-mode="OVERRIDE" location="classpath:jdbc.properties"/>
 
+    <context:component-scan base-package="ua.kpi.mobiledev.repository"/>
+
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${driver}"/>
         <property name="url" value="${url}"/>
