@@ -1,6 +1,6 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,7 +9,11 @@ import java.util.Map;
 /**
  * Created by Oleg on 05.11.2016.
  */
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "Account")
 public class Order {
@@ -37,7 +41,7 @@ public class Order {
     @Column(name = "price")
     private Double price;
 
-    private enum OrderStatus {
+    public enum OrderStatus {
 
         NEW,
 
@@ -54,11 +58,42 @@ public class Order {
 
     //stores map AdditionalRequirement/requirementValueKey (AdditionalRequirement.requirementValues.key)
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "accountadditionalrequirements")
+    @CollectionTable(name = "accountAdditionalRequirements")
     @MapKeyJoinColumn(name = "idAdditionalRequirement")
     @JoinColumn(name = "idAccount")
     @Column(name = "idAdditionalRequirementValue")
     @Convert(attributeName = "key", converter = AdditionalRequirementIdConverter.class)
     private Map<AdditionalRequirement, Integer> additionalRequirementList;
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Order order = (Order) o;
+
+        if (!customer.equals(order.customer)) return false;
+        if (taxiDriver != null ? !taxiDriver.equals(order.taxiDriver) : order.taxiDriver != null) return false;
+        if (!startTime.equals(order.startTime)) return false;
+        if (!startPoint.equals(order.startPoint)) return false;
+        if (!endPoint.equals(order.endPoint)) return false;
+        if (!price.equals(order.price)) return false;
+        if (orderStatus != order.orderStatus) return false;
+        return additionalRequirementList.equals(order.additionalRequirementList);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = customer.hashCode();
+        result = 31 * result + (taxiDriver != null ? taxiDriver.hashCode() : 0);
+        result = 31 * result + startTime.hashCode();
+        result = 31 * result + startPoint.hashCode();
+        result = 31 * result + endPoint.hashCode();
+        result = 31 * result + price.hashCode();
+        result = 31 * result + orderStatus.hashCode();
+        result = 31 * result + additionalRequirementList.hashCode();
+        return result;
+    }
 }
