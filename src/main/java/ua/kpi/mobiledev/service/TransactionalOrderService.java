@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.Order;
-import ua.kpi.mobiledev.domain.OrderStatusManager;
+import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.repository.OrderRepository;

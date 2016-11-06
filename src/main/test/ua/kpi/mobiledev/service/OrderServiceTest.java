@@ -6,10 +6,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
+import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
+import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionManager;
 import ua.kpi.mobiledev.repository.OrderRepository;
 
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
 import java.util.Collections;
 

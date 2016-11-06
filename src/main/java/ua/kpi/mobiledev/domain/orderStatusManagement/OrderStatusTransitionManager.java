@@ -1,4 +1,7 @@
-package ua.kpi.mobiledev.domain;
+package ua.kpi.mobiledev.domain.orderStatusManagement;
+
+import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.User;
 
 import java.text.MessageFormat;
 import java.util.Map;
@@ -6,7 +9,7 @@ import java.util.Map;
 /**
  * Created by Oleg on 06.11.2016.
  */
-public class OrderStatusTransitionManager implements OrderStatusManager{
+public class OrderStatusTransitionManager implements OrderStatusManager {
 
     private Map<User.UserType, Map<Order.OrderStatus, OrderStatusTransition>> permittedTransitions;
 
