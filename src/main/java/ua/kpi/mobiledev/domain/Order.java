@@ -58,7 +58,7 @@ public class Order {
     @MapKeyJoinColumn(name = "idAdditionalRequirement")
     @JoinColumn(name = "idAccount")
     @Column(name = "idAdditionalRequirementValue")
-    @Convert(converter = AdditionalRequirementIdConverter.class)
+    @Convert(attributeName = "key", converter = AdditionalRequirementIdConverter.class)
     private Map<AdditionalRequirement, Integer> additionalRequirementList;
 
 }
