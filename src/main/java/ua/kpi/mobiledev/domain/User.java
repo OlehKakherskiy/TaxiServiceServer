@@ -19,7 +19,7 @@ import java.util.List;
 @Table(name = "User")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "userType")
-@DiscriminatorValue("Customer")
+@DiscriminatorValue("CUSTOMER")
 public class User {
 
     @Id
@@ -34,6 +34,15 @@ public class User {
     @Column(name = "email")
     @NotNull
     private String email;
+
+    public enum UserType {
+        CUSTOMER,
+
+        TAXI_DRIVER
+    }
+
+    @Column(name = "userType", insertable = false, updatable = false)
+    private UserType userType;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private List<MobileNumber> mobileNumbers;

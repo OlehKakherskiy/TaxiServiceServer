@@ -13,7 +13,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Entity
-@DiscriminatorValue("TaxiDriver")
+@DiscriminatorValue("TAXI_DRIVER")
 public class TaxiDriver extends User {
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -21,7 +21,7 @@ public class TaxiDriver extends User {
     private Car car;
 
     public TaxiDriver(Integer id, String name, String email, List<MobileNumber> mobileNumbers, @NonNull Car car) {
-        super(id, name, email, mobileNumbers);
+        super(id, name, email, UserType.TAXI_DRIVER, mobileNumbers);
         this.car = car;
     }
 }
