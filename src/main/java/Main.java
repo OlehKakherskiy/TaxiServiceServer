@@ -20,7 +20,7 @@ public class Main {
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
-        User user = new User(null, "name", "email", new ArrayList<>());
+        User user = new User(null, "name", "email", User.UserType.CUSTOMER, new ArrayList<>());
         user.getMobileNumbers().addAll(Arrays.asList(new MobileNumber(null, "+380935705681", user), new MobileNumber(null, "+380975106619", user)));
         System.out.println("user before persist = " + user);
         em.persist(user);
