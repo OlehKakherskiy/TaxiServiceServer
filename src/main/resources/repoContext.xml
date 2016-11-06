@@ -12,6 +12,12 @@
 
     <context:component-scan base-package="ua.kpi.mobiledev.repository"/>
 
+    <bean id="additionalRequirements" class="java.util.HashSet">
+        <constructor-arg>
+            <set></set>
+        </constructor-arg>
+    </bean>
+
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${driver}"/>
         <property name="url" value="${url}"/>
