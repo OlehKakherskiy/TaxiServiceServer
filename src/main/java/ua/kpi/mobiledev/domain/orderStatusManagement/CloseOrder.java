@@ -8,7 +8,7 @@ import ua.kpi.mobiledev.domain.User;
  */
 public class CloseOrder implements OrderStatusTransition {
     @Override
-    public Order changeOrderStatus(Order order, User user, Order.OrderStatus orderStatus) {
+    public Order changeOrderStatus(Order order, User user) {
         order.setOrderStatus(Order.OrderStatus.CANCELLED);
         return order;
     }

@@ -10,7 +10,7 @@ import ua.kpi.mobiledev.domain.User;
 public class AcceptOrderServicing implements OrderStatusTransition {
 
     @Override
-    public Order changeOrderStatus(Order order, User user, Order.OrderStatus orderStatus) {
+    public Order changeOrderStatus(Order order, User user) {
         order.setTaxiDriver((TaxiDriver) user);
         order.setOrderStatus(Order.OrderStatus.ACCEPTED);
         return order;

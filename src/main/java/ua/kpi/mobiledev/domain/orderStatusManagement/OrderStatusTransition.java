@@ -8,5 +8,5 @@ import ua.kpi.mobiledev.domain.User;
  */
 public interface OrderStatusTransition {
 
-    Order changeOrderStatus(Order order, User user, Order.OrderStatus orderStatus);
+    Order changeOrderStatus(Order order, User user);
 }
