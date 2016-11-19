@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.Order;
-import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
+import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.repository.OrderRepository;
 
 import java.util.Collections;
@@ -78,8 +78,18 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
-    public Boolean deleteOrder(Long orderId) {
-        return null;
+    public Boolean deleteOrder(Long orderId, Integer userId) {
+        Order order = getOrder(orderId);
+        if (isUserOwner(order, userId)) {
+            orderRepository.delete(order);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isUserOwner(Order order, Integer userId) {
+        return Integer.compare(userId, order.getCustomer().getId()) == 0;
     }
 
     @Override

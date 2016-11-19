@@ -2,9 +2,11 @@ package ua.kpi.mobiledev.service;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import ua.kpi.mobiledev.domain.*;
+import ua.kpi.mobiledev.domain.Car;
+import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.TaxiDriver;
+import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionManager;
@@ -143,8 +145,38 @@ public class OrderServiceTest {
     }
 
     @Test
-    @Ignore
     public void deleteOrder() throws Exception {
+        Order order = mock(Order.class);
+        User mockCustomer = mock(User.class);
+        when(mockCustomer.getId()).thenReturn(1);
+        when(order.getCustomer()).thenReturn(mockCustomer);
+
+        OrderRepository orderRepository = mock(OrderRepository.class);
+        when(orderRepository.findOne(1L)).thenReturn(order);
+        OrderService orderService = new TransactionalOrderService(orderRepository, null, null, null);
+
+        Assert.assertTrue(orderService.deleteOrder(1L, 1));
+        verify(order).getCustomer();
+        verify(mockCustomer).getId();
+        verify(orderRepository).findOne(1L);
+        verify(orderRepository).delete(order);
+    }
+
+    @Test
+    public void deleteOrder_UserHasNoRights() throws Exception {
+        Order order = mock(Order.class);
+        User mockCustomer = mock(User.class);
+        when(mockCustomer.getId()).thenReturn(2);
+        when(order.getCustomer()).thenReturn(mockCustomer);
+
+        OrderRepository orderRepository = mock(OrderRepository.class);
+        when(orderRepository.findOne(1L)).thenReturn(order);
+        OrderService orderService = new TransactionalOrderService(orderRepository, null, null, null);
+
+        Assert.assertFalse(orderService.deleteOrder(1L, 1));
+        verify(order).getCustomer();
+        verify(mockCustomer).getId();
+        verify(orderRepository).findOne(1L);
     }
 
     @Test

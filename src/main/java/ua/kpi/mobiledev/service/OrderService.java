@@ -18,7 +18,7 @@ public interface OrderService {
 
     Order getOrder(Long orderId);
 
-    Boolean deleteOrder(Long orderId);
+    Boolean deleteOrder(Long orderId, Integer userId);
 
     Order updateOrder(Long orderId, OrderDto orderDto);
 }
