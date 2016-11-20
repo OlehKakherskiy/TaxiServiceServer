@@ -7,9 +7,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.Map;
 
-/**
- * Created by Oleg on 05.11.2016.
- */
 @Data
 @Setter(AccessLevel.NONE)
 @Entity
@@ -30,5 +27,5 @@ public abstract class AdditionalRequirement {
     @Transient
     private Map<Integer, String> requirementValues;
 
-    public abstract void addPrice(Order order, Integer requirementValue);
+    public abstract double addPrice(Double basicPrice, Integer requirementValue);
 }

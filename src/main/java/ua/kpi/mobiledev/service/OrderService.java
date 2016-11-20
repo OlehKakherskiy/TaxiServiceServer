@@ -2,15 +2,15 @@ package ua.kpi.mobiledev.service;
 
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
+import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 
 import java.util.List;
 
-/**
- * Created by Oleg on 06.11.2016.
- */
 public interface OrderService {
 
     Order addOrder(OrderDto orderDto);
+
+    Double calculatePrice(OrderPriceDto orderPriceDto);
 
     Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus);
 

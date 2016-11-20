@@ -1,35 +1,31 @@
 package ua.kpi.mobiledev.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
+import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.repository.OrderRepository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.MessageFormat;
+import java.util.*;
 
-/**
- * Created by Oleg on 06.11.2016.
- */
-@Service
 public class TransactionalOrderService implements OrderService {
 
     private OrderRepository orderRepository;
 
     private UserService userService;
 
-    private Set<AdditionalRequirement> additionalRequirements;
+    private Map<Integer, AdditionalRequirement> additionalRequirements;
 
     private OrderStatusManager orderStatusManager;
 
+    private Integer kmPrice;
+
     @Autowired
-    public TransactionalOrderService(OrderRepository orderRepository, UserService userService, Set<AdditionalRequirement> additionalRequirements, OrderStatusManager orderStatusManager) {
+    public TransactionalOrderService(OrderRepository orderRepository, UserService userService, Map<Integer, AdditionalRequirement> additionalRequirements, OrderStatusManager orderStatusManager) {
         this.orderRepository = orderRepository;
         this.userService = userService;
         this.additionalRequirements = additionalRequirements;
@@ -42,24 +38,54 @@ public class TransactionalOrderService implements OrderService {
         if (user.getUserType() == User.UserType.TAXI_DRIVER) {
             throw new IllegalArgumentException("Taxi driver can't add order");
         }
+        OrderPriceDto orderPriceDto = Objects.requireNonNull(orderDto.getOrderPrice(), "There's no data for order price calculation");
         Order order = new Order(null, user, null, orderDto.getStartTime(),
                 orderDto.getStartPoint(), orderDto.getEndPoint(),
-                calculateOrderPrice(orderDto),
+                calculatePrice(orderPriceDto),
                 Order.OrderStatus.NEW,
-                getAdditionalRequirementMap(orderDto));
+                getAdditionalRequirementMap(orderPriceDto));
         return orderRepository.save(order);
     }
 
-    private double calculateOrderPrice(OrderDto orderDto) {
-        return 0.0; //TODO: change implementation
+    @Override
+    public Double calculatePrice(OrderPriceDto orderPriceDto) {
+        double basicPrice = orderPriceDto.getDistance() * kmPrice;
+        double extraPrice = getAdditionalRequirementMap(orderPriceDto).entrySet()
+                .stream()
+                .map(reqEntry -> reqEntry.getKey().addPrice(basicPrice, reqEntry.getValue()))
+                .reduce(Double::sum).orElse(0.0);
+        return basicPrice + extraPrice;
     }
 
-    private Map<AdditionalRequirement, Integer> getAdditionalRequirementMap(OrderDto orderDto) {
-        if (orderDto.getAdditionalRequestValueMap() != null && orderDto.getAdditionalRequestValueMap().size() != 0) {
+    private Map<AdditionalRequirement, Integer> getAdditionalRequirementMap(OrderPriceDto orderPriceDto) {
+        if (Objects.isNull(orderPriceDto)) {
+            return Collections.emptyMap();
+        }
+        Map<Integer, Integer> orderRequirements = orderPriceDto.getAdditionalRequestValueMap();
+        if (Objects.nonNull(orderRequirements) && !orderRequirements.isEmpty()) {
             return Collections.emptyMap();
         } else {
-            return Collections.emptyMap(); //TODO: change implementation
+            Map<AdditionalRequirement, Integer> result = new HashMap<>();
+            for (Map.Entry<Integer, Integer> orderRequirement : orderRequirements.entrySet()) {
+                AdditionalRequirement additionalRequirement = convertToRequirement(orderRequirement.getKey());
+                if (isValidRequirementValueId(additionalRequirement, orderRequirement.getValue())) {
+                    result.put(additionalRequirement, orderRequirement.getValue());
+                }
+            }
+            return result;
         }
+    }
+
+    private AdditionalRequirement convertToRequirement(Integer requirementId) {
+        return Objects.requireNonNull(additionalRequirements.get(requirementId),
+                MessageFormat.format("Illegal requirement id. Id = {0}", requirementId));
+    }
+
+    private boolean isValidRequirementValueId(AdditionalRequirement additionalRequirement, Integer reqValueId) {
+        Objects.requireNonNull(additionalRequirement.getRequirementValues().get(reqValueId),
+                MessageFormat.format("There's no value id in additional requirement with id={0}. Value id={1}",
+                        additionalRequirement.getId(), reqValueId));
+        return true;
     }
 
     @Override
@@ -95,11 +121,14 @@ public class TransactionalOrderService implements OrderService {
     @Override
     public Order updateOrder(Long orderId, OrderDto orderDto) {
         Order order = findOrder(orderId);
-        order.setStartTime((orderDto.getStartTime() != null) ? orderDto.getStartTime() : order.getStartTime());
-        order.setStartPoint((orderDto.getStartPoint() != null) ? orderDto.getStartPoint() : order.getStartPoint());
-        order.setEndPoint((orderDto.getEndPoint() != null) ? orderDto.getEndPoint() : order.getEndPoint());
-        Map<AdditionalRequirement, Integer> addReqs = getAdditionalRequirementMap(orderDto);
-        order.setAdditionalRequirementList((!addReqs.isEmpty()) ? addReqs : order.getAdditionalRequirementList());
+        order.setStartTime(Objects.isNull(orderDto.getStartTime()) ? order.getStartTime() : orderDto.getStartTime());
+        order.setStartPoint(Objects.isNull(orderDto.getStartPoint()) ? order.getStartPoint() : orderDto.getStartPoint());
+        order.setEndPoint(Objects.isNull(orderDto.getEndPoint()) ? order.getEndPoint() : orderDto.getEndPoint());
+        OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
+        if (!Objects.isNull(orderPriceDto)) {
+            order.setPrice(calculatePrice(orderPriceDto));
+            order.setAdditionalRequirementList(getAdditionalRequirementMap(orderDto.getOrderPrice()));
+        }
         orderRepository.save(order);
         return order;
     }
@@ -110,5 +139,9 @@ public class TransactionalOrderService implements OrderService {
 
     private Order findOrder(Long orderId) {
         return orderRepository.findOne(orderId);
+    }
+
+    public void setKmPrice(Integer kmPrice) {
+        this.kmPrice = kmPrice;
     }
 }

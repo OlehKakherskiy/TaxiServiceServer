@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="repoContext.xml"/>
+    <context:component-scan base-package="ua.kpi.mobiledev.service"/>
+    <context:component-scan base-package="ua.kpi.mobiledev.domain"/>
+    <context:property-placeholder system-properties-mode="OVERRIDE"
+                                  location="classpath:app.properties, classpath:addRequirement.properties"
+                                  ignore-unresolvable="true"/>
+
+    <bean id="orderService" class="ua.kpi.mobiledev.service.TransactionalOrderService">
+        <property name="kmPrice" value="${kmPrice}"/>
+    </bean>
+
+    <bean id="additionalRequirements" class="java.util.HashMap"/>
+
+</beans>

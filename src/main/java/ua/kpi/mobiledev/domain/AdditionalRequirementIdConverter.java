@@ -1,19 +1,19 @@
 package ua.kpi.mobiledev.domain;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-/**
- * Created by Oleg on 05.11.2016.
- */
 @Converter
-public class AdditionalRequirementIdConverter implements AttributeConverter<AdditionalRequirement, Integer> {
+public class AdditionalRequirementIdConverter implements AttributeConverter<AdditionalRequirement, Integer>, ApplicationContextAware {
 
-    @Autowired
-    List<AdditionalRequirement> additionalRequirementList;
+    private ApplicationContext applicationContext;
 
     @Override
     public Integer convertToDatabaseColumn(AdditionalRequirement attribute) {
@@ -22,6 +22,12 @@ public class AdditionalRequirementIdConverter implements AttributeConverter<Addi
 
     @Override
     public AdditionalRequirement convertToEntityAttribute(Integer dbData) {
-        return additionalRequirementList.stream().filter(req -> req.getId().equals(dbData)).findFirst().orElse(null);
+        Map<Integer, AdditionalRequirement> additionalRequirements = applicationContext.getBean("additionalRequirements", Map.class);
+        return Optional.of(additionalRequirements.get(dbData)).orElseThrow(RuntimeException::new);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

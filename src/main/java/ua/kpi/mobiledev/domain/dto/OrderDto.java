@@ -2,14 +2,9 @@ package ua.kpi.mobiledev.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
-/**
- * Created by Oleg on 06.11.2016.
- */
 @Getter
 @AllArgsConstructor
 public class OrderDto {
@@ -22,5 +17,5 @@ public class OrderDto {
 
     private String endPoint;
 
-    private Map<Integer, Integer> additionalRequestValueMap;
+    private OrderPriceDto orderPrice;
 }

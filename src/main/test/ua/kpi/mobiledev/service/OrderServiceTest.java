@@ -8,6 +8,7 @@ import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
+import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionManager;
 import ua.kpi.mobiledev.repository.OrderRepository;
@@ -18,9 +19,6 @@ import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
-/**
- * Created by Oleg on 06.11.2016.
- */
 public class OrderServiceTest {
 
     private static LocalDateTime NOW;
@@ -35,19 +33,19 @@ public class OrderServiceTest {
 
     @Test
     public void addOrder() throws Exception {
-
         LocalDateTime now = LocalDateTime.now();
-        OrderDto orderDto = new OrderDto(1, now, "start", "end", Collections.emptyMap());
+        OrderDto orderDto = new OrderDto(1, now, "start", "end", new OrderPriceDto(5.0, Collections.emptyMap()));
         User mockUser = mock(User.class);
-        Order targetOrder = new Order(null, mockUser, null, now, "start", "end", 0.0, Order.OrderStatus.NEW, Collections.emptyMap());
-        Order expectedOrder = new Order(1L, mockUser, null, now, "start", "end", 0.0, Order.OrderStatus.NEW, Collections.emptyMap());
+        Order targetOrder = new Order(null, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
+        Order expectedOrder = new Order(1L, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
 
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.save(targetOrder)).thenReturn(expectedOrder);
         UserService userService = mock(UserService.class);
         when(userService.getUser(1)).thenReturn(mockUser);
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptySet(), mock(OrderStatusTransitionManager.class));
+        TransactionalOrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
+        orderService.setKmPrice(5);
         Assert.assertEquals(expectedOrder, orderService.addOrder(orderDto));
         verify(userService).getUser(1);
         verify(orderRepository).save(targetOrder);
@@ -56,15 +54,14 @@ public class OrderServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void addOrder_TaxiDriverIsOwner() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        OrderDto orderDto = new OrderDto(1, now, "start", "end", Collections.emptyMap());
+        OrderDto orderDto = new OrderDto(1, now, "start", "end", mock(OrderPriceDto.class));
 
         UserService userService = mock(UserService.class);
         when(userService.getUser(1)).thenReturn(new TaxiDriver(1, "", "", Collections.emptyList(), mock(Car.class)));
 
-        OrderService orderService = new TransactionalOrderService(mock(OrderRepository.class), userService, Collections.emptySet(), mock(OrderStatusTransitionManager.class));
+        OrderService orderService = new TransactionalOrderService(mock(OrderRepository.class), userService, Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         orderService.addOrder(orderDto);
     }
-
 
     @Test
     public void changeOrderStatus() throws Exception {
@@ -80,7 +77,7 @@ public class OrderServiceTest {
         OrderStatusTransitionManager transitionManager = mock(OrderStatusTransitionManager.class);
         when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenReturn(mock(Order.class));
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptySet(), transitionManager);
+        OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptyMap(), transitionManager);
         Assert.assertNotNull(orderService.changeOrderStatus(1L, 1, mockStatus));
 
         verify(orderRepository).findOne(1L);
@@ -102,7 +99,7 @@ public class OrderServiceTest {
         OrderStatusTransitionManager transitionManager = mock(OrderStatusTransitionManager.class);
         when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenThrow(IllegalStateException.class);
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptySet(), transitionManager);
+        OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptyMap(), transitionManager);
         orderService.changeOrderStatus(1L, 1, mockStatus);
     }
 
@@ -120,7 +117,7 @@ public class OrderServiceTest {
         OrderStatusTransitionManager transitionManager = mock(OrderStatusTransitionManager.class);
         when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenThrow(IllegalArgumentException.class);
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptySet(), transitionManager);
+        OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptyMap(), transitionManager);
         orderService.changeOrderStatus(1L, 1, mockStatus);
     }
 
@@ -129,7 +126,7 @@ public class OrderServiceTest {
         Order.OrderStatus mockStatus = Order.OrderStatus.CANCELLED;
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.getAllByOrderStatus(mockStatus)).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
-        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptySet(), mock(OrderStatusTransitionManager.class));
+        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         Assert.assertEquals(2, orderService.getOrderList(mockStatus).size());
         verify(orderRepository).getAllByOrderStatus(mockStatus);
     }
@@ -139,7 +136,7 @@ public class OrderServiceTest {
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.findOne(1L)).thenReturn(mock(Order.class));
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptySet(), mock(OrderStatusTransitionManager.class));
+        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         Assert.assertNotNull(orderService.getOrder(1L));
         verify(orderRepository).findOne(1L);
     }
@@ -189,7 +186,7 @@ public class OrderServiceTest {
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
         when(orderRepository.save(mockOrder)).thenReturn(mockOrder);
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptySet(), mock(OrderStatusManager.class));
+        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusManager.class));
         Assert.assertEquals(expectedOrder, orderService.updateOrder(1L, orderDto));
         verify(orderRepository).findOne(1L);
         verify(orderRepository).save(mockOrder);
@@ -205,10 +202,17 @@ public class OrderServiceTest {
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
         when(orderRepository.save(mockOrder)).thenReturn(mockOrder);
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptySet(), mock(OrderStatusManager.class));
+        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusManager.class));
         Assert.assertEquals(expectedOrder, orderService.updateOrder(1L, orderDto));
         verify(orderRepository).findOne(1L);
         verify(orderRepository).save(mockOrder);
     }
 
+    @Test
+    public void calculatePrice_calculateWithoutAddParams() throws Exception {
+        OrderPriceDto orderPrice = new OrderPriceDto(5.0, Collections.emptyMap());
+        TransactionalOrderService orderService = new TransactionalOrderService(null, null, null, null);
+        orderService.setKmPrice(5);
+        Assert.assertEquals(25.0, orderService.calculatePrice(orderPrice), 1e-7);
+    }
 }
