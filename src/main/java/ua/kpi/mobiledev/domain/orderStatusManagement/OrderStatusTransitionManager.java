@@ -1,21 +1,50 @@
 package ua.kpi.mobiledev.domain.orderStatusManagement;
 
+import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Created by Oleg on 06.11.2016.
- */
+@Component
 public class OrderStatusTransitionManager implements OrderStatusManager {
+
+    private static Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> defaultTransitionConfig;
+
+    static {
+        Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> customerTransitions = new HashMap<>();
+        Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> taxiDriverTransitions = new HashMap<>();
+        defaultTransitionConfig = new HashMap<>();
+
+        defaultTransitionConfig.put(User.UserType.CUSTOMER, customerTransitions);
+        defaultTransitionConfig.put(User.UserType.TAXI_DRIVER, taxiDriverTransitions);
+
+        Map<Order.OrderStatus, OrderStatusTransition> customerFromNewTransitions = new HashMap<>();
+        customerFromNewTransitions.put(Order.OrderStatus.CANCELLED, new CloseOrder());
+        Map<Order.OrderStatus, OrderStatusTransition> customerFromAcceptedTransitions = new HashMap<>();
+        customerFromAcceptedTransitions.put(Order.OrderStatus.CANCELLED, new CloseOrder());
+
+        customerTransitions.put(Order.OrderStatus.NEW, customerFromNewTransitions);
+        customerTransitions.put(Order.OrderStatus.ACCEPTED, customerFromAcceptedTransitions);
+
+        Map<Order.OrderStatus, OrderStatusTransition> taxiDriverFromNewTransitions = new HashMap<>();
+        taxiDriverFromNewTransitions.put(Order.OrderStatus.ACCEPTED, new AcceptOrderServicing());
+
+        Map<Order.OrderStatus, OrderStatusTransition> taxiDriverFromAcceptedTransitions = new HashMap<>();
+        taxiDriverFromAcceptedTransitions.put(Order.OrderStatus.DONE, new MarkOrderAsDone());
+        taxiDriverFromAcceptedTransitions.put(Order.OrderStatus.NEW, new RefuseOrderServicing());
+
+        taxiDriverTransitions.put(Order.OrderStatus.NEW, taxiDriverFromNewTransitions);
+        taxiDriverTransitions.put(Order.OrderStatus.ACCEPTED, taxiDriverFromAcceptedTransitions);
+    }
 
     private Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> permittedTransitions;
 
     public OrderStatusTransitionManager(Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> permittedTransitions) {
-        this.permittedTransitions = permittedTransitions;
+        this.permittedTransitions = Objects.isNull(permittedTransitions) ? defaultTransitionConfig : permittedTransitions;
     }
 
     @Override
