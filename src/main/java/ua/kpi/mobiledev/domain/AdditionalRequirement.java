@@ -1,15 +1,15 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Map;
 
-@Data
 @Setter(AccessLevel.NONE)
 @Entity
+@EqualsAndHashCode(exclude = "id")
+@ToString
+@Getter
 @Table(name = "additionalRequirement")
 public abstract class AdditionalRequirement {
 
@@ -19,13 +19,22 @@ public abstract class AdditionalRequirement {
     private Integer id;
 
     @Transient
-    private String requirementName;
+    protected String requirementName;
 
     @Transient
     private String priceDescription;
 
     @Transient
-    private Map<Integer, String> requirementValues;
+    protected Map<Integer, String> requirementValues;
+
+    public AdditionalRequirement() {
+    }
+
+    public AdditionalRequirement(String requirementName, String priceDescription, Map<Integer, String> requirementValues) {
+        this.requirementName = requirementName;
+        this.priceDescription = priceDescription;
+        this.requirementValues = requirementValues;
+    }
 
     public abstract double addPrice(Double basicPrice, Integer requirementValue);
 }
