@@ -2,8 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="repoContext.xml"/>
     <context:component-scan base-package="ua.kpi.mobiledev.service"/>
@@ -18,4 +20,40 @@
 
     <bean id="additionalRequirements" class="java.util.HashMap"/>
 
+    <bean id="carTypeAddRequirement"
+          class="ua.kpi.mobiledev.domain.additionalRequirements.CarTypeAdditionalRequirement">
+        <constructor-arg name="requirementName" value="${carTypeRequirement.name}"/>
+        <constructor-arg name="priceDescription" value="${carTypeRequirement.priceDescription}"/>
+        <constructor-arg name="requirementValues" ref="carTypeReqValues"/>
+        <constructor-arg name="multiplyCoefficients" ref="multiplyCoefficients"/>
+    </bean>
+
+    <util:map id="carTypeReqValues" key-type="java.lang.Integer" value-type="java.lang.String">
+        <entry key="1" value="Truck"/>
+        <entry key="2" value="PassengerCar"/>
+        <entry key="3" value="Minibus"/>
+    </util:map>
+
+    <util:map id="multiplyCoefficients" key-type="ua.kpi.mobiledev.domain.Car.CarType" value-type="java.lang.Double">
+        <entry key="TRUCK" value="${carType.truckPriceMultiplication}"/>
+        <entry key="PASSENGER_CAR" value="${carType.passengerCarMultiplication}"/>
+        <entry key="MINIBUS" value="${carType.minibusMultiplication}"/>
+    </util:map>
+
+    <bean id="paymentTypeAddRequirement"
+          class="ua.kpi.mobiledev.domain.additionalRequirements.PaymentTypeAdditionalRequirement">
+        <constructor-arg name="requirementName" value="${paymentTypeRequirement.name}"/>
+        <constructor-arg name="priceDescription" value="${paymenTypeRequirement.priceDescription}"/>
+        <constructor-arg name="requirementValues" ref="paymentTypeValues"/>
+        <constructor-arg name="paymentTypeExtraPrice" ref="paymentTypeExtraPrice"/>
+    </bean>
+
+    <util:map id="paymentTypeValues" key-type="java.lang.Integer" value-type="java.lang.String">
+        <entry key="1" value="Yes"/>
+        <entry key="2" value="No"/>
+    </util:map>
+    <util:map id="paymentTypeExtraPrice" key-type="java.lang.Integer" value-type="java.lang.Integer">
+        <entry key="1" value="${paymentTypeExtraPrice.cardPayment}"/>
+        <entry key="2" value="${paymentTypeExtraPrice.cashPayment}"/>
+    </util:map>
 </beans>
