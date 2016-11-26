@@ -36,5 +36,5 @@ public abstract class AdditionalRequirement {
         this.requirementValues = requirementValues;
     }
 
-    public abstract double addPrice(Double basicPrice, Integer requirementValue);
+    public abstract double addPrice(Double basicPrice, Integer requirementValueId);
 }
