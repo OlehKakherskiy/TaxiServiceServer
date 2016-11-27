@@ -122,13 +122,22 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void getOrderList() throws Exception {
+    public void getOrderList_FilterByOrderStatus() throws Exception {
         Order.OrderStatus mockStatus = Order.OrderStatus.CANCELLED;
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.getAllByOrderStatus(mockStatus)).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
         OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         Assert.assertEquals(2, orderService.getOrderList(mockStatus).size());
         verify(orderRepository).getAllByOrderStatus(mockStatus);
+    }
+
+    @Test
+    public void getOrderList_withoutFilteringByStatus() throws Exception {
+        OrderRepository orderRepository = mock(OrderRepository.class);
+        when(orderRepository.findAll()).thenReturn(Arrays.asList(mock(Order.class)));
+        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
+        Assert.assertEquals(1, orderService.getOrderList(null).size());
+        verify(orderRepository).findAll();
     }
 
     @Test
