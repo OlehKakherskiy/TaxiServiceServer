@@ -21,4 +21,10 @@ public class ErrorControllerAdvice {
                         .map(FieldError::of)
                         .collect(Collectors.toList()));
     }
+
+    @RequestMapping(produces = "application/json")
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorMessage> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(new ErrorMessage(ex.getLocalizedMessage()));
+    }
 }
