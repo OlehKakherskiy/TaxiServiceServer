@@ -102,6 +102,8 @@ Request body:
 ```
 /order/{orderStatus}
 ```
+**orderStatus** = NEW/ACCEPTED/CANCELLED/DONE/ALL
+
 Request type: GET
 
 Response:
@@ -112,7 +114,8 @@ Response:
     "startTime" : "DateTime",
     "startPoint" : "String",
     "endPoint" : "String",
-    "price" : "Double"
+    "price" : "Double",
+    "status":"NEW/ACCEPTED/CANCELLED/DONE"
 }]
 ```
 **NOTES:**
@@ -142,11 +145,10 @@ Response:
         "name" : "String"
     },
     "price" : "Double",
-    "additionalRequirements" : [
-        {"id" : "Integer",
-        "name" : "String",
-        "description" : "String"
-        }]
+    "additionalRequirements" : [{  
+        "reqId" : "Integer",
+        "reqValueId":"Integer"
+    }]
 }
 ```
 **NOTES**
