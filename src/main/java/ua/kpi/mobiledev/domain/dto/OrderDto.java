@@ -1,9 +1,13 @@
 package ua.kpi.mobiledev.domain.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeDeserializer;
+import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeSerializer;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
@@ -35,6 +39,8 @@ public class OrderDto {
     @Min(0)
     private Integer customerId;
 
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     @NotNull
     @Future
     private LocalDateTime startTime;

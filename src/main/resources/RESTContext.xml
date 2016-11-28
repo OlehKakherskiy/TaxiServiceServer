@@ -11,7 +11,10 @@
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <mvc:annotation-driven/>
-    <context:component-scan base-package="ua.kpi.mobiledev.web"/>
+    <context:component-scan base-package="ua.kpi.mobiledev.web.сontroller"/>
+    <context:component-scan base-package="ua.kpi.mobiledev.web.validators"/>
+    <context:component-scan base-package="ua.kpi.mobiledev.web.exceptionHandling"/>
+
 
     <bean id="orderPriceDtoValidator" class="ua.kpi.mobiledev.web.validators.OrderPriceDtoValidator"/>
 
