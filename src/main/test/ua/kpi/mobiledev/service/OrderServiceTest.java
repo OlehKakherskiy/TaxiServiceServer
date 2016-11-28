@@ -34,7 +34,7 @@ public class OrderServiceTest {
     @Test
     public void addOrder() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        OrderDto orderDto = new OrderDto(1, now, "start", "end", new OrderPriceDto(5.0, Collections.emptyMap()));
+        OrderDto orderDto = new OrderDto(1, now, "start", "end", new OrderPriceDto(5.0, Collections.emptyMap()), 0.0);
         User mockUser = mock(User.class);
         Order targetOrder = new Order(null, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
         Order expectedOrder = new Order(1L, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
@@ -54,7 +54,7 @@ public class OrderServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void addOrder_TaxiDriverIsOwner() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        OrderDto orderDto = new OrderDto(1, now, "start", "end", mock(OrderPriceDto.class));
+        OrderDto orderDto = new OrderDto(1, now, "start", "end", mock(OrderPriceDto.class), 0.0);
 
         UserService userService = mock(UserService.class);
         when(userService.getUser(1)).thenReturn(new TaxiDriver(1, "", "", Collections.emptyList(), mock(Car.class)));
@@ -132,6 +132,15 @@ public class OrderServiceTest {
     }
 
     @Test
+    public void getOrderList_ignoringOrderStatus() throws Exception{
+        OrderRepository orderRepository = mock(OrderRepository.class);
+        when(orderRepository.getAllByOrderStatus(null)).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
+        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
+        Assert.assertEquals(2, orderService.getOrderList(mockStatus).size());
+        verify(orderRepository).getAllByOrderStatus(null);
+    }
+
+    @Test
     public void getOrder() throws Exception {
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.findOne(1L)).thenReturn(mock(Order.class));
@@ -139,6 +148,15 @@ public class OrderServiceTest {
         OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         Assert.assertNotNull(orderService.getOrder(1L));
         verify(orderRepository).findOne(1L);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getOrder_NoOrderWithId() throws Exception {
+        OrderRepository orderRepository = mock(OrderRepository.class);
+        when(orderRepository.findOne(1L)).thenReturn(null);
+        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class),
+                Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
+        orderService.getOrder(1L);
     }
 
     @Test
@@ -178,7 +196,7 @@ public class OrderServiceTest {
 
     @Test
     public void updateOrder_nothingToChange() throws Exception {
-        OrderDto orderDto = new OrderDto(null, null, null, null, null);
+        OrderDto orderDto = new OrderDto(null, null, null, null, null, null);
         Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
         Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
 
@@ -194,7 +212,7 @@ public class OrderServiceTest {
 
     @Test
     public void updateOrder_willBeChanged() throws Exception {
-        OrderDto orderDto = new OrderDto(null, NOW, "start", "end", null);
+        OrderDto orderDto = new OrderDto(null, NOW, "start", "end", null, null);
         Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
         Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "start", "end", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
 
