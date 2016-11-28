@@ -100,7 +100,7 @@ Request body:
 ###Order API
 **_1. Get all orders (by type)_**
 ```
-/order/{orderStatus}
+/order?orderStatus='actualOrderStatus'
 ```
 **orderStatus** = NEW/ACCEPTED/CANCELLED/DONE/ALL
 
