@@ -95,12 +95,22 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public List<Order> getOrderList(Order.OrderStatus orderStatus) {
-        return orderRepository.getAllByOrderStatus(orderStatus);
+        return Objects.isNull(orderStatus) ? mapToList(orderRepository.findAll()) : orderRepository.getAllByOrderStatus(orderStatus);
+    }
+
+    private List<Order> mapToList(Iterable<Order> all) {
+        List<Order> orders = new ArrayList<>();
+        all.forEach(orders::add);
+        return orders;
     }
 
     @Override
     public Order getOrder(Long orderId) {
-        return orderRepository.findOne(orderId);
+        Order order = orderRepository.findOne(orderId);
+        if (Objects.isNull(order)) {
+            throw new IllegalArgumentException(MessageFormat.format("Order with id = '{0}' doesn't exist", orderId));
+        }
+        return order;
     }
 
     @Override
