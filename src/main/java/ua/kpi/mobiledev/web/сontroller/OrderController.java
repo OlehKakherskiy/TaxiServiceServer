@@ -1,6 +1,5 @@
 package ua.kpi.mobiledev.web.сontroller;
 
-//import org.modelmapper.ModelMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,12 +18,22 @@ import ua.kpi.mobiledev.service.OrderService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
 public class OrderController {
+
+    private static String VALID_ORDER_STATUSES;
+
+    static {
+        VALID_ORDER_STATUSES = Arrays.stream(Order.OrderStatus.values())
+                .map(Order.OrderStatus::name)
+                .collect(Collectors.joining(","));
+    }
 
     private OrderService orderService;
 
@@ -56,14 +65,14 @@ public class OrderController {
         return Objects.nonNull(price) ? ResponseEntity.ok(price) : new ResponseEntity<>(-1.0, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @RequestMapping(value = "/order/{orderId}/status")
+    @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)
     public HttpStatus changeOrderStatus(@Valid OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
         Order changedStatusOrder = orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
         return Objects.nonNull(changedStatusOrder) ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
-    @RequestMapping(value = "/order/{orderStatus}")
-    public ResponseEntity<List<OrderDto>> readAllOrders(@NotNull @PathVariable("orderStatus") String orderStatus) {
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public ResponseEntity<List<OrderDto>> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
         String uppercasedOrderStatus = orderStatus.toUpperCase();
         List<OrderDto> orders = (uppercasedOrderStatus.equals("ALL"))
                 ? mapToDto(orderService.getOrderList(null))
@@ -73,7 +82,11 @@ public class OrderController {
     }
 
     private Order.OrderStatus getFromName(String uppercasedOrderStatus) {
-        return Order.OrderStatus.valueOf(uppercasedOrderStatus);
+        try {
+            return Order.OrderStatus.valueOf(uppercasedOrderStatus);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(MessageFormat.format("invalid order status. Can't be {0}. Valid ones: {1}", uppercasedOrderStatus, VALID_ORDER_STATUSES));
+        }
     }
 
     private List<OrderDto> mapToDto(List<Order> orderList) {
