@@ -18,4 +18,8 @@
 
     <bean id="orderPriceDtoValidator" class="ua.kpi.mobiledev.web.validators.OrderPriceDtoValidator"/>
 
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:validatorMessages"/>
+    </bean>
+
 </beans>
