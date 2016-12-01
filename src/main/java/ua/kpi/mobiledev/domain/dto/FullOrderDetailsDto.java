@@ -23,7 +23,7 @@ public class FullOrderDetailsDto {
         }
         orderDetailsDto.price = order.getPrice();
         orderDetailsDto.additionalRequirements = order.getAdditionalRequirementList().entrySet().stream()
-                .map(entry -> new AdditionalRequirementSimpleDto(entry.getKey().getId(), entry.getValue()))
+                .map(entry -> new AddReqSimpleDto(entry.getKey().getId(), entry.getValue()))
                 .collect(Collectors.toList());
         return orderDetailsDto;
     }
@@ -44,6 +44,6 @@ public class FullOrderDetailsDto {
 
     private Double price;
 
-    private List<AdditionalRequirementSimpleDto> additionalRequirements;
+    private List<AddReqSimpleDto> additionalRequirements;
 
 }
