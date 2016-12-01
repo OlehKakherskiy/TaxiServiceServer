@@ -2,9 +2,7 @@ package ua.kpi.mobiledev.domain.dto;
 
 import lombok.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Setter
 @Getter
@@ -20,7 +18,8 @@ public class OrderPriceDto {
 
     public Map<Integer, Integer> paramsToMap() {
         Map<Integer, Integer> map = new HashMap<>();
-        additionalRequirements.forEach(req -> map.put(req.getReqId(), req.getReqValueId()));
+        Optional.ofNullable(additionalRequirements).orElse(Collections.emptyList())
+                .forEach(req -> map.put(req.getReqId(), req.getReqValueId()));
         return map;
     }
 
