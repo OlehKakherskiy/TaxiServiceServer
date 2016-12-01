@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.web.сontroller;
+package ua.kpi.mobiledev.web.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ua.kpi.mobiledev.domain.Order;
-import ua.kpi.mobiledev.domain.dto.FullOrderDetailsDto;
-import ua.kpi.mobiledev.domain.dto.OrderDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
-import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
+import ua.kpi.mobiledev.domain.dto.*;
 import ua.kpi.mobiledev.service.OrderService;
 
 import javax.validation.Valid;
@@ -46,7 +43,7 @@ public class OrderController {
         this.orderPriceDtoValidator = orderPriceDtoValidator;
     }
 
-    @InitBinder
+    @InitBinder("orderPriceDto")
     private void initBinder(WebDataBinder webDataBinder) {
         webDataBinder.setValidator(orderPriceDtoValidator);
     }
@@ -59,10 +56,10 @@ public class OrderController {
                 : HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
-    @RequestMapping(value = "/order/price", method = RequestMethod.GET)
-    public ResponseEntity<Double> calculatePrice(@Validated OrderPriceDto orderPriceDto) {
+    @RequestMapping(value = "/order/price", method = RequestMethod.POST)
+    public ResponseEntity<PriceDto> calculatePrice(@Validated @RequestBody OrderPriceDto orderPriceDto) {
         Double price = orderService.calculatePrice(orderPriceDto);
-        return Objects.nonNull(price) ? ResponseEntity.ok(price) : new ResponseEntity<>(-1.0, HttpStatus.INTERNAL_SERVER_ERROR);
+        return Objects.nonNull(price) ? ResponseEntity.ok(new PriceDto(price)) : new ResponseEntity<>(new PriceDto(price), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)

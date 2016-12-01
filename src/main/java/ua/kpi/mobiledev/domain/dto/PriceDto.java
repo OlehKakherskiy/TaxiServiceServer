@@ -2,12 +2,10 @@ package ua.kpi.mobiledev.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-public class AdditionalRequirementSimpleDto {
-
-    private Integer reqId;
-
-    private Integer reqValueId;
+public class PriceDto {
+    private Double price;
 }
