@@ -224,3 +224,23 @@ Request body:
       "reqValueId" : "Integer"
   }]
 }
+```
+
+**_7. Calculate order price_**
+```
+/order/price
+```
+Request type: **POST**
+
+Request body:
+```json
+{
+  "distance" : "Double",
+  "additionalRequirements":[{
+    "reqId" : "Integer",
+    "reqValueId" : "Integer"
+  }]
+}
+```
+**NOTES**
+* Can be performed only by customer.
