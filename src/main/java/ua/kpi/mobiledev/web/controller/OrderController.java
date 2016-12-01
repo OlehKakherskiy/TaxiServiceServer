@@ -58,8 +58,7 @@ public class OrderController {
 
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
     public ResponseEntity<PriceDto> calculatePrice(@Validated @RequestBody OrderPriceDto orderPriceDto) {
-        Double price = orderService.calculatePrice(orderPriceDto);
-        return Objects.nonNull(price) ? ResponseEntity.ok(new PriceDto(price)) : new ResponseEntity<>(new PriceDto(price), HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(new PriceDto(orderService.calculatePrice(orderPriceDto)));
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)

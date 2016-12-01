@@ -49,7 +49,7 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public Double calculatePrice(OrderPriceDto orderPriceDto) {
-        double basicPrice = orderPriceDto.getDistance() * kmPrice;
+        double basicPrice = Optional.ofNullable(orderPriceDto.getDistance() * kmPrice).orElse(0.0);
         double extraPrice = getAdditionalRequirementMap(orderPriceDto).entrySet()
                 .stream()
                 .map(reqEntry -> reqEntry.getKey().addPrice(basicPrice, reqEntry.getValue()))
@@ -61,8 +61,8 @@ public class TransactionalOrderService implements OrderService {
         if (Objects.isNull(orderPriceDto)) {
             return Collections.emptyMap();
         }
-        Map<Integer, Integer> orderRequirements = orderPriceDto.getAdditionalRequestValueMap();
-        if (Objects.nonNull(orderRequirements) && !orderRequirements.isEmpty()) {
+        Map<Integer, Integer> orderRequirements = orderPriceDto.paramsToMap();
+        if (Objects.nonNull(orderRequirements) && !orderRequirements.isEmpty()) { //todo: WTF is this?
             return Collections.emptyMap();
         } else {
             Map<AdditionalRequirement, Integer> result = new HashMap<>();
