@@ -62,7 +62,7 @@ public class TransactionalOrderService implements OrderService {
             return Collections.emptyMap();
         }
         Map<Integer, Integer> orderRequirements = orderPriceDto.paramsToMap();
-        if (Objects.nonNull(orderRequirements) && !orderRequirements.isEmpty()) { //todo: WTF is this?
+        if (Objects.isNull(orderRequirements) || orderRequirements.isEmpty()) {
             return Collections.emptyMap();
         } else {
             Map<AdditionalRequirement, Integer> result = new HashMap<>();
