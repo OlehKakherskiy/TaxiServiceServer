@@ -244,3 +244,20 @@ Request body:
 ```
 **NOTES**
 * Can be performed only by customer.
+
+
+**EXCEPTION RESPONSE TEMPLATES**
+
+*Request validation error template:*
+```json
+[{
+  "field" : "String",
+  "code"  : "String",
+  "message" : "String"
+}]
+```
+
+*Any other exception:*
+```json
+{"message" : "String"}
+```
