@@ -10,7 +10,7 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <mvc:annotation-driven/>
+    <mvc:annotation-driven conversion-service="conversionService"/>
     <context:component-scan base-package="ua.kpi.mobiledev.web.controller"/>
     <context:component-scan base-package="ua.kpi.mobiledev.web.validators"/>
     <context:component-scan base-package="ua.kpi.mobiledev.web.exceptionHandling"/>
@@ -20,6 +20,14 @@
 
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basename" value="classpath:validatorMessages"/>
+    </bean>
+
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="ua.kpi.mobiledev.web.converter.StringToOrderStatusConverter"/>
+            </set>
+        </property>
     </bean>
 
 </beans>

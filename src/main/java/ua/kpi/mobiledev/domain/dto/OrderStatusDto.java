@@ -1,22 +1,20 @@
 package ua.kpi.mobiledev.domain.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import ua.kpi.mobiledev.domain.Order;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-@Getter
 @AllArgsConstructor
+@Data
 public class OrderStatusDto {
 
-    @NotNull
-    @Min(0)
+    @NotNull(message = "userId.required")
+    @Min(value = 0, message = "userId.negative")
     private Integer userId;
 
-    @NotNull
+    @NotNull(message = "orderStatus.nullOrInvalid")
     private Order.OrderStatus orderStatus;
 
 }
