@@ -26,6 +26,7 @@
         <property name="converters">
             <set>
                 <bean class="ua.kpi.mobiledev.web.converter.StringToOrderStatusConverter"/>
+                <bean class="ua.kpi.mobiledev.web.converter.StringToIntegerConverter"/>
             </set>
         </property>
     </bean>

@@ -62,9 +62,9 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)
-    public HttpStatus changeOrderStatus(@Valid OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
-        Order changedStatusOrder = orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
-        return Objects.nonNull(changedStatusOrder) ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
+    public HttpStatus changeOrderStatus(@Valid @RequestBody OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
+        orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
+        return HttpStatus.OK;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)

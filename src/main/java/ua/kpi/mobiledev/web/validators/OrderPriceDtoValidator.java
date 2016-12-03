@@ -21,20 +21,20 @@ public class OrderPriceDtoValidator implements Validator {
         OrderPriceDto orderPriceDto = (OrderPriceDto) target;
         checkDistance(orderPriceDto, errors);
         Map<Integer, Integer> requirementValueMap = orderPriceDto.paramsToMap();
-        checkSetForNegativeValuesOrZero(requirementValueMap.keySet(), errors, "additionalRequirements.illegalKey");
-        checkSetForNegativeValuesOrZero(new HashSet<>(requirementValueMap.values()), errors, "additionalRequirements.illegalValue");
+        checkSetForNegativeValuesOrZero(requirementValueMap.keySet(), errors, "additionalRequirements.invalidKey");
+        checkSetForNegativeValuesOrZero(new HashSet<>(requirementValueMap.values()), errors, "additionalRequirements.invalidValue");
 
     }
 
     private void checkDistance(OrderPriceDto orderPriceDto, Errors errors) {
         if (Objects.nonNull(orderPriceDto.getDistance()) && orderPriceDto.getDistance() <= 0.0) {
-            errors.rejectValue("distance", "distance.illegalValue");
+            errors.rejectValue("distance", "distance.invalidValue", "distance.invalidValue");
         }
     }
 
     private void checkSetForNegativeValuesOrZero(Set<Integer> values, Errors errors, String errorKey) {
         values.stream().filter(value -> value < 0).findFirst().ifPresent(value -> {
-            errors.rejectValue("additionalRequirements", errorKey);
+            errors.rejectValue("additionalRequirements", errorKey, errorKey);
         });
     }
 }

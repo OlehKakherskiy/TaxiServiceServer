@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.domain.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import ua.kpi.mobiledev.domain.Order;
 
 import javax.validation.constraints.Min;

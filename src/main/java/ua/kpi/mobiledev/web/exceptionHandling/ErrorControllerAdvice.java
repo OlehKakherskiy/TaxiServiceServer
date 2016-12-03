@@ -1,8 +1,10 @@
 package ua.kpi.mobiledev.web.exceptionHandling;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,9 +34,9 @@ public class ErrorControllerAdvice {
                 .collect(Collectors.toList());
     }
 
-    private CustomFieldError toCustomFieldError(org.springframework.validation.FieldError basicFieldError) {
-        return new CustomFieldError(basicFieldError.getField(), basicFieldError.getCode(),
-                messageSource.getMessage(basicFieldError.getCode(), basicFieldError.getArguments(), new Locale("en", "EN")));
+    private CustomFieldError toCustomFieldError(FieldError basicFieldError) {
+        return new CustomFieldError(basicFieldError.getField(), basicFieldError.getDefaultMessage(),
+                messageSource.getMessage(new DefaultMessageSourceResolvable(basicFieldError.getCodes(), basicFieldError.getArguments()), new Locale("en", "EN")));
     }
 
     @RequestMapping(produces = "application/json")
