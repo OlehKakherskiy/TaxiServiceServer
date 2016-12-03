@@ -48,4 +48,10 @@ public class ErrorControllerAdvice {
     public ResponseEntity<ErrorMessage> handleNPE(NullPointerException ex) {
         return ResponseEntity.badRequest().body(new ErrorMessage(ex.getLocalizedMessage()));
     }
+
+    @RequestMapping(produces = "application/json")
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorMessage> handleIllegalArgumentException(IllegalStateException ex) {
+        return ResponseEntity.badRequest().body(new ErrorMessage(ex.getLocalizedMessage()));
+    }
 }
