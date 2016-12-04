@@ -4,8 +4,10 @@ package ua.kpi.mobiledev.web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ua.kpi.mobiledev.domain.Order;
@@ -36,20 +38,27 @@ public class OrderController {
 
     private Validator orderPriceDtoValidator;
 
+    private Validator futureTimeValidator;
 
     @Autowired
-    public OrderController(OrderService orderService, Validator orderPriceDtoValidator) {
+    public OrderController(OrderService orderService, Validator orderPriceDtoValidator, Validator futureTimeValidator) {
         this.orderService = orderService;
         this.orderPriceDtoValidator = orderPriceDtoValidator;
+        this.futureTimeValidator = futureTimeValidator;
     }
 
     @InitBinder("orderPriceDto")
-    private void initBinder(WebDataBinder webDataBinder) {
-        webDataBinder.setValidator(orderPriceDtoValidator);
+    private void initOrderPriceBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(orderPriceDtoValidator);
+    }
+
+    @InitBinder("orderDto")
+    private void initStartTimeBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(futureTimeValidator);
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.POST)
-    public HttpStatus addOrder(@Valid OrderDto orderDto) {
+    public HttpStatus addOrder(@Valid @RequestBody OrderDto orderDto) {
         Order order = orderService.addOrder(orderDto);
         return (Objects.nonNull(order) && Objects.nonNull(order.getOrderId()))
                 ? HttpStatus.OK
@@ -101,7 +110,18 @@ public class OrderController {
 //    } //TODO: implement delete order with security
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.POST)
-    public HttpStatus updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId, OrderDto orderDto) {
-        return Objects.isNull(orderService.updateOrder(orderId, orderDto)) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK;
+    public HttpStatus updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
+                                  @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
+        futureTimeValidator.validate(orderDto, bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new MethodArgumentNotValidException(null, bindingResult);
+        } else {
+            return updateAndOk(orderId, orderDto);
+        }
+    }
+
+    private HttpStatus updateAndOk(Long orderId, OrderDto orderDto) {
+        orderService.updateOrder(orderId, orderDto);
+        return HttpStatus.OK;
     }
 }

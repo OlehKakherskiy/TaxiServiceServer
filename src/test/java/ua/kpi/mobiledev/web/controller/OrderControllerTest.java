@@ -12,11 +12,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
+import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
 import ua.kpi.mobiledev.service.OrderService;
@@ -345,5 +345,41 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.message").value("Exception message"));
         verify(orderService).changeOrderStatus(1L, 1, Order.OrderStatus.ACCEPTED);
         verifyNoMoreInteractions(orderService);
+    }
+
+    @Test
+    public void updateOrder() throws Exception {
+        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", null, null);
+        when(orderService.updateOrder(1L, orderDto)).thenReturn(new Order());
+        mockMvc.perform(post("/order/1")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JsonMapper.toJson(orderDto)))
+                .andExpect(status().isOk());
+        verify(orderService).updateOrder(1L, orderDto);
+    }
+
+    @Test
+    public void updateOrder_InvalidStartTime() throws Exception {
+        OrderDto orderDto = new OrderDto(1, NOW.minusHours(1), "start", "end", null, null);
+        mockMvc.perform(post("/order/1")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JsonMapper.toJson(orderDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.[0].field").value("startTime"))
+                .andExpect(jsonPath("$.[0].code").value("startTime.futureTimeRequired"))
+                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
+        verifyNoMoreInteractions(orderService);
+    }
+
+    @Test
+    public void updateOrder_illegalArgumentException() throws Exception {
+        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", null, null);
+        when(orderService.updateOrder(1L,orderDto)).thenThrow(new IllegalArgumentException("ExceptionMessage"));
+        mockMvc.perform(post("/order/1")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JsonMapper.toJson(orderDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("ExceptionMessage"));
+        verify(orderService).updateOrder(1L, orderDto);
     }
 }
