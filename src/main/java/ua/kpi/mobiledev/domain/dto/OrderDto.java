@@ -46,11 +46,11 @@ public class OrderDto {
     private LocalDateTime startTime;
 
     @NotNull(message = "startPoint.required")
-    @Size(min = 1, max = 1000, message = "startPoint.invalidSize")
+    @Size(min = 1, max = 200, message = "startPoint.invalidSize")
     private String startPoint;
 
     @NotNull(message = "endPoint.required")
-    @Size(min = 1, max = 1000, message = "endPoint.invalidSize")
+    @Size(min = 1, max = 200, message = "endPoint.invalidSize")
     private String endPoint;
 
     @NotNull(message = "orderPrice.required")
