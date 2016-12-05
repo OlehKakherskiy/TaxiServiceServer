@@ -66,24 +66,25 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
-    public ResponseEntity<PriceDto> calculatePrice(@Validated @RequestBody OrderPriceDto orderPriceDto) {
-        return ResponseEntity.ok(new PriceDto(orderService.calculatePrice(orderPriceDto)));
+    @ResponseStatus(HttpStatus.OK)
+    public PriceDto calculatePrice(@Validated @RequestBody OrderPriceDto orderPriceDto) {
+        return new PriceDto(orderService.calculatePrice(orderPriceDto));
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)
-    public HttpStatus changeOrderStatus(@Valid @RequestBody OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
+    @ResponseStatus(HttpStatus.OK)
+    public void changeOrderStatus(@Valid @RequestBody OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
         orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
-        return HttpStatus.OK;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseEntity<List<OrderDto>> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
+    @ResponseStatus(HttpStatus.OK)
+    public List<OrderDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
         String uppercasedOrderStatus = orderStatus.toUpperCase();
-        List<OrderDto> orders = (uppercasedOrderStatus.equals("ALL"))
+        return (uppercasedOrderStatus.equals("ALL"))
                 ? mapToDto(orderService.getOrderList(null))
                 : mapToDto(orderService.getOrderList(getFromName(uppercasedOrderStatus)));
 
-        return ResponseEntity.ok(orders);
     }
 
     private Order.OrderStatus getFromName(String uppercasedOrderStatus) {
@@ -99,8 +100,9 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET)
-    public ResponseEntity<FullOrderDetailsDto> getOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId) {
-        return ResponseEntity.ok(FullOrderDetailsDto.from(orderService.getOrder(orderId)));
+    @ResponseStatus(HttpStatus.OK)
+    public FullOrderDetailsDto getOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId) {
+        return FullOrderDetailsDto.from(orderService.getOrder(orderId));
     }
 
 
@@ -110,18 +112,14 @@ public class OrderController {
 //    } //TODO: implement delete order with security
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.POST)
-    public HttpStatus updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
+    @ResponseStatus(HttpStatus.OK)
+    public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
                                   @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
         futureTimeValidator.validate(orderDto, bindingResult);
         if (bindingResult.hasErrors()) {
             throw new MethodArgumentNotValidException(null, bindingResult);
         } else {
-            return updateAndOk(orderId, orderDto);
+            orderService.updateOrder(orderId, orderDto);
         }
-    }
-
-    private HttpStatus updateAndOk(Long orderId, OrderDto orderDto) {
-        orderService.updateOrder(orderId, orderDto);
-        return HttpStatus.OK;
     }
 }
