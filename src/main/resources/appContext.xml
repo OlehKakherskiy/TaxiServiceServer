@@ -49,11 +49,11 @@
     </bean>
 
     <util:map id="paymentTypeValues" key-type="java.lang.Integer" value-type="java.lang.String">
-        <entry key="1" value="Yes"/>
-        <entry key="2" value="No"/>
+        <entry key="1" value="Cash"/>
+        <entry key="2" value="Credit card"/>
     </util:map>
     <util:map id="paymentTypeExtraPrice" key-type="java.lang.Integer" value-type="java.lang.Integer">
-        <entry key="1" value="${paymentTypeExtraPrice.cardPayment}"/>
-        <entry key="2" value="${paymentTypeExtraPrice.cashPayment}"/>
+        <entry key="2" value="${paymentTypeExtraPrice.cardPayment}"/>
+        <entry key="1" value="${paymentTypeExtraPrice.cashPayment}"/>
     </util:map>
 </beans>
