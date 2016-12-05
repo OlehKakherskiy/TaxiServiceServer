@@ -34,7 +34,7 @@ public class OrderServiceTest {
     @Test
     public void addOrder() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        OrderDto orderDto = new OrderDto(1, now, "start", "end", new OrderPriceDto(5.0, Collections.emptyMap()), 0.0);
+        OrderDto orderDto = new OrderDto(1, now, "start", "end", new OrderPriceDto(5.0, Collections.emptyList()), 0.0);
         User mockUser = mock(User.class);
         Order targetOrder = new Order(null, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
         Order expectedOrder = new Order(1L, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
@@ -122,7 +122,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void getOrderList() throws Exception {
+    public void getOrderList_FilterByOrderStatus() throws Exception {
         Order.OrderStatus mockStatus = Order.OrderStatus.CANCELLED;
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.getAllByOrderStatus(mockStatus)).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
@@ -134,10 +134,10 @@ public class OrderServiceTest {
     @Test
     public void getOrderList_ignoringOrderStatus() throws Exception{
         OrderRepository orderRepository = mock(OrderRepository.class);
-        when(orderRepository.getAllByOrderStatus(null)).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
+        when(orderRepository.findAll()).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
         OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
-        Assert.assertEquals(2, orderService.getOrderList(mockStatus).size());
-        verify(orderRepository).getAllByOrderStatus(null);
+        Assert.assertEquals(2, orderService.getOrderList(null).size());
+        verify(orderRepository).findAll();
     }
 
     @Test
@@ -228,7 +228,7 @@ public class OrderServiceTest {
 
     @Test
     public void calculatePrice_calculateWithoutAddParams() throws Exception {
-        OrderPriceDto orderPrice = new OrderPriceDto(5.0, Collections.emptyMap());
+        OrderPriceDto orderPrice = new OrderPriceDto(5.0, Collections.emptyList());
         TransactionalOrderService orderService = new TransactionalOrderService(null, null, null, null);
         orderService.setKmPrice(5);
         Assert.assertEquals(25.0, orderService.calculatePrice(orderPrice), 1e-7);

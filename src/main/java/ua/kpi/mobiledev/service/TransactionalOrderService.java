@@ -49,7 +49,7 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public Double calculatePrice(OrderPriceDto orderPriceDto) {
-        double basicPrice = orderPriceDto.getDistance() * kmPrice;
+        double basicPrice = Optional.ofNullable(orderPriceDto.getDistance() * kmPrice).orElse(0.0);
         double extraPrice = getAdditionalRequirementMap(orderPriceDto).entrySet()
                 .stream()
                 .map(reqEntry -> reqEntry.getKey().addPrice(basicPrice, reqEntry.getValue()))
@@ -61,8 +61,8 @@ public class TransactionalOrderService implements OrderService {
         if (Objects.isNull(orderPriceDto)) {
             return Collections.emptyMap();
         }
-        Map<Integer, Integer> orderRequirements = orderPriceDto.getAdditionalRequestValueMap();
-        if (Objects.nonNull(orderRequirements) && !orderRequirements.isEmpty()) {
+        Map<Integer, Integer> orderRequirements = orderPriceDto.paramsToMap();
+        if (Objects.isNull(orderRequirements) || orderRequirements.isEmpty()) {
             return Collections.emptyMap();
         } else {
             Map<AdditionalRequirement, Integer> result = new HashMap<>();
@@ -90,7 +90,7 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus) {
-        return orderStatusManager.changeOrderStatus(findOrder(orderId), findUser(userId), orderStatus);
+        return orderStatusManager.changeOrderStatus(getOrder(orderId), findUser(userId), orderStatus);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public Order updateOrder(Long orderId, OrderDto orderDto) {
-        Order order = findOrder(orderId);
+        Order order = getOrder(orderId);
         order.setStartTime(Objects.isNull(orderDto.getStartTime()) ? order.getStartTime() : orderDto.getStartTime());
         order.setStartPoint(Objects.isNull(orderDto.getStartPoint()) ? order.getStartPoint() : orderDto.getStartPoint());
         order.setEndPoint(Objects.isNull(orderDto.getEndPoint()) ? order.getEndPoint() : orderDto.getEndPoint());
@@ -145,10 +145,6 @@ public class TransactionalOrderService implements OrderService {
 
     private User findUser(Integer userId) {
         return userService.getUser(userId);
-    }
-
-    private Order findOrder(Long orderId) {
-        return orderRepository.findOne(orderId);
     }
 
     public void setKmPrice(Integer kmPrice) {
