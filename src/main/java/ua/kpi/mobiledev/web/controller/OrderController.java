@@ -1,9 +1,7 @@
 package ua.kpi.mobiledev.web.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
@@ -36,20 +34,23 @@ public class OrderController {
 
     private OrderService orderService;
 
-    private Validator orderPriceDtoValidator;
+    private Validator orderPriceDtoValidatorForAdd;
+
+    private Validator orderPriceDtoValidatorForCalculatePrice;
 
     private Validator futureTimeValidator;
 
     @Autowired
-    public OrderController(OrderService orderService, Validator orderPriceDtoValidator, Validator futureTimeValidator) {
+    public OrderController(OrderService orderService, Validator orderPriceDtoValidatorForAddOrder, Validator orderPriceDtoValidatorForCalculateOrderPrice, Validator futureTimeValidator) {
         this.orderService = orderService;
-        this.orderPriceDtoValidator = orderPriceDtoValidator;
+        this.orderPriceDtoValidatorForAdd = orderPriceDtoValidatorForAddOrder;
+        this.orderPriceDtoValidatorForCalculatePrice = orderPriceDtoValidatorForCalculateOrderPrice;
         this.futureTimeValidator = futureTimeValidator;
     }
 
     @InitBinder("orderPriceDto")
     private void initOrderPriceBinder(WebDataBinder webDataBinder) {
-        webDataBinder.addValidators(orderPriceDtoValidator);
+        webDataBinder.addValidators(orderPriceDtoValidatorForCalculatePrice);
     }
 
     @InitBinder("orderDto")
@@ -58,16 +59,30 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.POST)
-    public HttpStatus addOrder(@Valid @RequestBody OrderDto orderDto) {
+    public HttpStatus addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
+        checkIfValid(bindingResult);
+        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
+
         Order order = orderService.addOrder(orderDto);
         return (Objects.nonNull(order) && Objects.nonNull(order.getOrderId()))
                 ? HttpStatus.OK
                 : HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
+    private void validate(Validator validator, Object object, BindingResult bindingResult) throws MethodArgumentNotValidException {
+        validator.validate(object, bindingResult);
+        checkIfValid(bindingResult);
+    }
+
+    private void checkIfValid(BindingResult bindingResult) throws MethodArgumentNotValidException {
+        if (bindingResult.hasErrors()) {
+            throw new MethodArgumentNotValidException(null, bindingResult);
+        }
+    }
+
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public PriceDto calculatePrice(@Validated @RequestBody OrderPriceDto orderPriceDto) {
+    public PriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
         return new PriceDto(orderService.calculatePrice(orderPriceDto));
     }
 
@@ -114,12 +129,8 @@ public class OrderController {
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
-                                  @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
-        futureTimeValidator.validate(orderDto, bindingResult);
-        if (bindingResult.hasErrors()) {
-            throw new MethodArgumentNotValidException(null, bindingResult);
-        } else {
-            orderService.updateOrder(orderId, orderDto);
-        }
+                            @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
+        validate(futureTimeValidator, orderDto, bindingResult);
+        orderService.updateOrder(orderId, orderDto);
     }
 }

@@ -22,8 +22,4 @@ public class OrderPriceDto {
                 .forEach(req -> map.put(req.getReqId(), req.getReqValueId()));
         return map;
     }
-
-    public Double getDistance() {
-        return distance;
-    }
 }
