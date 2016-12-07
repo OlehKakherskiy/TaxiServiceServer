@@ -100,7 +100,7 @@ Request body:
 ###Order API
 **_1. Get all orders (by type)_**
 ```
-/order/{orderStatus}
+/order?orderStatus='actualOrderStatus'
 ```
 **orderStatus** = NEW/ACCEPTED/CANCELLED/DONE/ALL
 
@@ -224,3 +224,40 @@ Request body:
       "reqValueId" : "Integer"
   }]
 }
+```
+
+**_7. Calculate order price_**
+```
+/order/price
+```
+Request type: **POST**
+
+Request body:
+```json
+{
+  "distance" : "Double",
+  "additionalRequirements":[{
+    "reqId" : "Integer",
+    "reqValueId" : "Integer"
+  }]
+}
+```
+**NOTES**
+* Can be performed only by customer.
+
+
+**EXCEPTION RESPONSE TEMPLATES**
+
+*Request validation error template:*
+```json
+[{
+  "field" : "String",
+  "code"  : "String",
+  "message" : "String"
+}]
+```
+
+*Any other exception:*
+```json
+{"message" : "String"}
+```
