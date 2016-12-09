@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 public class OrderController {
 
-    private static String VALID_ORDER_STATUSES;
+    private static String VALID_ORDER_STATUSES = "NEW/ACCEPTED/DONE/CANCELLED/ALL";
 
     static {
         VALID_ORDER_STATUSES = Arrays.stream(Order.OrderStatus.values())
@@ -58,7 +58,7 @@ public class OrderController {
         webDataBinder.addValidators(futureTimeValidator);
     }
 
-    @RequestMapping(value = "/order", method = RequestMethod.POST)
+    @RequestMapping(value = "/order", method = RequestMethod.POST, consumes = "application/json")
     public HttpStatus addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
         checkIfValid(bindingResult);
         validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
@@ -114,7 +114,7 @@ public class OrderController {
         return orderList.stream().map(OrderDto::from).collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public FullOrderDetailsDto getOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId) {
         return FullOrderDetailsDto.from(orderService.getOrder(orderId));
