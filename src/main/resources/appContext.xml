@@ -15,10 +15,18 @@
                                   ignore-unresolvable="true"/>
 
     <bean id="orderService" class="ua.kpi.mobiledev.service.TransactionalOrderService">
+        <constructor-arg name="orderRepository" ref="orderRepository"/>
+        <constructor-arg name="additionalRequirements" ref="additionalRequirements"/>
+        <constructor-arg name="orderStatusManager" ref="orderStatusTransitionManager"/>
+        <constructor-arg name="userService" ref="transactionalUserService"/>
         <property name="kmPrice" value="${kmPrice}"/>
     </bean>
 
-    <bean id="additionalRequirements" class="java.util.HashMap"/>
+    <util:map id="additionalRequirements" key-type="java.lang.Integer"
+              value-type="ua.kpi.mobiledev.domain.AdditionalRequirement" map-class="java.util.HashMap">
+        <entry key="1" value-ref="carTypeAddRequirement"/>
+        <entry key="2" value-ref="paymentTypeAddRequirement"/>
+    </util:map>
 
     <bean id="carTypeAddRequirement"
           class="ua.kpi.mobiledev.domain.additionalRequirements.CarTypeAdditionalRequirement">
