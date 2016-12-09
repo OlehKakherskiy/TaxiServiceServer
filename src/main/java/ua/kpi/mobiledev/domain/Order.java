@@ -19,6 +19,7 @@ import java.util.Map;
 public class Order {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idAccount")
     private Long orderId;
 
@@ -30,6 +31,7 @@ public class Order {
     @JoinColumn(name = "idTaxiDriver", nullable = true)
     private TaxiDriver taxiDriver;
 
+    @Column(name = "startTime")
     private LocalDateTime startTime;
 
     @Column(name = "startPoint")
