@@ -18,8 +18,8 @@ import java.util.List;
 @Entity
 @Table(name = "User")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "userType")
-@DiscriminatorValue("CUSTOMER")
+@DiscriminatorColumn(name = "userType", discriminatorType = DiscriminatorType.INTEGER)
+@DiscriminatorValue("0")
 public class User {
 
     @Id
@@ -42,6 +42,7 @@ public class User {
     }
 
     @Column(name = "userType", insertable = false, updatable = false)
+    @Enumerated(EnumType.ORDINAL)
     private UserType userType;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")

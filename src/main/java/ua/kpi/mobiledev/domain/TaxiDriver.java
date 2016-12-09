@@ -13,7 +13,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Entity
-@DiscriminatorValue("TAXI_DRIVER")
+@DiscriminatorValue("1")
 public class TaxiDriver extends User {
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
