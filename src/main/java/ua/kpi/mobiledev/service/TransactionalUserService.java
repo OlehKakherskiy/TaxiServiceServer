@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.repository.UserRepository;
@@ -12,7 +13,7 @@ import javax.annotation.Resource;
 @Service
 public class TransactionalUserService implements UserService {
 
-    @Resource
+    @Autowired
     private UserRepository userRepository;
 
     public TransactionalUserService(UserRepository userRepository) {

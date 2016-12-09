@@ -1,6 +1,5 @@
 package ua.kpi.mobiledev.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
@@ -24,7 +23,6 @@ public class TransactionalOrderService implements OrderService {
 
     private Integer kmPrice;
 
-    @Autowired
     public TransactionalOrderService(OrderRepository orderRepository, UserService userService, Map<Integer, AdditionalRequirement> additionalRequirements, OrderStatusManager orderStatusManager) {
         this.orderRepository = orderRepository;
         this.userService = userService;
@@ -108,7 +106,7 @@ public class TransactionalOrderService implements OrderService {
     public Order getOrder(Long orderId) {
         Order order = orderRepository.findOne(orderId);
         if (Objects.isNull(order)) {
-            throw new IllegalArgumentException(MessageFormat.format("Order with id = '{0}' doesn't exist", orderId));
+            throw new IllegalArgumentException(MessageFormat.format("Order with id = ''{0}'' doesn''t exist", orderId));
         }
         return order;
     }
