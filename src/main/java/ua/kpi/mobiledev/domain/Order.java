@@ -24,7 +24,7 @@ public class Order {
     @JoinColumn(name = "idCustomer", nullable = false)
     private User customer;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idTaxiDriver", nullable = true)
     private TaxiDriver taxiDriver;
 

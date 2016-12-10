@@ -13,7 +13,7 @@ import java.util.Set;
 @DiscriminatorValue("1")
 public class TaxiDriver extends User {
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
     @JoinColumn(name = "idCar")
     private Car car;
 

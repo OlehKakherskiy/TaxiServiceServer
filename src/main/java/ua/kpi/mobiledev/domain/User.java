@@ -40,7 +40,7 @@ public class User {
     @Enumerated(EnumType.ORDINAL)
     private UserType userType;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
     private Set<MobileNumber> mobileNumbers;
 }
