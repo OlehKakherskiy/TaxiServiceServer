@@ -89,7 +89,9 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus) {
-        return orderStatusManager.changeOrderStatus(getOrder(orderId), findUser(userId), orderStatus);
+        Order updatedOrder = orderStatusManager.changeOrderStatus(getOrder(orderId), findUser(userId), orderStatus);
+        updatedOrder = orderRepository.save(updatedOrder);
+        return updatedOrder;
     }
 
     @Override
@@ -109,6 +111,7 @@ public class TransactionalOrderService implements OrderService {
         if (Objects.isNull(order)) {
             throw new IllegalArgumentException(MessageFormat.format("Order with id = ''{0}'' doesn''t exist", orderId));
         }
+        order.getTaxiDriver();
         return order;
     }
 

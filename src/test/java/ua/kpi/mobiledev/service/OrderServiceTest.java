@@ -67,20 +67,23 @@ public class OrderServiceTest {
     public void changeOrderStatus() throws Exception {
         User mockUser = mock(User.class);
         Order mockOrder = mock(Order.class);
+        Order updatedOrder = mock(Order.class);
         Order.OrderStatus mockStatus = Order.OrderStatus.NEW;
 
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
+        when(orderRepository.save(updatedOrder)).thenReturn(updatedOrder);
 
         UserService userService = mock(UserService.class);
         when(userService.getUser(1)).thenReturn(mockUser);
         OrderStatusTransitionManager transitionManager = mock(OrderStatusTransitionManager.class);
-        when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenReturn(mock(Order.class));
+        when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenReturn(updatedOrder);
 
         OrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptyMap(), transitionManager);
         Assert.assertNotNull(orderService.changeOrderStatus(1L, 1, mockStatus));
 
         verify(orderRepository).findOne(1L);
+        verify(orderRepository).save(updatedOrder);
         verify(userService).getUser(1);
         verify(transitionManager).changeOrderStatus(mockOrder, mockUser, mockStatus);
     }
@@ -132,7 +135,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void getOrderList_ignoringOrderStatus() throws Exception{
+    public void getOrderList_ignoringOrderStatus() throws Exception {
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.findAll()).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
         OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
