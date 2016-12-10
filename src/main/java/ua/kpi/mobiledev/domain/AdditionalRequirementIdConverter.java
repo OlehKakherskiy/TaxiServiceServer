@@ -3,14 +3,13 @@ package ua.kpi.mobiledev.domain;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Map;
 import java.util.Optional;
 
-@Converter
+@Converter(autoApply = true)
 public class AdditionalRequirementIdConverter implements AttributeConverter<AdditionalRequirement, Integer>, ApplicationContextAware {
 
     private ApplicationContext applicationContext;

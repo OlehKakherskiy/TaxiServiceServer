@@ -5,26 +5,15 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Map;
 
-@Setter(AccessLevel.NONE)
-@Entity
-@EqualsAndHashCode(exclude = "id")
-@ToString
-@Getter
-@Table(name = "additionalRequirement")
+@Data
 public abstract class AdditionalRequirement {
 
-    @Id
-    @Column(name = "idAdditionalRequirement")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Transient
     protected String requirementName;
 
-    @Transient
     private String priceDescription;
 
-    @Transient
     protected Map<Integer, String> requirementValues;
 
     public AdditionalRequirement() {

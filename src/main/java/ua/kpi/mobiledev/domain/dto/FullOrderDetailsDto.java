@@ -22,8 +22,8 @@ public class FullOrderDetailsDto {
             orderDetailsDto.taxiDriver = new TaxiDriverSimpleDto(order.getTaxiDriver().getId(), order.getTaxiDriver().getName());
         }
         orderDetailsDto.price = order.getPrice();
-        orderDetailsDto.additionalRequirements = order.getAdditionalRequirementList().entrySet().stream()
-                .map(entry -> new AddReqSimpleDto(entry.getKey().getId(), entry.getValue()))
+        orderDetailsDto.additionalRequirements = order.getAdditionalRequirements().stream()
+                .map(entry -> new AddReqSimpleDto(entry.getAdditionalRequirement().getId(), entry.getRequirementValue()))
                 .collect(Collectors.toList());
         return orderDetailsDto;
     }

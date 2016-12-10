@@ -4,11 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.Set;
 
-/**
- * Created by Oleg on 05.11.2016.
- */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -58,14 +55,9 @@ public class Order {
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus;
 
-    //stores map AdditionalRequirement/requirementValueKey (AdditionalRequirement.requirementValues.key)
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "accountAdditionalRequirements")
-    @MapKeyJoinColumn(name = "idAdditionalRequirement")
-    @JoinColumn(name = "idAccount")
-    @Column(name = "idAdditionalRequirementValue")
-    @Convert(attributeName = "key", converter = AdditionalRequirementIdConverter.class)
-    private Map<AdditionalRequirement, Integer> additionalRequirementList;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idAccount", referencedColumnName = "idAccount")
+    private Set<AdditionalRequirementValue> additionalRequirements;
 
 
     @Override
@@ -82,7 +74,7 @@ public class Order {
         if (!endPoint.equals(order.endPoint)) return false;
         if (!price.equals(order.price)) return false;
         if (orderStatus != order.orderStatus) return false;
-        return additionalRequirementList.equals(order.additionalRequirementList);
+        return additionalRequirements.equals(order.additionalRequirements);
 
     }
 
@@ -95,7 +87,7 @@ public class Order {
         result = 31 * result + endPoint.hashCode();
         result = 31 * result + price.hashCode();
         result = 31 * result + orderStatus.hashCode();
-        result = 31 * result + additionalRequirementList.hashCode();
+        result = 31 * result + additionalRequirements.hashCode();
         return result;
     }
 }

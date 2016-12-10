@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.Car;
 
-import javax.persistence.Transient;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class CarTypeAdditionalRequirement extends AdditionalRequirement {
     private static final String NO_REQUIREMENT_DEFINITION = "There's no requirement value definition in requirement '{0}' with value id = '{1}'";
 
     private static final String ILLEGAL_REQUIREMENT_VALUE_ID = "Illegal requirement value id (requirement name = '{0}', requirement value id = '{1}')";
-    @Transient
+
     private Map<Car.CarType, Double> multiplyCoefficients;
 
     public CarTypeAdditionalRequirement(String requirementName, String priceDescription, Map<Integer, String> requirementValues, Map<Car.CarType, Double> multiplyCoefficients) {
