@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.service;
 
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
+import ua.kpi.mobiledev.domain.AdditionalRequirementValue;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
@@ -41,33 +42,33 @@ public class TransactionalOrderService implements OrderService {
                 orderDto.getStartPoint(), orderDto.getEndPoint(),
                 calculatePrice(orderPriceDto),
                 Order.OrderStatus.NEW,
-                getAdditionalRequirementMap(orderPriceDto));
+                getAdditionalRequirementValueSet(orderPriceDto));
         return orderRepository.save(order);
     }
 
     @Override
     public Double calculatePrice(OrderPriceDto orderPriceDto) {
         double basicPrice = Optional.ofNullable(orderPriceDto.getDistance() * kmPrice).orElse(0.0);
-        double extraPrice = getAdditionalRequirementMap(orderPriceDto).entrySet()
+        double extraPrice = getAdditionalRequirementValueSet(orderPriceDto)
                 .stream()
-                .map(reqEntry -> reqEntry.getKey().addPrice(basicPrice, reqEntry.getValue()))
+                .map(reqEntry -> reqEntry.getAdditionalRequirement().addPrice(basicPrice, reqEntry.getRequirementValue()))
                 .reduce(Double::sum).orElse(0.0);
         return basicPrice + extraPrice;
     }
 
-    private Map<AdditionalRequirement, Integer> getAdditionalRequirementMap(OrderPriceDto orderPriceDto) {
+    private Set<AdditionalRequirementValue> getAdditionalRequirementValueSet(OrderPriceDto orderPriceDto) {
         if (Objects.isNull(orderPriceDto)) {
-            return Collections.emptyMap();
+            return Collections.emptySet();
         }
         Map<Integer, Integer> orderRequirements = orderPriceDto.paramsToMap();
         if (Objects.isNull(orderRequirements) || orderRequirements.isEmpty()) {
-            return Collections.emptyMap();
+            return Collections.emptySet();
         } else {
-            Map<AdditionalRequirement, Integer> result = new HashMap<>();
+            Set<AdditionalRequirementValue> result = new HashSet<>();
             for (Map.Entry<Integer, Integer> orderRequirement : orderRequirements.entrySet()) {
                 AdditionalRequirement additionalRequirement = convertToRequirement(orderRequirement.getKey());
                 if (isValidRequirementValueId(additionalRequirement, orderRequirement.getValue())) {
-                    result.put(additionalRequirement, orderRequirement.getValue());
+                    result.add(new AdditionalRequirementValue(null, additionalRequirement, orderRequirement.getValue()));
                 }
             }
             return result;
@@ -135,7 +136,7 @@ public class TransactionalOrderService implements OrderService {
         OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
         if (!Objects.isNull(orderPriceDto)) {
             order.setPrice(calculatePrice(orderPriceDto));
-            order.setAdditionalRequirementList(getAdditionalRequirementMap(orderDto.getOrderPrice()));
+            order.setAdditionalRequirements(getAdditionalRequirementValueSet(orderDto.getOrderPrice()));
         }
         orderRepository.save(order);
         return order;

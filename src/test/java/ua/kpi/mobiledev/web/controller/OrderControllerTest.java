@@ -24,8 +24,8 @@ import ua.kpi.mobiledev.service.OrderService;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -52,20 +52,21 @@ public class OrderControllerTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        mockUser = new User(1, "oleh", "ol@gmail.com", User.UserType.CUSTOMER, Collections.emptyList());
-        taxiDriver = new TaxiDriver(2, "taxist", "taxist@gmail.com", Collections.emptyList(), mock(Car.class));
+        mockUser = new User(1, "oleh", "ol@gmail.com", User.UserType.CUSTOMER, Collections.emptySet());
+        taxiDriver = new TaxiDriver(2, "taxist", "taxist@gmail.com", Collections.emptySet(), mock(Car.class));
         AdditionalRequirement additionalRequirement = mock(AdditionalRequirement.class);
         when(additionalRequirement.getId()).thenReturn(1);
         AdditionalRequirement additionalRequirement1 = mock(AdditionalRequirement.class);
         when(additionalRequirement1.getId()).thenReturn(2);
-        Map<AdditionalRequirement, Integer> additionalRequirementIntegerMap = new LinkedHashMap<>();
-        additionalRequirementIntegerMap.put(additionalRequirement, 1);
-        additionalRequirementIntegerMap.put(additionalRequirement1, 3);
+        Set<AdditionalRequirementValue> additionalRequirementValues = new HashSet<>(Arrays.asList(
+                new AdditionalRequirementValue(null, additionalRequirement, 1),
+                new AdditionalRequirementValue(null, additionalRequirement1, 3)
+        ));
         mockNewOrder = new Order(1L, mockUser, taxiDriver, NOW,
-                "Start", "End", 100.0, Order.OrderStatus.ACCEPTED, additionalRequirementIntegerMap);
+                "Start", "End", 100.0, Order.OrderStatus.ACCEPTED, additionalRequirementValues);
 
         mockOrderWithoutDriverAndAddReqs = new Order(1L, mockUser, null, NOW,
-                "Start", "End", 100.0, Order.OrderStatus.NEW, Collections.emptyMap());
+                "Start", "End", 100.0, Order.OrderStatus.NEW, Collections.emptySet());
     }
 
     private MockMvc mockMvc;
@@ -132,7 +133,7 @@ public class OrderControllerTest {
     @Test
     public void readAllOrders_validStatusLowerCased() throws Exception {
         Order additionalOrder = new Order(1L, mockUser, taxiDriver, NOW,
-                "Start1", "End1", 115.0, Order.OrderStatus.ACCEPTED, Collections.emptyMap());
+                "Start1", "End1", 115.0, Order.OrderStatus.ACCEPTED, Collections.emptySet());
         when(orderService.getOrderList(Order.OrderStatus.ACCEPTED)).thenReturn(Arrays.asList(mockNewOrder, additionalOrder));
         mockMvc.perform(get("/order?orderStatus=accepted")
                 .accept(MediaType.APPLICATION_JSON_UTF8))

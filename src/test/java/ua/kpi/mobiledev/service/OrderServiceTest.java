@@ -36,8 +36,8 @@ public class OrderServiceTest {
         LocalDateTime now = LocalDateTime.now();
         OrderDto orderDto = new OrderDto(1, now, "start", "end", new OrderPriceDto(5.0, Collections.emptyList()), 0.0);
         User mockUser = mock(User.class);
-        Order targetOrder = new Order(null, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
-        Order expectedOrder = new Order(1L, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptyMap());
+        Order targetOrder = new Order(null, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptySet());
+        Order expectedOrder = new Order(1L, mockUser, null, now, "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptySet());
 
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.save(targetOrder)).thenReturn(expectedOrder);
@@ -57,7 +57,7 @@ public class OrderServiceTest {
         OrderDto orderDto = new OrderDto(1, now, "start", "end", mock(OrderPriceDto.class), 0.0);
 
         UserService userService = mock(UserService.class);
-        when(userService.getUser(1)).thenReturn(new TaxiDriver(1, "", "", Collections.emptyList(), mock(Car.class)));
+        when(userService.getUser(1)).thenReturn(new TaxiDriver(1, "", "", Collections.emptySet(), mock(Car.class)));
 
         OrderService orderService = new TransactionalOrderService(mock(OrderRepository.class), userService, Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         orderService.addOrder(orderDto);
@@ -197,8 +197,8 @@ public class OrderServiceTest {
     @Test
     public void updateOrder_nothingToChange() throws Exception {
         OrderDto orderDto = new OrderDto(null, null, null, null, null, null);
-        Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
-        Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
+        Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
+        Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
 
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
@@ -213,8 +213,8 @@ public class OrderServiceTest {
     @Test
     public void updateOrder_willBeChanged() throws Exception {
         OrderDto orderDto = new OrderDto(null, NOW, "start", "end", null, null);
-        Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
-        Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "start", "end", 1.0, Order.OrderStatus.NEW, Collections.emptyMap());
+        Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
+        Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "start", "end", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
 
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
