@@ -1,0 +1,1 @@
+INSERT INTO taxiservice.car (model, manufacturer, plateNumber, seatNumber, carType) VALUES ('model', 'manufacturer', 'plateNum', 6, 2);
