@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.AdditionalRequirementValue;
 import ua.kpi.mobiledev.domain.Order;
@@ -32,6 +33,7 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
+    @Transactional
     public Order addOrder(OrderDto orderDto) {
         User user = findUser(orderDto.getCustomerId());
         if (user.getUserType() == User.UserType.TAXI_DRIVER) {
@@ -88,6 +90,7 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
+    @Transactional
     public Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus) {
         Order updatedOrder = orderStatusManager.changeOrderStatus(getOrder(orderId), findUser(userId), orderStatus);
         updatedOrder = orderRepository.save(updatedOrder);
@@ -116,6 +119,7 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
+    @Transactional
     public Boolean deleteOrder(Long orderId, Integer userId) {
         Order order = getOrder(orderId);
         if (isUserOwner(order, userId)) {
@@ -131,6 +135,7 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
+    @Transactional
     public Order updateOrder(Long orderId, OrderDto orderDto) {
         Order order = getOrder(orderId);
         order.setStartTime(Objects.isNull(orderDto.getStartTime()) ? order.getStartTime() : orderDto.getStartTime());

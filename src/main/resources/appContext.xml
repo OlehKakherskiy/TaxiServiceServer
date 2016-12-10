@@ -3,9 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <import resource="repoContext.xml"/>
     <context:component-scan base-package="ua.kpi.mobiledev.service"/>
@@ -34,6 +37,7 @@
         <constructor-arg name="priceDescription" value="${carTypeRequirement.priceDescription}"/>
         <constructor-arg name="requirementValues" ref="carTypeReqValues"/>
         <constructor-arg name="multiplyCoefficients" ref="multiplyCoefficients"/>
+        <property name="id" value="1"/>
     </bean>
 
     <util:map id="carTypeReqValues" key-type="java.lang.Integer" value-type="java.lang.String">
@@ -54,6 +58,7 @@
         <constructor-arg name="priceDescription" value="${paymenTypeRequirement.priceDescription}"/>
         <constructor-arg name="requirementValues" ref="paymentTypeValues"/>
         <constructor-arg name="paymentTypeExtraPrice" ref="paymentTypeExtraPrice"/>
+        <property name="id" value="2"/>
     </bean>
 
     <util:map id="paymentTypeValues" key-type="java.lang.Integer" value-type="java.lang.String">
@@ -64,4 +69,10 @@
         <entry key="1" value="${paymentTypeExtraPrice.cardPayment}"/>
         <entry key="2" value="${paymentTypeExtraPrice.cashPayment}"/>
     </util:map>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
 </beans>
