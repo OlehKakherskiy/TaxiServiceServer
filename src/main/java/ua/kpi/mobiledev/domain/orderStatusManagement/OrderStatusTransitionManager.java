@@ -47,6 +47,11 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
         this.permittedTransitions = Objects.isNull(permittedTransitions) ? defaultTransitionConfig : permittedTransitions;
     }
 
+
+    public OrderStatusTransitionManager() {
+        permittedTransitions = defaultTransitionConfig;
+    }
+
     @Override
     public Order changeOrderStatus(Order order, User user, Order.OrderStatus changeTo) {
         OrderStatusTransition orderStatusTransition = null;
