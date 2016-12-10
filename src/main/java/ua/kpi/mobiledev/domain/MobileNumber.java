@@ -10,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@ToString(exclude = "user")
+@ToString
 @Setter(AccessLevel.NONE)
 @Entity
 public class MobileNumber {
@@ -24,7 +24,4 @@ public class MobileNumber {
     @NonNull
     private String mobileNumber;
 
-    @ManyToOne
-    @JoinColumn(name = "idUser", nullable = false)
-    private User user;
 }

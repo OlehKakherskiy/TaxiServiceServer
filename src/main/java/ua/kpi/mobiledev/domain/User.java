@@ -4,16 +4,11 @@ import com.sun.istack.internal.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
-/**
- * Created by Oleg on 05.11.2016.
- */
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@EqualsAndHashCode
-@ToString
 @Setter(AccessLevel.NONE)
 @Entity
 @Table(name = "User")
@@ -45,6 +40,7 @@ public class User {
     @Enumerated(EnumType.ORDINAL)
     private UserType userType;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
-    private List<MobileNumber> mobileNumbers;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "idUser", referencedColumnName = "idUser")
+    private Set<MobileNumber> mobileNumbers;
 }
