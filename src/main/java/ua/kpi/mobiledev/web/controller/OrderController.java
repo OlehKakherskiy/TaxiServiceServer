@@ -114,7 +114,7 @@ public class OrderController {
         return orderList.stream().map(OrderDto::from).collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET, consumes = "application/json")
+    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public FullOrderDetailsDto getOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId) {
         return FullOrderDetailsDto.from(orderService.getOrder(orderId));
