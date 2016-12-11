@@ -1,6 +1,6 @@
 package ua.kpi.mobiledev.domain;
 
-import com.sun.istack.internal.NotNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,6 +20,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idUser")
+    @NonNull
     private Integer id;
 
     @Column(name = "name")
@@ -27,8 +28,11 @@ public class User {
     private String name;
 
     @Column(name = "email")
-    @NotNull
-    private String email;
+    @NonNull
+    private String username; //e.g. email
+
+    @JsonIgnore
+    private String password;
 
     public enum UserType {
         CUSTOMER,

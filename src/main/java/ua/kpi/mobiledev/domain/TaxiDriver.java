@@ -13,12 +13,12 @@ import java.util.Set;
 @DiscriminatorValue("1")
 public class TaxiDriver extends User {
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "idCar")
     private Car car;
 
-    public TaxiDriver(Integer id, String name, String email, Set<MobileNumber> mobileNumbers, @NonNull Car car) {
-        super(id, name, email, UserType.TAXI_DRIVER, mobileNumbers);
+    public TaxiDriver(Integer id, String name, String email, String password, Set<MobileNumber> mobileNumbers, @NonNull Car car) {
+        super(id, name, email, password, UserType.TAXI_DRIVER, mobileNumbers);
         this.car = car;
     }
 }
