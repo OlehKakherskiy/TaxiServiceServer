@@ -185,7 +185,6 @@ public class OrderControllerTest {
                 new AddReqSimpleDto(2, 3),
                 new AddReqSimpleDto(3, 3)));
         when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
-
         mockMvc.perform(post("/order/price")
                 .content(JsonMapper.toJson(priceDto))
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -350,9 +349,9 @@ public class OrderControllerTest {
 
     @Test
     public void updateOrder() throws Exception {
-        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", null, null);
+        OrderDto orderDto = new OrderDto(null, NOW.plusHours(1), "start", "end", null, null);
         when(orderService.updateOrder(1L, orderDto)).thenReturn(new Order());
-        mockMvc.perform(post("/order/1")
+        mockMvc.perform(put("/order/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonMapper.toJson(orderDto)))
                 .andExpect(status().isOk());
@@ -361,8 +360,8 @@ public class OrderControllerTest {
 
     @Test
     public void updateOrder_InvalidStartTime() throws Exception {
-        OrderDto orderDto = new OrderDto(1, NOW.minusHours(1), "start", "end", null, null);
-        mockMvc.perform(post("/order/1")
+        OrderDto orderDto = new OrderDto(null, NOW.minusHours(1), "start", "end", null, null);
+        mockMvc.perform(put("/order/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonMapper.toJson(orderDto)))
                 .andExpect(status().isBadRequest())
@@ -374,9 +373,9 @@ public class OrderControllerTest {
 
     @Test
     public void updateOrder_illegalArgumentException() throws Exception {
-        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", null, null);
+        OrderDto orderDto = new OrderDto(null, NOW.plusHours(1), "start", "end", null, null);
         when(orderService.updateOrder(1L, orderDto)).thenThrow(new IllegalArgumentException("ExceptionMessage"));
-        mockMvc.perform(post("/order/1")
+        mockMvc.perform(put("/order/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonMapper.toJson(orderDto)))
                 .andExpect(status().isBadRequest())
@@ -389,7 +388,6 @@ public class OrderControllerTest {
         OrderPriceDto orderPrice = new OrderPriceDto(100.0, Collections.emptyList());
         OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", orderPrice, null);
         when(orderService.addOrder(orderDto)).thenReturn(new Order());
-
         mockMvc.perform(post("/order")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonMapper.toJson(orderDto)))

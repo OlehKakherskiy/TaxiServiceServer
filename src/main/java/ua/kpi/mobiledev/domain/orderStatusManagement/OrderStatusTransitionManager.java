@@ -58,7 +58,7 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
         if (userHaveAccessToOrder(user, order) && Objects.nonNull(orderStatusTransition = getPossibleTransition(order.getOrderStatus(), changeTo, user))) {
             return orderStatusTransition.changeOrderStatus(order, user);
         } else {
-            throw new IllegalStateException(MessageFormat.format("This type of user {0} can't change order status from {1} to {2}",
+            throw new IllegalStateException(MessageFormat.format("This type of user (''{0}'') can''t change order status from ''{1}'' to ''{2}''",
                     user.getUserType(), order.getOrderStatus(), changeTo));
         }
     }

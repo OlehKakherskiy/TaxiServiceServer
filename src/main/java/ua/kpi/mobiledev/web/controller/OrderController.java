@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -126,7 +125,7 @@ public class OrderController {
 //        orderService.deleteOrder()
 //    } //TODO: implement delete order with security
 
-    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
                             @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {

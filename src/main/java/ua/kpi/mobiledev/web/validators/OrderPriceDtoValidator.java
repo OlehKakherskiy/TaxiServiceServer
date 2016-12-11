@@ -4,10 +4,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class OrderPriceDtoValidator implements Validator {
 
@@ -41,8 +38,12 @@ public class OrderPriceDtoValidator implements Validator {
     }
 
     private void checkSetForNegativeValuesOrZero(Set<Integer> values, Errors errors, String errorKey) {
-        values.stream().filter(value -> value < 0).findFirst().ifPresent(value -> {
+        values.stream().map(this::avoidNulls).filter(value -> value < 0).forEach(value -> {
             errors.rejectValue(addRequirementsField, errorKey, errorKey);
         });
+    }
+
+    private Integer avoidNulls(Integer value) {
+        return Optional.ofNullable(value).orElse(-1);
     }
 }
