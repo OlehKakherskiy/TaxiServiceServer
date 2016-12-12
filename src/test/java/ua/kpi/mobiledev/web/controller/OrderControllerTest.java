@@ -140,17 +140,19 @@ public class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$.[0].customerId").value(1))
+                .andExpect(jsonPath("$.[0].orderId").value(1))
                 .andExpect(jsonPath("$.[0].startTime").value(NOW.toString()))
                 .andExpect(jsonPath("$.[0].startPoint").value("Start"))
                 .andExpect(jsonPath("$.[0].endPoint").value("End"))
                 .andExpect(jsonPath("$.[0].price").value(100.0))
+                .andExpect(jsonPath("$.[0].status").value("ACCEPTED"))
 
-                .andExpect(jsonPath("$.[1].customerId").value(1))
+                .andExpect(jsonPath("$.[1].orderId").value(1))
                 .andExpect(jsonPath("$.[1].startTime").value(NOW.toString()))
                 .andExpect(jsonPath("$.[1].startPoint").value("Start1"))
                 .andExpect(jsonPath("$.[1].endPoint").value("End1"))
-                .andExpect(jsonPath("$.[1].price").value(115.0));
+                .andExpect(jsonPath("$.[1].price").value(115.0))
+                .andExpect(jsonPath("$.[0].status").value("ACCEPTED"));
         verify(orderService, times(1)).getOrderList(Order.OrderStatus.ACCEPTED);
         verifyNoMoreInteractions(orderService);
     }
