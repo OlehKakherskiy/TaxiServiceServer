@@ -1,6 +1,5 @@
 package ua.kpi.mobiledev.domain;
 
-import com.sun.istack.internal.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,7 +26,7 @@ public class User {
     private String name;
 
     @Column(name = "email")
-    @NotNull
+    @NonNull
     private String email;
 
     public enum UserType {
