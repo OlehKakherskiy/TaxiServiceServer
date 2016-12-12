@@ -1,5 +1,8 @@
 package ua.kpi.mobiledev.domain;
 
+import lombok.NonNull;
+
+import javax.persistence.Column;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 

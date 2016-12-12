@@ -93,7 +93,7 @@ public class OrderController {
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
+    public List<OrderSimpleDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
         String uppercasedOrderStatus = orderStatus.toUpperCase();
         return (uppercasedOrderStatus.equals("ALL"))
                 ? mapToDto(orderService.getOrderList(null))
@@ -109,8 +109,8 @@ public class OrderController {
         }
     }
 
-    private List<OrderDto> mapToDto(List<Order> orderList) {
-        return orderList.stream().map(OrderDto::from).collect(Collectors.toList());
+    private List<OrderSimpleDto> mapToDto(List<Order> orderList) {
+        return orderList.stream().map(OrderSimpleDto::of).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET)
