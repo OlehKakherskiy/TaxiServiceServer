@@ -136,18 +136,15 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     @Transactional
-    public Order updateOrder(Long orderId, OrderDto orderDto) {
+    public Order updateOrder(Long orderId, OrderDto orderDto) {//userId is ignored
         Order order = getOrder(orderId);
-        order.setStartTime(Objects.isNull(orderDto.getStartTime()) ? order.getStartTime() : orderDto.getStartTime());
-        order.setStartPoint(Objects.isNull(orderDto.getStartPoint()) ? order.getStartPoint() : orderDto.getStartPoint());
-        order.setEndPoint(Objects.isNull(orderDto.getEndPoint()) ? order.getEndPoint() : orderDto.getEndPoint());
+        order.setStartTime(orderDto.getStartTime());
+        order.setStartPoint(orderDto.getStartPoint());
+        order.setEndPoint(orderDto.getEndPoint());
         OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
-        if (!Objects.isNull(orderPriceDto)) {
-            order.setPrice(calculatePrice(orderPriceDto));
-            order.setAdditionalRequirements(getAdditionalRequirementValueSet(orderDto.getOrderPrice()));
-        }
-        orderRepository.save(order);
-        return order;
+        order.setPrice(calculatePrice(orderPriceDto));
+        order.setAdditionalRequirements(getAdditionalRequirementValueSet(orderPriceDto));
+        return orderRepository.save(order);
     }
 
     private User findUser(Integer userId) {

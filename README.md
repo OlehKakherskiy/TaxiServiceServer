@@ -169,10 +169,13 @@ Request body:
   "startTime" : "DateTime",
   "startPoint" : "String",
   "endPoint" : "String",
-  "additionalRequirements" : [{
-      "reqId" : "Integer",
-      "reqValueId" : "Integer"
-  }]
+  "orderPrice":{
+        "distance":"Double",
+        "additionalRequirements" : [{
+            "reqId" : "Integer",
+            "reqValueId" : "Integer"
+      }]
+  }
 }
 ```
 **NOTES:**
@@ -189,7 +192,7 @@ Request body:
 ```json
 {
   "userId" : "Long",
-  "type" : "ACCEPTED/CANCELLED/DONE"
+  "orderStatus" : "ACCEPTED/CANCELLED/DONE"
 }
 ```
 **NOTES:**
@@ -216,13 +219,17 @@ Request body:
 
 ```json
 {
+  "customerId" : "Long",
   "startTime" : "DateTime",
   "startPoint" : "String",
   "endPoint" : "String",
-  "additionalRequirements": [{
-      "reqId" : "Integer",
-      "reqValueId" : "Integer"
-  }]
+  "orderPrice":{
+          "distance":"Double",
+          "additionalRequirements" : [{
+              "reqId" : "Integer",
+              "reqValueId" : "Integer"
+        }]
+    }
 }
 ```
 

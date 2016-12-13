@@ -197,33 +197,19 @@ public class OrderServiceTest {
         verify(orderRepository).findOne(1L);
     }
 
-    @Test
-    public void updateOrder_nothingToChange() throws Exception {
-        OrderDto orderDto = new OrderDto(null, null, null, null, null, null);
-        Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
-        Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
-
-        OrderRepository orderRepository = mock(OrderRepository.class);
-        when(orderRepository.findOne(1L)).thenReturn(mockOrder);
-        when(orderRepository.save(mockOrder)).thenReturn(mockOrder);
-
-        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusManager.class));
-        Assert.assertEquals(expectedOrder, orderService.updateOrder(1L, orderDto));
-        verify(orderRepository).findOne(1L);
-        verify(orderRepository).save(mockOrder);
-    }
 
     @Test
     public void updateOrder_willBeChanged() throws Exception {
-        OrderDto orderDto = new OrderDto(null, NOW, "start", "end", null, null);
-        Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "", "", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
-        Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "start", "end", 1.0, Order.OrderStatus.NEW, Collections.emptySet());
+        OrderDto orderDto = new OrderDto(1, NOW, "start", "end", new OrderPriceDto(5.0, null), null);
+        Order mockOrder = new Order(1L, MOCK_USER, null, NOW, "start", "end", 10.0, Order.OrderStatus.NEW, Collections.emptySet());
+        Order expectedOrder = new Order(1L, MOCK_USER, null, NOW, "start", "end", 10.0, Order.OrderStatus.NEW, Collections.emptySet());
 
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
         when(orderRepository.save(mockOrder)).thenReturn(mockOrder);
 
-        OrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusManager.class));
+        TransactionalOrderService orderService = new TransactionalOrderService(orderRepository, mock(UserService.class), Collections.emptyMap(), mock(OrderStatusManager.class));
+        orderService.setKmPrice(2);
         Assert.assertEquals(expectedOrder, orderService.updateOrder(1L, orderDto));
         verify(orderRepository).findOne(1L);
         verify(orderRepository).save(mockOrder);
