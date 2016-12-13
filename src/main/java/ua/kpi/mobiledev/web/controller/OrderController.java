@@ -128,7 +128,7 @@ public class OrderController {
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
-                            @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
+                            @RequestBody @Valid OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
         validate(futureTimeValidator, orderDto, bindingResult);
         orderService.updateOrder(orderId, orderDto);
     }
