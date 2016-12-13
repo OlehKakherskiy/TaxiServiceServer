@@ -351,7 +351,7 @@ public class OrderControllerTest {
 
     @Test
     public void updateOrder() throws Exception {
-        OrderDto orderDto = new OrderDto(null, NOW.plusHours(1), "start", "end", null, null);
+        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
         when(orderService.updateOrder(1L, orderDto)).thenReturn(new Order());
         mockMvc.perform(put("/order/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -367,15 +367,16 @@ public class OrderControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonMapper.toJson(orderDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.[0].field").value("startTime"))
-                .andExpect(jsonPath("$.[0].code").value("startTime.futureTimeRequired"))
-                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$.[2].field").value("startTime"))
+                .andExpect(jsonPath("$.[2].code").value("startTime.futureTimeRequired"))
+                .andExpect(jsonPath("$.[2].message").value(Matchers.notNullValue()));
         verifyNoMoreInteractions(orderService);
     }
 
     @Test
     public void updateOrder_illegalArgumentException() throws Exception {
-        OrderDto orderDto = new OrderDto(null, NOW.plusHours(1), "start", "end", null, null);
+        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
         when(orderService.updateOrder(1L, orderDto)).thenThrow(new IllegalArgumentException("ExceptionMessage"));
         mockMvc.perform(put("/order/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)

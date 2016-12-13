@@ -23,12 +23,12 @@ public class PaymentTypeAdditionalRequirementTest {
 
     @Test
     public void addPrice() throws Exception {
-        Assert.assertEquals(0, paymentTypeAdditionalRequirement.addPrice(100, 1), 10e-7);
+        Assert.assertEquals(0, paymentTypeAdditionalRequirement.addPrice(100.0, 1), 10e-7);
     }
 
     @Test
     public void addPrice_notExistedKey() throws Exception {
-        Assert.assertEquals(0, paymentTypeAdditionalRequirement.addPrice(100, 5), 10e-7);
+        Assert.assertEquals(0, paymentTypeAdditionalRequirement.addPrice(100.0, 5), 10e-7);
     }
 
 }

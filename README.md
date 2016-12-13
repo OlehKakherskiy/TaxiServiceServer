@@ -192,7 +192,7 @@ Request body:
 ```json
 {
   "userId" : "Long",
-  "type" : "ACCEPTED/CANCELLED/DONE"
+  "orderStatus" : "ACCEPTED/CANCELLED/DONE"
 }
 ```
 **NOTES:**

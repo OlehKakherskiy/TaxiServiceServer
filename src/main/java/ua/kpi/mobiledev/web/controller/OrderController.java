@@ -129,7 +129,8 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
                             @RequestBody @Valid OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
-        validate(futureTimeValidator, orderDto, bindingResult);
+        checkIfValid(bindingResult);
+        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
         orderService.updateOrder(orderId, orderDto);
     }
 }
