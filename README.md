@@ -169,10 +169,13 @@ Request body:
   "startTime" : "DateTime",
   "startPoint" : "String",
   "endPoint" : "String",
-  "additionalRequirements" : [{
-      "reqId" : "Integer",
-      "reqValueId" : "Integer"
-  }]
+  "orderPrice":{
+        "distance":"Double",
+        "additionalRequirements" : [{
+            "reqId" : "Integer",
+            "reqValueId" : "Integer"
+      }]
+  }
 }
 ```
 **NOTES:**
@@ -219,10 +222,13 @@ Request body:
   "startTime" : "DateTime",
   "startPoint" : "String",
   "endPoint" : "String",
-  "additionalRequirements": [{
-      "reqId" : "Integer",
-      "reqValueId" : "Integer"
-  }]
+  "orderPrice":{
+          "distance":"Double",
+          "additionalRequirements" : [{
+              "reqId" : "Integer",
+              "reqValueId" : "Integer"
+        }]
+    }
 }
 ```
 
