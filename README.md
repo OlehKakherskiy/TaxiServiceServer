@@ -219,6 +219,7 @@ Request body:
 
 ```json
 {
+  "customerId" : "Long",
   "startTime" : "DateTime",
   "startPoint" : "String",
   "endPoint" : "String",
