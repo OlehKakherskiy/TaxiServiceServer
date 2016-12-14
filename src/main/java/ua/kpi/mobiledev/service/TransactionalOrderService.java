@@ -148,7 +148,7 @@ public class TransactionalOrderService implements OrderService {
     }
 
     private User findUser(Integer userId) {
-        return userService.getUser(userId);
+        return userService.getById(userId);
     }
 
     public void setKmPrice(Integer kmPrice) {

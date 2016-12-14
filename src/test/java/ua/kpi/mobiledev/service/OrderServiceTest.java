@@ -42,12 +42,12 @@ public class OrderServiceTest {
         OrderRepository orderRepository = mock(OrderRepository.class);
         when(orderRepository.save(targetOrder)).thenReturn(expectedOrder);
         UserService userService = mock(UserService.class);
-        when(userService.getUser(1)).thenReturn(mockUser);
+        when(userService.getById(1)).thenReturn(mockUser);
 
         TransactionalOrderService orderService = new TransactionalOrderService(orderRepository, userService, Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         orderService.setKmPrice(5);
         Assert.assertEquals(expectedOrder, orderService.addOrder(orderDto));
-        verify(userService).getUser(1);
+        verify(userService).getById(1);
         verify(orderRepository).save(targetOrder);
     }
 
@@ -57,7 +57,7 @@ public class OrderServiceTest {
         OrderDto orderDto = new OrderDto(1, now, "start", "end", mock(OrderPriceDto.class), 0.0);
 
         UserService userService = mock(UserService.class);
-        when(userService.getUser(1)).thenReturn(new TaxiDriver(1, "", "", Collections.emptySet(), mock(Car.class)));
+        when(userService.getById(1)).thenReturn(new TaxiDriver(1, "", "", Collections.emptySet(), mock(Car.class)));
 
         OrderService orderService = new TransactionalOrderService(mock(OrderRepository.class), userService, Collections.emptyMap(), mock(OrderStatusTransitionManager.class));
         orderService.addOrder(orderDto);
@@ -75,7 +75,7 @@ public class OrderServiceTest {
         when(orderRepository.save(updatedOrder)).thenReturn(updatedOrder);
 
         UserService userService = mock(UserService.class);
-        when(userService.getUser(1)).thenReturn(mockUser);
+        when(userService.getById(1)).thenReturn(mockUser);
         OrderStatusTransitionManager transitionManager = mock(OrderStatusTransitionManager.class);
         when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenReturn(updatedOrder);
 
@@ -84,7 +84,7 @@ public class OrderServiceTest {
 
         verify(orderRepository).findOne(1L);
         verify(orderRepository).save(updatedOrder);
-        verify(userService).getUser(1);
+        verify(userService).getById(1);
         verify(transitionManager).changeOrderStatus(mockOrder, mockUser, mockStatus);
     }
 
@@ -98,7 +98,7 @@ public class OrderServiceTest {
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
 
         UserService userService = mock(UserService.class);
-        when(userService.getUser(1)).thenReturn(mockUser);
+        when(userService.getById(1)).thenReturn(mockUser);
         OrderStatusTransitionManager transitionManager = mock(OrderStatusTransitionManager.class);
         when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenThrow(IllegalStateException.class);
 
@@ -116,7 +116,7 @@ public class OrderServiceTest {
         when(orderRepository.findOne(1L)).thenReturn(mockOrder);
 
         UserService userService = mock(UserService.class);
-        when(userService.getUser(1)).thenReturn(mockUser);
+        when(userService.getById(1)).thenReturn(mockUser);
         OrderStatusTransitionManager transitionManager = mock(OrderStatusTransitionManager.class);
         when(transitionManager.changeOrderStatus(mockOrder, mockUser, mockStatus)).thenThrow(IllegalArgumentException.class);
 

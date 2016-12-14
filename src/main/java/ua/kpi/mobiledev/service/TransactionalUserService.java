@@ -22,8 +22,13 @@ public class TransactionalUserService implements UserService {
     }
 
     @Override
-    public User getUser(Integer userId) {
+    public User getById(Integer userId) {
         User result = userRepository.findOne(userId);
         return Objects.requireNonNull(result, MessageFormat.format("There''s no user with id = ''{0}''", userId));
+    }
+
+    @Override
+    public User getByUsername(String username) {
+        return userRepository.findByEmail(username);
     }
 }
