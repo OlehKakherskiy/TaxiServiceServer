@@ -1,6 +1,9 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -17,8 +20,8 @@ public class TaxiDriver extends User {
     @JoinColumn(name = "idCar")
     private Car car;
 
-    public TaxiDriver(Integer id, String name, String email, String password, Set<MobileNumber> mobileNumbers, @NonNull Car car) {
-        super(id, name, email, password, UserType.TAXI_DRIVER, mobileNumbers);
+    public TaxiDriver(Integer id, String name, String email, Set<MobileNumber> mobileNumbers, Car car) {
+        super(id, name, email, UserType.TAXI_DRIVER, mobileNumbers);
         this.car = car;
     }
 }

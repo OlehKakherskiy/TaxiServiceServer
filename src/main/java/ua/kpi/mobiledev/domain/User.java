@@ -1,8 +1,5 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.NonNull;
-
-import javax.persistence.Column;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -32,10 +29,7 @@ public class User {
 
     @Column(name = "email")
     @NonNull
-    private String username; //e.g. email
-
-    @JsonIgnore
-    private String password;
+    private String email; //e.g. email
 
     public enum UserType {
         CUSTOMER,
