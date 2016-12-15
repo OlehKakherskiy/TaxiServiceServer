@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 import ua.kpi.mobiledev.web.security.token.AccessJwtToken;
 import ua.kpi.mobiledev.web.security.token.JwtTokenFactory;
@@ -46,15 +47,16 @@ public class UsernamePasswordAuthenticationSuccessHandler implements Authenticat
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        mapper.writeValue(response.getWriter(), getTokenMap(accessToken));
+        mapper.writeValue(response.getWriter(), getTokenMap(accessToken, userContext.getUserType()));
 
         clearAuthenticationAttributes(request);
     }
 
-    private Map<String, String> getTokenMap(AccessJwtToken accessToken) {
+    private Map<String, String> getTokenMap(AccessJwtToken accessToken, User.UserType userType) {
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("token", accessToken.getToken());
-        tokenMap.put("type", "Bearer");
+        tokenMap.put("token_type", "Bearer");
+        tokenMap.put("userType", userType.name());
 //        tokenMap.put("refreshToken", refreshToken.getToken());
         return tokenMap;
     }
