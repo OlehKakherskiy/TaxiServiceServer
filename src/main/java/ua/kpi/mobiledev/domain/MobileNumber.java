@@ -4,9 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 
-/**
- * Created by Oleg on 05.11.2016.
- */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,7 +15,7 @@ public class MobileNumber {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idMobileNumber")
-    private Integer id;
+    private Integer idMobileNumber;
 
     @Column(name = "mobileNumber")
     @NonNull

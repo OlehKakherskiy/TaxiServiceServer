@@ -4,9 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 
-/**
- * Created by Oleg on 05.11.2016.
- */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,7 +15,7 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idCar")
-    private Integer id;
+    private Integer carId;
 
     @Column(name = "model")
     @NonNull
