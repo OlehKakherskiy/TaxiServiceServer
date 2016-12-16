@@ -14,7 +14,7 @@ Request body:
 ```json
 {
   "name": "String",
-  "email" : "String",
+  "username" : "String", //email
   "password" : "String",
   "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
   "userType" : "CUSTOMER/TAXI_DRIVER",
@@ -54,11 +54,16 @@ RequestType: **GET**
 Response:
 ```json
 {
+  "userId":"String",
   "name": "String",
   "email" : "String",
-  "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
+  "mobileNumbers" : [{
+     "idMobileNumber":"Integer",
+     "mobileNumber": "String"
+  }],
   "userType" : "CUSTOMER/TAXI_DRIVER",
   "car" : {
+    "carId":"Integer",
     "manufacturer" : "String",
     "model" : "String",
     "plateNumber" : "String",
@@ -78,12 +83,16 @@ RequestType: **PUT**
 Request body:
 ```json
 {
+  "userId":"String",
   "name": "String",
   "email" : "String",
-  "password" : "String",
-  "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
+  "mobileNumbers" : [{
+     "idMobileNumber":"Integer",
+     "mobileNumber": "String"
+  }],
   "userType" : "CUSTOMER/TAXI_DRIVER",
   "car" : {
+    "carId":"Integer",
     "manufacturer" : "String",
     "model" : "String",
     "plateNumber" : "String",
@@ -94,9 +103,31 @@ Request body:
 ```
 
 **NOTES:**
-* If car object is null - no changes will be performed with it.
 * Car object will be omitted if userType = CUSTOMER. 
 
+
+**_5. Login_**
+```
+/login
+```
+RequestType: **POST**
+
+Request body:
+```json
+{
+  "username":"String",
+  "password":"String"
+}
+```
+
+Response body:
+```json
+{
+  "token":"String",
+  "token_type":"String",
+  "user_type":"String"
+}
+```
 ###Order API
 **_1. Get all orders (by type)_**
 ```
