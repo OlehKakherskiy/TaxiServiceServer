@@ -2,10 +2,13 @@
          xmlns:b="http://www.springframework.org/schema/beans"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns:context="http://www.springframework.org/schema/context"
+         xmlns:util="http://www.springframework.org/schema/util"
          xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/security
-	http://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	http://www.springframework.org/schema/security/spring-security.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 
     <context:component-scan base-package="ua.kpi.mobiledev.web.security"/>
@@ -16,12 +19,11 @@
         <csrf disabled="true"/>
         <custom-filter ref="usernamePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
     </http>
-    <!--<http pattern="/api/signup" security="none"/>-->
 
     <http pattern="/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless" use-expressions="true"
           auto-config="false">
-
-        <!--<custom-filter ref=""-->
+        <csrf disabled="true"/>
+        <custom-filter ref="jwtAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
         <intercept-url pattern="/**" access="isFullyAuthenticated()"/>
         <logout/>
     </http>
@@ -32,19 +34,28 @@
         <b:constructor-arg name="successHandler" ref="usernamePasswordAuthenticationSuccessHandler"/>
         <b:property name="authenticationManager" ref="authenticationManager"/>
     </b:bean>
-    <!--<security:csrf disabled="true"/>-->
-    <!--<security:custom-filter before="FORM_LOGIN_FILTER" ref="jwtAuthenticationFilter"/>-->
-    <!--</security:http>-->
 
-    <!--<b:bean id="jwtAuthenticationFilter" class="com.toptal.travelplanner.security.JwtAuthenticationFilter">-->
-    <!--<beans:property name="authenticationManager" ref="authenticationManager"/>-->
-    <!--<beans:property name="authenticationSuccessHandler" ref="jwtAuthenticationSuccessHandler"/>-->
-    <!--</b:bean>-->
+    <b:bean id="jwtAuthenticationFilter" class="ua.kpi.mobiledev.web.security.jwtBasedAuthentication.JwtTokenAuthenticationProcessingFilter">
+        <b:property name="authenticationManager" ref="authenticationManager"/>
+        <b:constructor-arg name="matcher" ref="skipPathRequestMatcher"/>
+        <b:constructor-arg name="tokenExtractor" ref="tokenExtractor"/>
+    </b:bean>
+
+    <b:bean id="tokenExtractor" class="ua.kpi.mobiledev.web.security.token.extractor.JwtHeaderTokenExtractor"/>
 
     <authentication-manager alias="authenticationManager">
         <authentication-provider ref="userCredentialsProvider"/>
-        <!--<security:authentication-provider ref="JwtProvider"/>-->
+        <authentication-provider ref="jwtProvider"/>
     </authentication-manager>
+
+    <b:bean id="skipPathRequestMatcher" class="ua.kpi.mobiledev.web.security.jwtBasedAuthentication.SkipPathRequestMatcher">
+        <b:constructor-arg name="pathsToSkip" ref="pathsToSkip"/>
+        <b:constructor-arg name="processingPath" value="/**"/>
+    </b:bean>
+
+    <util:list id="pathsToSkip" list-class="java.util.ArrayList" value-type="java.lang.String">
+        <b:value>/login</b:value>
+    </util:list>
 
     <b:bean id="daoSupport" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
         <b:property name="dataSource" ref="dataSource"/>
