@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.web.security.loginBasedAuthentication;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,7 +41,11 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
         if (notPostMethod(request)) {
             throw new HttpRequestMethodNotSupportedException("Authentication method not supported for " + request.getMethod());
         }
-        return this.getAuthenticationManager().authenticate(mapToToken(ifValidLoginRequest(mapFromJson(request))));
+        LoginRequest loginRequest = mapFromJson(request);
+        if (Objects.isNull(loginRequest)) {
+            throw new SecurityException("Bad request. Invalid request body");
+        }
+        return this.getAuthenticationManager().authenticate(mapToToken(ifValidLoginRequest(loginRequest)));
     }
 
     private UsernamePasswordAuthenticationToken mapToToken(LoginRequest loginRequest) {
@@ -48,7 +53,11 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     }
 
     private LoginRequest mapFromJson(HttpServletRequest request) throws IOException {
-        return objectMapper.readValue(request.getReader(), LoginRequest.class);
+        try {
+            return objectMapper.readValue(request.getReader(), LoginRequest.class);
+        } catch (JsonMappingException e) {
+            return null;
+        }
     }
 
     private LoginRequest ifValidLoginRequest(LoginRequest loginRequest) {

@@ -56,7 +56,7 @@ public class UsernamePasswordAuthenticationSuccessHandler implements Authenticat
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("token", accessToken.getToken());
         tokenMap.put("token_type", "Bearer");
-        tokenMap.put("userType", userType.name());
+        tokenMap.put("user_type", userType.name());
 //        tokenMap.put("refreshToken", refreshToken.getToken());
         return tokenMap;
     }
