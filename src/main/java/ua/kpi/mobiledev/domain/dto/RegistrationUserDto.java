@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class RegistrationUserDto {
 
-    public static User toUser(UserDto userDto) {
-        Set<MobileNumber> mobileNumbers = toMobileNumbers(userDto.getMobileNumbers());
-        return isTaxiDriver(userDto.getUserType()) ?
-                new TaxiDriver(null, userDto.name, userDto.username, mobileNumbers, CarDto.toCar(userDto.getCar())) :
-                new User(null, userDto.name, userDto.username, userDto.userType, mobileNumbers);
+    public static User toUser(RegistrationUserDto registrationUserDto) {
+        Set<MobileNumber> mobileNumbers = toMobileNumbers(registrationUserDto.getMobileNumbers());
+        return isTaxiDriver(registrationUserDto.getUserType()) ?
+                new TaxiDriver(null, registrationUserDto.name, registrationUserDto.username, mobileNumbers, CarDto.toCar(registrationUserDto.getCar())) :
+                new User(null, registrationUserDto.name, registrationUserDto.username, registrationUserDto.userType, mobileNumbers);
     }
 
     private static boolean isTaxiDriver(User.UserType userType) {
