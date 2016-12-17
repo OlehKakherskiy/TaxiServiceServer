@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.service;
 
 import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.AdditionalRequirementValue;
@@ -14,6 +15,8 @@ import ua.kpi.mobiledev.repository.OrderRepository;
 import java.text.MessageFormat;
 import java.util.*;
 
+@Transactional(readOnly = true)
+@Service
 public class TransactionalOrderService implements OrderService {
 
     private OrderRepository orderRepository;
