@@ -9,4 +9,7 @@
         <constructor-arg value="ua.kpi.mobiledev.service.OrderService"/>
     </bean>
 
+    <bean id="userService" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.service.TransactionalUserService"/>
+    </bean>
 </beans>
