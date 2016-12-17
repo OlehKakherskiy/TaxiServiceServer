@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.service;
 
+import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.AdditionalRequirementValue;
@@ -114,7 +115,7 @@ public class TransactionalOrderService implements OrderService {
         if (Objects.isNull(order)) {
             throw new IllegalArgumentException(MessageFormat.format("Order with id = ''{0}'' doesn''t exist", orderId));
         }
-        order.getTaxiDriver();
+        Hibernate.initialize(order.getTaxiDriver());
         return order;
     }
 
