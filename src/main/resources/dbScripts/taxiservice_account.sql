@@ -1,1 +1,0 @@
-INSERT INTO taxiservice.account (startTime, startPoint, endPoint, statusId, price, idCustomer, idTaxiDriver) VALUES ('2016-12-10 05:01:15.430000', 'startPoint', 'endPoint', 0, 123, 5, null);

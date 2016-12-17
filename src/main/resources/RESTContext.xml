@@ -37,6 +37,7 @@
             <set>
                 <bean class="ua.kpi.mobiledev.web.converter.StringToOrderStatusConverter"/>
                 <bean class="ua.kpi.mobiledev.web.converter.StringToIntegerConverter"/>
+                <bean class="ua.kpi.mobiledev.web.converter.StringToUserTypeConverter"/>
             </set>
         </property>
     </bean>

@@ -1,6 +1,5 @@
 package ua.kpi.mobiledev.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,15 +19,12 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idUser")
-    @NonNull
     private Integer id;
 
     @Column(name = "name")
-    @NonNull
     private String name;
 
     @Column(name = "email")
-    @NonNull
     private String email; //e.g. email
 
     public enum UserType {

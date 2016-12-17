@@ -20,12 +20,13 @@
         <custom-filter ref="usernamePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
     </http>
 
+    <http pattern="/user/register" security="none"/>
+
     <http pattern="/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless" use-expressions="true"
           auto-config="false">
         <csrf disabled="true"/>
         <custom-filter ref="jwtAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
         <intercept-url pattern="/**" access="isFullyAuthenticated()"/>
-        <logout/>
     </http>
 
     <b:bean id="usernamePasswordAuthenticationFilter"
@@ -55,6 +56,7 @@
 
     <util:list id="pathsToSkip" list-class="java.util.ArrayList" value-type="java.lang.String">
         <b:value>/login</b:value>
+        <b:value>/user/register</b:value>
     </util:list>
 
     <b:bean id="daoSupport" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
