@@ -9,4 +9,6 @@ public interface UserService {
     User getByUsername(String username);
 
     User register(User user, String password);
+
+    User update(User user);
 }

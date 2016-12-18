@@ -75,7 +75,7 @@ Response:
 
 **_4. Update user profile_**
 ```
-/user/{userId}
+/user
 ```
 
 RequestType: **PUT**

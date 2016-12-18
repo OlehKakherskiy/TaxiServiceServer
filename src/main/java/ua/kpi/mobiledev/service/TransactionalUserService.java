@@ -62,6 +62,12 @@ public class TransactionalUserService implements UserService {
         return resultUser;
     }
 
+    @Override
+    @Transactional
+    public User update(User user) {
+        return userRepository.save(user);
+    }
+
     private UserDetails prepareSecurityDetails(User user, String password) {
         return new SecurityDetails(user.getEmail(), password, "", true,
                 Arrays.asList(new Role(new SimpleGrantedAuthority(user.getUserType().name()))));

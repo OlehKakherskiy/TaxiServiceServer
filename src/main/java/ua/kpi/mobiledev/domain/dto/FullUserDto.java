@@ -3,6 +3,7 @@ package ua.kpi.mobiledev.domain.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ua.kpi.mobiledev.domain.MobileNumber;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
 
@@ -11,6 +12,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -31,12 +33,19 @@ public class FullUserDto {
         return fullUserDto;
     }
 
+    public static User toUser(FullUserDto fullUserDto) {
+        Set<MobileNumber> mobileNumbers = fullUserDto.getMobileNumbers().stream().map(MobileNumberDto::from).collect(Collectors.toSet());
+        return isTaxiDriver(fullUserDto.getUserType()) ?
+                new TaxiDriver(fullUserDto.userId, fullUserDto.name, fullUserDto.email, mobileNumbers, CarDto.toCar(fullUserDto.getCar())) :
+                new User(fullUserDto.userId, fullUserDto.name, fullUserDto.email, fullUserDto.userType, mobileNumbers);
+    }
+
     private static boolean isTaxiDriver(User.UserType userType) {
         return userType == User.UserType.TAXI_DRIVER;
     }
 
-    @NotNull
-    @Min(1)
+    @NotNull(message = "userId.required")
+    @Min(value = 1, message = "userId.negativeOrZero")
     private Integer userId;
 
     @NotNull(message = "name.required")
@@ -51,6 +60,7 @@ public class FullUserDto {
     private User.UserType userType;
 
     @NotNull(message = "mobileNumbers.required")
+    @Valid
     private List<MobileNumberDto> mobileNumbers;
 
     @Valid
