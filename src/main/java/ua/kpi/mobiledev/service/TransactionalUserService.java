@@ -1,10 +1,12 @@
 package ua.kpi.mobiledev.service;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.repository.UserRepository;
 import ua.kpi.mobiledev.web.security.model.Role;
@@ -16,6 +18,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Service
+@Transactional(readOnly = true)
 public class TransactionalUserService implements UserService {
 
     private UserRepository userRepository;
@@ -30,8 +33,15 @@ public class TransactionalUserService implements UserService {
 
     @Override
     public User getById(Integer userId) {
-        User result = userRepository.findOne(userId);
-        return Objects.requireNonNull(result, MessageFormat.format("There''s no user with id = ''{0}''", userId));
+        User result = Objects.requireNonNull(userRepository.findOne(userId),
+                MessageFormat.format("There''s no user with id = ''{0}''", userId));
+        //lazy loading
+        Hibernate.initialize(result.getMobileNumbers());
+        if (result instanceof TaxiDriver) {
+            Hibernate.initialize(((TaxiDriver) result).getCar());
+        }
+        return result;
+
     }
 
     @Override
