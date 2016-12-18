@@ -2,14 +2,20 @@ package ua.kpi.mobiledev.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.*;
 import ua.kpi.mobiledev.service.OrderService;
+import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -58,6 +64,8 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.POST, consumes = "application/json")
+    @Secured("ROLE_CUSTOMER")
+    @PreAuthorize("#orderDto.customerId == authentication.details.id")
     public HttpStatus addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
         checkIfValid(bindingResult);
         validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
@@ -120,13 +128,26 @@ public class OrderController {
     }
 
 
-//    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.DELETE)
-//    public HttpStatus deleteOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId){
-//        orderService.deleteOrder()
-//    } //TODO: implement delete order with security
+    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId, Authentication authentication) {
+        UserContext userContext = (UserContext) authentication.getDetails();
+        Integer userId = userContext.getId();
+        checkUserType(userContext.getUserType());
+        if (!orderService.deleteOrder(orderId, userId)) {
+            throw new SecurityException("User with id = " + userId + " is not order owner.");
+        }
+    }
+
+    private void checkUserType(User.UserType userType) {
+        if (userType == User.UserType.TAXI_DRIVER) {
+            throw new SecurityException("Taxi driver can't delete the order");
+        }
+    }
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
+    @Secured("ROLE_CUSTOMER")
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
                             @RequestBody @Valid OrderDto orderDto, BindingResult bindingResult) throws MethodArgumentNotValidException {
         checkIfValid(bindingResult);
