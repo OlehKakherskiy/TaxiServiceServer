@@ -8,7 +8,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ua.kpi.mobiledev.web.security.JwtAuthenticationToken;
 import ua.kpi.mobiledev.web.security.token.RawAccessJwtToken;
@@ -53,6 +52,6 @@ public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticati
                                               AuthenticationException failed) throws IOException, ServletException {
         SecurityContextHolder.clearContext();
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     }
 }
