@@ -47,16 +47,17 @@ public class UsernamePasswordAuthenticationSuccessHandler implements Authenticat
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        mapper.writeValue(response.getWriter(), getTokenMap(accessToken, userContext.getUserType()));
+        mapper.writeValue(response.getWriter(), getTokenMap(accessToken, userContext.getUserType(), userContext.getId()));
 
         clearAuthenticationAttributes(request);
     }
 
-    private Map<String, String> getTokenMap(AccessJwtToken accessToken, User.UserType userType) {
+    private Map<String, String> getTokenMap(AccessJwtToken accessToken, User.UserType userType, Integer userId) {
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("token", accessToken.getToken());
         tokenMap.put("token_type", "Bearer");
         tokenMap.put("user_type", userType.name());
+        tokenMap.put("id", userId.toString());
 //        tokenMap.put("refreshToken", refreshToken.getToken());
         return tokenMap;
     }
