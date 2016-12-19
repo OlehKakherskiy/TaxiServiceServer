@@ -6,7 +6,7 @@ server RESTful app developed using Spring framework
 
 **_1. Register_**
 ```
-/user
+/user/register
 ```
 RequestType: **POST**
 
