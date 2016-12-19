@@ -42,6 +42,8 @@
 
     <b:bean id="tokenExtractor" class="ua.kpi.mobiledev.web.security.token.extractor.JwtHeaderTokenExtractor"/>
 
+    <b:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
     <authentication-manager alias="authenticationManager">
         <authentication-provider ref="userCredentialsProvider"/>
         <authentication-provider ref="jwtProvider"/>

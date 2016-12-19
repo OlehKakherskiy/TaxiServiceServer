@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.service.UserService;
@@ -20,15 +21,15 @@ import java.util.Objects;
 @Component(value = "userCredentialsProvider")
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
 
-//    private final BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     private final UserService userService;
 
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public UsernamePasswordAuthenticationProvider(/*BCryptPasswordEncoder passwordEncoder,*/ UserService userService, UserDetailsService userDetailsService) {
-//        this.passwordEncoder = passwordEncoder;
+    public UsernamePasswordAuthenticationProvider(BCryptPasswordEncoder passwordEncoder, UserService userService, UserDetailsService userDetailsService) {
+        this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
     }
@@ -54,8 +55,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
     }
 
     private boolean invalidPassword(String password, String storedPassword) {
-//        return !passwordEncoder.matches(password, encodedPassword);
-        return !password.equals(storedPassword);
+        return !passwordEncoder.matches(password, storedPassword);
     }
 
     @Override

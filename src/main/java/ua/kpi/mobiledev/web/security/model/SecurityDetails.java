@@ -2,6 +2,7 @@ package ua.kpi.mobiledev.web.security.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -21,6 +22,7 @@ public class SecurityDetails implements UserDetails {
     private String username;
 
     @Column(name = "password")
+    @Setter
     private String password;
 
     @Column(name = "salt")
