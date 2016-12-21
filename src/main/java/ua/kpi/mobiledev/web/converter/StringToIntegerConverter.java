@@ -8,7 +8,7 @@ public class StringToIntegerConverter implements Converter<String, Integer> {
     public Integer convert(String source) {
         try {
             return Integer.valueOf(source);
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             return null;
         }
     }

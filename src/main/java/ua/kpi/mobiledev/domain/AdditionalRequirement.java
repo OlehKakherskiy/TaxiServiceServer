@@ -1,8 +1,7 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.*;
+import lombok.Data;
 
-import javax.persistence.*;
 import java.util.Map;
 
 @Data
