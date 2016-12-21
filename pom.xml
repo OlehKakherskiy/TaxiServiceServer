@@ -184,6 +184,12 @@
             <version>1.7.5.RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>de.mkammerer</groupId>
+            <artifactId>argon2-jvm</artifactId>
+            <version>2.1</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>TaxiServiceServer</finalName>

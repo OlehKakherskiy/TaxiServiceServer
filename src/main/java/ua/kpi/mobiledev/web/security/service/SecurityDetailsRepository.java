@@ -1,5 +1,7 @@
 package ua.kpi.mobiledev.web.security.service;
 
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,13 +18,6 @@ public class SecurityDetailsRepository implements CustomUserDetailsService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    public SecurityDetailsRepository(BCryptPasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
     public UserDetails fullLoadWithAuthorities(String username) {
         return entityManager.find(SecurityDetails.class, username);
@@ -32,8 +27,10 @@ public class SecurityDetailsRepository implements CustomUserDetailsService {
     @Transactional
     public void registerNewUser(UserDetails newUser) {
         SecurityDetails securityDetails = (SecurityDetails) newUser;
+        Argon2 argon2 = Argon2Factory.create();
+
         String plainPassword = newUser.getPassword();
-        String encodedPassword = passwordEncoder.encode(plainPassword);
+        String encodedPassword = argon2.hash(2, 65536, 1, plainPassword);
         securityDetails.setPassword(encodedPassword);
         entityManager.persist(securityDetails);
     }

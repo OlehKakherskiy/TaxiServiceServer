@@ -1,5 +1,7 @@
 package ua.kpi.mobiledev.web.security.loginBasedAuthentication;
 
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,15 +23,12 @@ import java.util.Objects;
 @Component(value = "userCredentialsProvider")
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
 
-    private final BCryptPasswordEncoder passwordEncoder;
-
     private final UserService userService;
 
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public UsernamePasswordAuthenticationProvider(BCryptPasswordEncoder passwordEncoder, UserService userService, UserDetailsService userDetailsService) {
-        this.passwordEncoder = passwordEncoder;
+    public UsernamePasswordAuthenticationProvider(UserService userService, UserDetailsService userDetailsService) {
         this.userService = userService;
         this.userDetailsService = userDetailsService;
     }
@@ -55,7 +54,9 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
     }
 
     private boolean invalidPassword(String password, String storedPassword) {
-        return !passwordEncoder.matches(password, storedPassword);
+        Argon2 argon2 = Argon2Factory.create();
+        return !argon2.verify(storedPassword, password);
+//        return !passwordEncoder.matches(password, storedPassword);
     }
 
     @Override
