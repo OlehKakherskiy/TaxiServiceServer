@@ -3,6 +3,8 @@ package ua.kpi.mobiledev.web.security.token;
 import io.jsonwebtoken.*;
 import org.springframework.security.authentication.BadCredentialsException;
 
+import java.security.Key;
+
 public class RawAccessJwtToken implements JwtToken {
 
     private String token;
@@ -11,7 +13,7 @@ public class RawAccessJwtToken implements JwtToken {
         this.token = token;
     }
 
-    public Jws<Claims> parseClaims(String signingKey) {
+    public Jws<Claims> parseClaims(Key signingKey) {
         try {
             return Jwts.parser().setSigningKey(signingKey).parseClaimsJws(this.token);
         } catch (UnsupportedJwtException | MalformedJwtException | IllegalArgumentException | SignatureException ex) {

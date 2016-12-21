@@ -32,7 +32,7 @@ public class SecurityDetails implements UserDetails {
     private boolean isEnabled;
 
     @ElementCollection
-    @CollectionTable(name = "authorities", joinColumns=@JoinColumn(name = "username"))
+    @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "username"))
     private List<Role> authorityList;
 
     @Override

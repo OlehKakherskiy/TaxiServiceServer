@@ -18,6 +18,12 @@
         <custom-filter ref="usernamePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
     </http>
 
+    <http pattern="/logout" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless"
+          use-expressions="true">
+        <csrf disabled="true"/>
+        <custom-filter ref="logoutFilter" position="LOGOUT_FILTER"/>
+    </http>
+
     <http pattern="/user/register" security="none"/>
 
     <http pattern="/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless" use-expressions="true"
@@ -27,6 +33,10 @@
         <intercept-url pattern="/**" access="isFullyAuthenticated()"/>
     </http>
 
+    <b:bean id="logoutFilter" class="ua.kpi.mobiledev.web.security.LogoutFilter" autowire="byName">
+        <b:property name="authenticationManager" ref="authenticationManager"/>
+    </b:bean>
+
     <b:bean id="usernamePasswordAuthenticationFilter"
             class="ua.kpi.mobiledev.web.security.loginBasedAuthentication.UsernamePasswordAuthenticationFilter">
         <b:constructor-arg name="defaultProcessUrl" value="/login" type="java.lang.String"/>
@@ -34,7 +44,8 @@
         <b:property name="authenticationManager" ref="authenticationManager"/>
     </b:bean>
 
-    <b:bean id="jwtAuthenticationFilter" class="ua.kpi.mobiledev.web.security.jwtBasedAuthentication.JwtTokenAuthenticationProcessingFilter">
+    <b:bean id="jwtAuthenticationFilter"
+            class="ua.kpi.mobiledev.web.security.jwtBasedAuthentication.JwtTokenAuthenticationProcessingFilter">
         <b:property name="authenticationManager" ref="authenticationManager"/>
         <b:constructor-arg name="matcher" ref="skipPathRequestMatcher"/>
         <b:constructor-arg name="tokenExtractor" ref="tokenExtractor"/>
@@ -49,7 +60,8 @@
         <authentication-provider ref="jwtProvider"/>
     </authentication-manager>
 
-    <b:bean id="skipPathRequestMatcher" class="ua.kpi.mobiledev.web.security.jwtBasedAuthentication.SkipPathRequestMatcher">
+    <b:bean id="skipPathRequestMatcher"
+            class="ua.kpi.mobiledev.web.security.jwtBasedAuthentication.SkipPathRequestMatcher">
         <b:constructor-arg name="pathsToSkip" ref="pathsToSkip"/>
         <b:constructor-arg name="processingPath" value="/**"/>
     </b:bean>
@@ -57,10 +69,27 @@
     <util:list id="pathsToSkip" list-class="java.util.ArrayList" value-type="java.lang.String">
         <b:value>/login</b:value>
         <b:value>/user/register</b:value>
+        <b:value>/logout</b:value>
     </util:list>
 
     <b:bean id="daoSupport" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
         <b:property name="dataSource" ref="dataSource"/>
     </b:bean>
 
+    <b:bean id="jedisConnFactory"
+            class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <b:property name="usePool" value="true"/>
+        <!--<b:property name="port" value="6379"/>-->
+    </b:bean>
+
+    <b:bean id="redisTemplate"
+            class="org.springframework.data.redis.core.RedisTemplate">
+        <b:property name="connectionFactory" ref="jedisConnFactory"/>
+    </b:bean>
+
+    <b:bean id="randomGenerator" class="com.auth0.jwt.internal.org.bouncycastle.crypto.prng.DigestRandomGenerator">
+        <b:constructor-arg ref="sha512Digest"/>
+    </b:bean>
+
+    <b:bean id="sha512Digest" class="com.auth0.jwt.internal.org.bouncycastle.crypto.digests.SHA512Digest"/>
 </b:beans>

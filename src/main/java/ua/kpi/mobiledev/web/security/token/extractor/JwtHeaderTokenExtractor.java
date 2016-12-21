@@ -1,7 +1,6 @@
 package ua.kpi.mobiledev.web.security.token.extractor;
 
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
