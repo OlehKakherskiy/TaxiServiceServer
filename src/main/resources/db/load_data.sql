@@ -8,7 +8,7 @@ INSERT INTO taxiservice.users (username, password, salt, enabled) VALUES ('email
 INSERT INTO taxiservice.authorities (authority, username) VALUES ('TAXI_DRIVER', 'email2@gmail.com');
 INSERT INTO taxiservice.authorities (authority, username) VALUES ('CUSTOMER', 'email@gmail.com');
 
-INSERT INTO taxiservice.mobilenumber (mobileNumber, idUser) VALUES ('+380975106619', 1); --change idUser, if it not '1'
+INSERT INTO taxiservice.mobilenumber (mobileNumber, idUser) VALUES ('+380975106619', 1);
 INSERT INTO taxiservice.mobilenumber (mobileNumber, idUser) VALUES ('+380935705681', 1);
 INSERT INTO taxiservice.mobilenumber (mobileNumber, idUser) VALUES ('+380935705681(1)', 2);
 INSERT INTO taxiservice.mobilenumber (mobileNumber, idUser) VALUES ('+380975106619(1)', 2);
@@ -21,10 +21,10 @@ INSERT INTO taxiservice.account (idAccount, startTime, startPoint, endPoint, sta
 INSERT INTO taxiservice.account (idAccount, startTime, startPoint, endPoint, statusId, price, idCustomer, idTaxiDriver) VALUES (6,'2016-12-14 23:00:05.222000', 'start', 'end', 0, 1000, 1, null);
 INSERT INTO taxiservice.account (idAccount, startTime, startPoint, endPoint, statusId, price, idCustomer, idTaxiDriver) VALUES (7,'2016-12-17 23:00:05.222000', 'start', 'end', 0, 1000, 1, null);
 
-INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount) VALUES (1, 3);
-INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount) VALUES (1, 4);
-INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount) VALUES (1, 1);
-INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount) VALUES (2, 5);
-INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount) VALUES (1, 5);
-INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount) VALUES (2, 6);
-INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount) VALUES (1, 6);
+INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount,idAdditionalRequirement) VALUES (1, 3,1);
+INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount,idAdditionalRequirement) VALUES (1, 4,1);
+INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount,idAdditionalRequirement) VALUES (1, 1,1);
+INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount,idAdditionalRequirement) VALUES (2, 5,1);
+INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount,idAdditionalRequirement) VALUES (1, 5,2);
+INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount,idAdditionalRequirement) VALUES (2, 6,1);
+INSERT INTO taxiservice.additionalrequirement (idAdditionalRequirementValue, idAccount,idAdditionalRequirement) VALUES (1, 6,2);
