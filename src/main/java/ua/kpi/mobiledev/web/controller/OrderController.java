@@ -19,6 +19,8 @@ import ua.kpi.mobiledev.web.security.model.UserContext;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -89,7 +91,9 @@ public class OrderController {
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public PriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
-        return new PriceDto(orderService.calculatePrice(orderPriceDto));
+        Double price = orderService.calculatePrice(orderPriceDto);
+        Double roundedPrice = new BigDecimal(price).setScale(2, RoundingMode.UP).doubleValue();
+        return new PriceDto(roundedPrice);
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)
