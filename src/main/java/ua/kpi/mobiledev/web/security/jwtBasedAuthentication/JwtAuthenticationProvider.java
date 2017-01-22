@@ -35,7 +35,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         if (tokenStoreObject == null) {
             throw new BadCredentialsException("Token is invalid");
         }
-        Jws<Claims> jwsClaims = rawAccessToken.parseClaims(tokenStoreObject.getDigestKey());
+        Jws<Claims> jwsClaims = rawAccessToken.parseClaims(tokenStoreObject.getTokenDigestKey());
         Claims claims = jwsClaims.getBody();
 
         checkIfValid(tokenStoreObject);

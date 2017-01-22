@@ -15,5 +15,5 @@ public class TokenStoreObject implements Serializable {
 
     private Date expiredIn;
 
-    private Key digestKey;
+    private Key tokenDigestKey;
 }

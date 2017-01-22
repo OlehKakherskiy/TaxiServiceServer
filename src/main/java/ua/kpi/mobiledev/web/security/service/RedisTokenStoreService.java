@@ -16,7 +16,7 @@ public class RedisTokenStoreService implements RedisStoreService<String, TokenSt
 
     @Override
     public void save(String key, TokenStoreObject value) {
-        redisTemplate.opsForValue().set(key.substring(0, 20), value);
+        redisTemplate.opsForValue().set(key, value);
         redisTemplate.expire(key, getExistedTime(value.getExpiredIn()), TimeUnit.MILLISECONDS);
     }
 
@@ -26,6 +26,6 @@ public class RedisTokenStoreService implements RedisStoreService<String, TokenSt
 
     @Override
     public TokenStoreObject get(String key) {
-        return redisTemplate.opsForValue().get(key.substring(0, 20));
+        return redisTemplate.opsForValue().get(key);
     }
 }
