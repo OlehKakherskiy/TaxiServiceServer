@@ -77,7 +77,16 @@
     <b:bean id="jedisConnFactory"
             class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
         <b:property name="usePool" value="true"/>
-        <!--<b:property name="port" value="6379"/>-->
+        <!--comment property if want to use localhost-->
+        <b:property name="shardInfo">
+            <b:bean class="redis.clients.jedis.JedisShardInfo">
+                <b:constructor-arg name="uri">
+                    <b:bean class="java.net.URI">
+                        <b:constructor-arg value="redis://h:p7d83e956313f2bbe703adbddc09724f0c8a062acf860669053cc50ece89c58df@ec2-54-225-127-4.compute-1.amazonaws.com:23919"/>
+                    </b:bean>
+                </b:constructor-arg>
+            </b:bean>
+        </b:property>
     </b:bean>
 
     <b:bean id="redisTemplate"
