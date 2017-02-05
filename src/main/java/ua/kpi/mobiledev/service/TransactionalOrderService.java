@@ -27,21 +27,23 @@ public class TransactionalOrderService implements OrderService {
 
     private Integer kmPrice;
 
-    public TransactionalOrderService(OrderRepository orderRepository, UserService userService, Map<Integer, AdditionalRequirement> additionalRequirements, OrderStatusManager orderStatusManager) {
+    public TransactionalOrderService(OrderRepository orderRepository, UserService userService,
+                                     OrderStatusManager orderStatusManager) {
         this.orderRepository = orderRepository;
         this.userService = userService;
-        this.additionalRequirements = additionalRequirements;
+        this.additionalRequirements = Collections.emptyMap();
         this.orderStatusManager = orderStatusManager;
     }
 
     @Override
     @Transactional
     public Order addOrder(OrderDto orderDto) {
+        OrderPriceDto orderPriceDto = Objects.requireNonNull(orderDto.getOrderPrice(),
+                "There's no data for order price calculation");
         User user = findUser(orderDto.getCustomerId());
         if (user.getUserType() == User.UserType.TAXI_DRIVER) {
             throw new IllegalArgumentException("Taxi driver can't add order");
         }
-        OrderPriceDto orderPriceDto = Objects.requireNonNull(orderDto.getOrderPrice(), "There's no data for order price calculation");
         Order order = new Order(null, user, null, orderDto.getStartTime(),
                 orderDto.getStartPoint(), orderDto.getEndPoint(),
                 calculatePrice(orderPriceDto),
@@ -52,7 +54,10 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public Double calculatePrice(OrderPriceDto orderPriceDto) {
-        double basicPrice = Optional.ofNullable(orderPriceDto.getDistance() * kmPrice).orElse(0.0);
+        if (Objects.isNull(orderPriceDto)) {
+            return 0.0;
+        }
+        double basicPrice = Optional.ofNullable(orderPriceDto.getDistance()).orElse(0.0) * kmPrice;
         double extraPrice = getAdditionalRequirementValueSet(orderPriceDto)
                 .stream()
                 .map(reqEntry -> reqEntry.getAdditionalRequirement().addPrice(basicPrice, reqEntry.getRequirementValue()))
@@ -67,16 +72,16 @@ public class TransactionalOrderService implements OrderService {
         Map<Integer, Integer> orderRequirements = orderPriceDto.paramsToMap();
         if (Objects.isNull(orderRequirements) || orderRequirements.isEmpty()) {
             return Collections.emptySet();
-        } else {
-            Set<AdditionalRequirementValue> result = new HashSet<>();
-            for (Map.Entry<Integer, Integer> orderRequirement : orderRequirements.entrySet()) {
-                AdditionalRequirement additionalRequirement = convertToRequirement(orderRequirement.getKey());
-                if (isValidRequirementValueId(additionalRequirement, orderRequirement.getValue())) {
-                    result.add(new AdditionalRequirementValue(null, additionalRequirement, orderRequirement.getValue()));
-                }
-            }
-            return result;
         }
+        Set<AdditionalRequirementValue> result = new HashSet<>();
+        for (Map.Entry<Integer, Integer> orderRequirement : orderRequirements.entrySet()) {
+            AdditionalRequirement additionalRequirement = convertToRequirement(orderRequirement.getKey());
+            if (isValidRequirementValueId(additionalRequirement, orderRequirement.getValue())) {
+                result.add(new AdditionalRequirementValue(null, additionalRequirement, orderRequirement.getValue()));
+            }
+        }
+        return result;
+
     }
 
     private AdditionalRequirement convertToRequirement(Integer requirementId) {
@@ -86,7 +91,7 @@ public class TransactionalOrderService implements OrderService {
 
     private boolean isValidRequirementValueId(AdditionalRequirement additionalRequirement, Integer reqValueId) {
         Objects.requireNonNull(additionalRequirement.getRequirementValues().get(reqValueId),
-                MessageFormat.format("There's no value id in additional requirement with id={0}. Value id={1}",
+                MessageFormat.format("There''s no value id in additional requirement with id={0}. Value id={1}",
                         additionalRequirement.getId(), reqValueId));
         return true;
     }
@@ -155,5 +160,9 @@ public class TransactionalOrderService implements OrderService {
 
     public void setKmPrice(Integer kmPrice) {
         this.kmPrice = kmPrice;
+    }
+
+    public void setAdditionalRequirements(Map<Integer, AdditionalRequirement> additionalRequirements) {
+        this.additionalRequirements = additionalRequirements;
     }
 }

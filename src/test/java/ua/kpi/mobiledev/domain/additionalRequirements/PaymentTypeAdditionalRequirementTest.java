@@ -3,12 +3,15 @@ package ua.kpi.mobiledev.domain.additionalRequirements;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
+import ua.kpi.mobiledev.testCategories.UnitTest;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@Category(UnitTest.class)
 public class PaymentTypeAdditionalRequirementTest {
 
     private static AdditionalRequirement paymentTypeAdditionalRequirement;

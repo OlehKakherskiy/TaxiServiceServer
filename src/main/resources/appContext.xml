@@ -19,10 +19,10 @@
 
     <bean id="orderService" class="ua.kpi.mobiledev.service.TransactionalOrderService">
         <constructor-arg name="orderRepository" ref="orderRepository"/>
-        <constructor-arg name="additionalRequirements" ref="additionalRequirements"/>
         <constructor-arg name="orderStatusManager" ref="orderStatusTransitionManager"/>
         <constructor-arg name="userService" ref="transactionalUserService"/>
         <property name="kmPrice" value="${kmPrice}"/>
+        <property name="additionalRequirements" ref="additionalRequirements"/>
     </bean>
 
     <util:map id="additionalRequirements" key-type="java.lang.Integer"
