@@ -2,15 +2,15 @@ package ua.kpi.mobiledev.domain.orderStatusManagement;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.testCategories.UnitTest;
 
 import static org.mockito.Mockito.mock;
 
-/**
- * Created by Oleg on 07.11.2016.
- */
+@Category(UnitTest.class)
 public class OrderStatusTransitionTest {
 
     @Test

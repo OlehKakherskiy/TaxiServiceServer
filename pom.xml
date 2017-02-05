@@ -190,6 +190,13 @@
             <version>2.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>pl.pragmatists</groupId>
+            <artifactId>JUnitParams</artifactId>
+            <version>1.0.6</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>TaxiServiceServer</finalName>

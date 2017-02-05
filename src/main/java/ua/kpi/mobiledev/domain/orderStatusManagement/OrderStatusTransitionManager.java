@@ -5,6 +5,7 @@ import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,8 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
 
         customerTransitions.put(Order.OrderStatus.NEW, customerFromNewTransitions);
         customerTransitions.put(Order.OrderStatus.ACCEPTED, customerFromAcceptedTransitions);
+        customerTransitions.put(Order.OrderStatus.DONE, Collections.emptyMap());
+        customerTransitions.put(Order.OrderStatus.CANCELLED, Collections.emptyMap());
 
         Map<Order.OrderStatus, OrderStatusTransition> taxiDriverFromNewTransitions = new HashMap<>();
         taxiDriverFromNewTransitions.put(Order.OrderStatus.ACCEPTED, new AcceptOrderServicing());
@@ -39,6 +42,8 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
 
         taxiDriverTransitions.put(Order.OrderStatus.NEW, taxiDriverFromNewTransitions);
         taxiDriverTransitions.put(Order.OrderStatus.ACCEPTED, taxiDriverFromAcceptedTransitions);
+        taxiDriverTransitions.put(Order.OrderStatus.DONE, Collections.emptyMap());
+        taxiDriverTransitions.put(Order.OrderStatus.CANCELLED, Collections.emptyMap());
     }
 
     private Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> permittedTransitions;
@@ -54,7 +59,7 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
 
     @Override
     public Order changeOrderStatus(Order order, User user, Order.OrderStatus changeTo) {
-        OrderStatusTransition orderStatusTransition = null;
+        OrderStatusTransition orderStatusTransition;
         if (userHaveAccessToOrder(user, order) && Objects.nonNull(orderStatusTransition = getPossibleTransition(order.getOrderStatus(), changeTo, user))) {
             return orderStatusTransition.changeOrderStatus(order, user);
         } else {
@@ -65,10 +70,10 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
 
     private boolean userHaveAccessToOrder(User user, Order order) {
         boolean hasRights = isOrderOwner(user, order) || servicesOrder(user, order) || isPotentialOrderTaxiDriver(user, order);
-        if (!hasRights) {
-            throw new IllegalArgumentException(MessageFormat.format("User with id = {0} has no rights to change the status of order with id = {1}", user.getId(), order.getOrderId()));
-        } else {
+        if (hasRights) {
             return true;
+        } else {
+            throw new IllegalArgumentException(MessageFormat.format("User with id = {0} has no rights to change the status of order with id = {1}", user.getId(), order.getOrderId()));
         }
     }
 

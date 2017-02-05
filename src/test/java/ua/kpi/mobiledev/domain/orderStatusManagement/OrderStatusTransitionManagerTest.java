@@ -1,158 +1,223 @@
 package ua.kpi.mobiledev.domain.orderStatusManagement;
 
-import org.junit.Assert;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.testCategories.UnitTest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.MessageFormat;
+import java.util.Objects;
 
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-/**
- * Created by Oleg on 10.11.2016.
- */
+@RunWith(JUnitParamsRunner.class)
+@Category(UnitTest.class)
 public class OrderStatusTransitionManagerTest {
 
     private static OrderStatusManager orderStatusManager;
 
-    private static User customerMock;
-
-    private static TaxiDriver taxiDriverMock;
-
-    private static Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> permittedTransitions;
-
-    private Order mockOrder;
+    @Mock
+    private User customerBeforeChangingStatus;
+    @Mock
+    private User customerAfterChangingStatus;
+    @Mock
+    private TaxiDriver driverBeforeChangingStatus;
+    @Mock
+    private TaxiDriver driverAfterChangingStatus;
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        permittedTransitions = new HashMap<>();
-        permittedTransitions.put(User.UserType.CUSTOMER, customerTransitions());
-        permittedTransitions.put(User.UserType.TAXI_DRIVER, taxiDriverTransition());
-        orderStatusManager = new OrderStatusTransitionManager(permittedTransitions);
-        customerMock = mockUserWithType(User.UserType.CUSTOMER);
-        taxiDriverMock = (TaxiDriver) mockUserWithType(User.UserType.TAXI_DRIVER);
-    }
-
-    private static User mockUserWithType(User.UserType type) {
-        User user = (type == User.UserType.CUSTOMER) ? mock(User.class) : mock(TaxiDriver.class);
-        when(user.getUserType()).thenReturn(type);
-        return user;
-    }
-
-    private static Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> customerTransitions() {
-        Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> customerTransitions = new HashMap<>();
-        Map<Order.OrderStatus, OrderStatusTransition> transitionFromStatusNew = new HashMap<>();
-        transitionFromStatusNew.put(Order.OrderStatus.CANCELLED, mock(OrderStatusTransition.class));
-        customerTransitions.put(Order.OrderStatus.NEW, transitionFromStatusNew);
-        customerTransitions.put(Order.OrderStatus.ACCEPTED, transitionFromStatusNew); //the same transition strategy as with new
-        return customerTransitions;
-    }
-
-    private static Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> taxiDriverTransition() {
-        Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> res = new HashMap<>();
-
-        Map<Order.OrderStatus, OrderStatusTransition> transitionFromStatusNew = new HashMap<>();
-        transitionFromStatusNew.put(Order.OrderStatus.ACCEPTED, mock(OrderStatusTransition.class));
-
-        Map<Order.OrderStatus, OrderStatusTransition> transitionFromAccepted = new HashMap<>();
-        transitionFromAccepted.put(Order.OrderStatus.DONE, mock(OrderStatusTransition.class));
-        transitionFromAccepted.put(Order.OrderStatus.NEW, mock(OrderStatusTransition.class));
-
-        res.put(Order.OrderStatus.NEW, transitionFromStatusNew);
-        res.put(Order.OrderStatus.ACCEPTED, transitionFromAccepted);
-        return res;
+        orderStatusManager = new OrderStatusTransitionManager();
     }
 
     @Before
     public void beforeTest() {
-        mockOrder = mock(Order.class);
+        when(customerBeforeChangingStatus.getUserType()).thenReturn(User.UserType.CUSTOMER);
+        when(customerAfterChangingStatus.getUserType()).thenReturn(User.UserType.CUSTOMER);
+        when(driverBeforeChangingStatus.getUserType()).thenReturn(User.UserType.TAXI_DRIVER);
+        when(driverAfterChangingStatus.getUserType()).thenReturn(User.UserType.TAXI_DRIVER);
     }
 
     @Test
-    public void changeOrderStatus_UserHasAccessAndChangesToPermittedStatus() throws Exception {
-        when(mockOrder.getCustomer()).thenReturn(customerMock);
-        when(mockOrder.getOrderStatus()).thenReturn(Order.OrderStatus.ACCEPTED);
-        Order changedStatusOrder = mock(Order.class);
-        when(changedStatusOrder.getOrderStatus()).thenReturn(Order.OrderStatus.CANCELLED);
-        OrderStatusTransition toCancelTransition = permittedTransitions.get(User.UserType.CUSTOMER).get(Order.OrderStatus.ACCEPTED).get(Order.OrderStatus.CANCELLED);
-        when(toCancelTransition.changeOrderStatus(mockOrder, customerMock))
-                .thenReturn(changedStatusOrder);
-        Assert.assertEquals(Order.OrderStatus.CANCELLED, orderStatusManager.changeOrderStatus(mockOrder, customerMock, Order.OrderStatus.CANCELLED).getOrderStatus());
-        verify(mockOrder).getCustomer();
-        verify(mockOrder).getOrderStatus();
-        verify(toCancelTransition).changeOrderStatus(mockOrder, customerMock);
+    @Parameters({
+            //id = 1 - customer's id
+            //id = 2 - driver's id
+            //id = -1 - should be null
+            "NEW,CANCELLED,1,1,-1,-1,1",              //user cancelled new order
+            "ACCEPTED,CANCELLED,1,1,2,2,1",           //user cancelled accepted order by driver
+            "NEW,ACCEPTED,1,1,-1,2,2",                //driver accepted order for servicing
+            "ACCEPTED,NEW,1,1,2,-1,2",                //driver declined order processing
+            "ACCEPTED,DONE,1,1,2,2,2"                 //driver finished order processing
+    })
+    public void testValidTransitions(String currentStatus, String nextStatus,
+                                     Integer customerIdBefore, Integer customerIdAfter,
+                                     Integer driverIdBefore, Integer driverIdAfter,
+                                     Integer userIdChangingStatus) throws Exception {
+        //given
+        customerBeforeChangingStatus = updateUserId(customerBeforeChangingStatus, processId(customerIdBefore));
+        customerAfterChangingStatus = updateUserId(customerAfterChangingStatus, processId(customerIdAfter));
+        driverBeforeChangingStatus = (TaxiDriver) updateUserId(driverBeforeChangingStatus, processId(driverIdBefore));
+        driverAfterChangingStatus = (TaxiDriver) updateUserId(driverAfterChangingStatus, processId(driverIdAfter));
+        Order order = initOrder(currentStatus, customerBeforeChangingStatus, driverBeforeChangingStatus);
+        Order.OrderStatus targetStatus = orderStatusOf(nextStatus);
 
+        //when
+        Order changedOrder = orderStatusManager.changeOrderStatus(order, getChangingStatusUser(userIdChangingStatus), targetStatus);
+
+        //then
+        assertEquals(processMessage(targetStatus, changedOrder), targetStatus, changedOrder.getOrderStatus());
+        checkUser(customerAfterChangingStatus, changedOrder.getCustomer());
+        checkUser(driverAfterChangingStatus, changedOrder.getTaxiDriver());
     }
 
+    private void checkUser(User expectedUser, User actualUser) {
+        if (Objects.isNull(expectedUser)) {
+            assertNull(actualUser);
+        } else {
+            assertEquals(expectedUser.getId(), actualUser.getId());
+        }
+    }
+
+    @Parameters({
+            "NEW,ACCEPTED",
+            "NEW,DONE",
+            "NEW,NEW",
+            "ACCEPTED,NEW",
+            "ACCEPTED,DONE",
+            "DONE,NEW",
+            "DONE,ACCEPTED",
+            "DONE,CANCELLED",
+            "CANCELLED,NEW",
+            "CANCELLED,ACCEPTED",
+            "CANCELLED,DONE",
+            "CANCELLED,CANCELLED",
+    })
     @Test(expected = IllegalStateException.class)
-    public void changeOrderStatus_UserHasAccessAndChangesToProhibitedStatus() throws Exception {
-        when(mockOrder.getOrderStatus()).thenReturn(Order.OrderStatus.ACCEPTED);
-        when(mockOrder.getCustomer()).thenReturn(customerMock);
-        orderStatusManager.changeOrderStatus(mockOrder, customerMock, Order.OrderStatus.NEW);
+    public void testCustomerIllegalTransitions(String currentStatus, String nextStatus) throws Exception {
+        //given
+        customerBeforeChangingStatus = updateUserId(customerBeforeChangingStatus, 1);
+        Order order = initOrder(currentStatus, customerBeforeChangingStatus, driverBeforeChangingStatus);
+        Order.OrderStatus targetOrderStatus = orderStatusOf(nextStatus);
+
+        //when
+        Order changedOrder = orderStatusManager.changeOrderStatus(order, customerBeforeChangingStatus, targetOrderStatus);
+
+        //then IllegalStateException is thrown
+    }
+
+    @Parameters({
+            "NEW,NEW",
+            "NEW,CANCELLED",
+            "ACCEPTED,CANCELLED",
+            "DONE,NEW",
+            "DONE,ACCEPTED",
+            "DONE,CANCELLED",
+            "CANCELLED,NEW",
+            "CANCELLED,ACCEPTED",
+            "CANCELLED,DONE",
+            "CANCELLED,CANCELLED",
+    })
+    @Test(expected = IllegalStateException.class)
+    public void testTaxiDriverIllegalTransitions(String currentStatus, String nextStatus) throws Exception {
+        //given
+        customerBeforeChangingStatus = updateUserId(customerBeforeChangingStatus, 1);
+        driverBeforeChangingStatus = (TaxiDriver) updateUserId(driverBeforeChangingStatus, 2);
+        Order order = initOrder(currentStatus, customerBeforeChangingStatus, driverBeforeChangingStatus);
+        Order.OrderStatus targetOrderStatus = orderStatusOf(nextStatus);
+
+        //when
+        Order changedOrder = orderStatusManager.changeOrderStatus(order, driverBeforeChangingStatus, targetOrderStatus);
+
+        //then IllegalStateException is thrown
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCustomerIsNotOrderOwner() throws Exception {
+        //given
+        Order order = initOrder("NEW", updateUserId(customerBeforeChangingStatus, 1),
+                mock(TaxiDriver.class));
+        User actualUser = updateUserId(mock(User.class), 2);
+
+        //when
+        orderStatusManager.changeOrderStatus(order, actualUser, Order.OrderStatus.ACCEPTED);
+
+        //then throw IllegalArgumentException
     }
 
 
-    @Test
-    public void changeOrderStatus_userIsOrderOwnerCheck() throws Exception {
-        when(mockOrder.getOrderStatus()).thenReturn(Order.OrderStatus.NEW);
-        when(mockOrder.getCustomer()).thenReturn(customerMock);
-        //just check that won't throw exception, also need to be called with permitted transition status
-        orderStatusManager.changeOrderStatus(mockOrder, customerMock, Order.OrderStatus.CANCELLED);
-        verify(customerMock, atLeastOnce()).getUserType();
-        verify(mockOrder).getCustomer();
-        verify(mockOrder).getOrderStatus();
+    @Test(expected = IllegalArgumentException.class)
+    public void testTaxiDriverCantServiceOrder() throws Exception {
+        //given
+        customerBeforeChangingStatus = updateUserId(customerBeforeChangingStatus, 1);
+        driverBeforeChangingStatus = (TaxiDriver) updateUserId(driverBeforeChangingStatus, 2);
+        Order order = initOrder("NEW", customerBeforeChangingStatus, driverBeforeChangingStatus);
+        TaxiDriver actualTaxiDriver = (TaxiDriver) updateUserId(mock(TaxiDriver.class), 3);
+
+        //when
+        orderStatusManager.changeOrderStatus(order, actualTaxiDriver, Order.OrderStatus.ACCEPTED);
+
+        //then throw IllegalArgumentException
     }
 
-    @Test
-    public void changeOrderStatus_userIsDriverAndServicesOrder() throws Exception {
-        when(mockOrder.getTaxiDriver()).thenReturn(taxiDriverMock);
-        when(mockOrder.getOrderStatus()).thenReturn(Order.OrderStatus.ACCEPTED);
-        orderStatusManager.changeOrderStatus(mockOrder, taxiDriverMock, Order.OrderStatus.DONE);
-        verify(taxiDriverMock, atLeastOnce()).getUserType();
-        verify(mockOrder).getTaxiDriver();
-        verify(mockOrder).getOrderStatus();
+    private Integer processId(Integer id) {
+        return (id == -1) ? null : id;
     }
 
-    @Test
-    public void changeOrderStatus_userIsNewServicingDriver() throws Exception {
-        when(mockOrder.getTaxiDriver()).thenReturn(null);
-        when(mockOrder.getOrderStatus()).thenReturn(Order.OrderStatus.NEW);
-
-        orderStatusManager.changeOrderStatus(mockOrder, taxiDriverMock, Order.OrderStatus.ACCEPTED);
-
-        verify(taxiDriverMock, atLeastOnce()).getUserType();
-        verify(mockOrder, atLeastOnce()).getTaxiDriver();
+    private String processMessage(Order.OrderStatus targetStatus, Order changedOrder) {
+        return MessageFormat.format("status is not as expected, should be ''{0}'', but was ''{1}''",
+                targetStatus, changedOrder.getOrderStatus());
     }
 
-    @Test
-    public void changeOrderStatus_customerHasNoRights() throws Exception {
-        when(mockOrder.getCustomer()).thenReturn(mock(User.class));
-        try {
-            orderStatusManager.changeOrderStatus(mockOrder, customerMock, Order.OrderStatus.CANCELLED);
-        } catch (IllegalArgumentException e) {
-            verify(customerMock, atLeastOnce()).getUserType();
-            verify(mockOrder).getCustomer();
-            return;
+    private Order initOrder(String currentStatus, User customerBeforeChangingStatus, TaxiDriver driverBeforeChangingStatus) {
+        Order order = new Order();
+        order.setOrderStatus(orderStatusOf(currentStatus));
+        order.setCustomer(customerBeforeChangingStatus);
+        order.setTaxiDriver(driverBeforeChangingStatus);
+        return order;
+    }
+
+    private Order.OrderStatus orderStatusOf(String orderStatusName) {
+        return Order.OrderStatus.valueOf(orderStatusName);
+    }
+
+    private User updateUserId(User targetUser, Integer userId) {
+        if (userId == null) {
+            return null;
         }
-        fail(); //TODO:change logic, remove try/catch
+        when(targetUser.getId()).thenReturn(userId);
+        return targetUser;
     }
 
-    @Test
-    public void changeOrderStatus_driverHasNoRights() throws Exception {
-        when(mockOrder.getTaxiDriver()).thenReturn(mock(TaxiDriver.class));
-        try {
-            orderStatusManager.changeOrderStatus(mockOrder, taxiDriverMock, Order.OrderStatus.DONE);
-        } catch (IllegalArgumentException e) {
-            verify(taxiDriverMock, atLeastOnce()).getUserType();
-            verify(mockOrder, atLeastOnce()).getTaxiDriver();
-            return;
+    private User getChangingStatusUser(Integer id) {
+        if (id == null) {
+            fail("there's no id of user that is changing status");
         }
-        fail();
+        if (Objects.nonNull(customerBeforeChangingStatus) && Objects.equals(id, customerBeforeChangingStatus.getId())) {
+            return customerBeforeChangingStatus;
+        }
+        if (Objects.nonNull(driverBeforeChangingStatus) && Objects.equals(id, driverBeforeChangingStatus.getId())) {
+            return driverBeforeChangingStatus;
+        }
+        if (Objects.equals(driverAfterChangingStatus.getId(), id)) {
+            return driverAfterChangingStatus;
+        }
+        fail("There's no user with id = " + id);
+        return null;
     }
+
 }
