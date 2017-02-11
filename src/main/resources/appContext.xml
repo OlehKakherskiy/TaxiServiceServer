@@ -13,6 +13,7 @@
     <import resource="repoContext.xml"/>
     <context:component-scan base-package="ua.kpi.mobiledev.service"/>
     <context:component-scan base-package="ua.kpi.mobiledev.domain"/>
+    <context:component-scan base-package="ua.kpi.mobiledev.util"/>
     <context:property-placeholder system-properties-mode="OVERRIDE"
                                   location="classpath:app.properties, classpath:addRequirement.properties"
                                   ignore-unresolvable="true"/>

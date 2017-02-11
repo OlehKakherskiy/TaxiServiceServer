@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.web.security.model;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class SecurityDetails implements UserDetails {
 
     @Id
