@@ -30,7 +30,12 @@
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
         </property>
         <property name="persistenceProviderClass" value="org.hibernate.jpa.HibernatePersistenceProvider"/>
-        <property name="packagesToScan" value="ua.kpi.mobiledev.domain"/>
+        <property name="packagesToScan">
+            <list>
+                <value>ua.kpi.mobiledev.domain</value>
+                <value>ua.kpi.mobiledev.web.security.model</value>
+            </list>
+        </property>
         <property name="jpaProperties">
             <props>
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
