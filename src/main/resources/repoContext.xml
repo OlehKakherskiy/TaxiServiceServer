@@ -7,16 +7,20 @@
         http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
-    <jpa:repositories base-package="ua.kpi.mobiledev.repository" entity-manager-factory-ref="entityManagerFactory" enable-default-transactions="false"/>
+    <jpa:repositories base-package="ua.kpi.mobiledev.repository" entity-manager-factory-ref="entityManagerFactory"
+                      enable-default-transactions="false"/>
 
-    <context:property-placeholder system-properties-mode="OVERRIDE" location="classpath:/jdbc.properties" ignore-unresolvable="true"/>
+    <context:property-placeholder system-properties-mode="OVERRIDE" location="WEB-INF/jdbc.properties"
+                                  ignore-unresolvable="true"/>
 
-    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
-        <property name="driverClassName" value="${driver}"/>
-        <property name="url" value="${url}"/>
-        <property name="username" value="${user}"/>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${driver}"/>
+        <property name="jdbcUrl" value="${url}"/>
+        <property name="user" value="${user}"/>
         <property name="password" value="${password}"/>
-        <property name="initialSize" value="5"/>
+        <property name="initialPoolSize" value="${initialPoolSize}"/>
+        <property name="maxPoolSize" value="${maxPoolSize}"/>
+        <property name="loginTimeout" value="${loginTimeout}"/>
     </bean>
 
     <bean name="entityManagerFactory"
@@ -25,7 +29,13 @@
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
         </property>
-
+        <property name="persistenceProviderClass" value="org.hibernate.jpa.HibernatePersistenceProvider"/>
+        <property name="packagesToScan">
+            <list>
+                <value>ua.kpi.mobiledev.domain</value>
+                <value>ua.kpi.mobiledev.web.security.model</value>
+            </list>
+        </property>
         <property name="jpaProperties">
             <props>
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>

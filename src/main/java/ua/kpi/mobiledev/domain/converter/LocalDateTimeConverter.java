@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.repository;
+package ua.kpi.mobiledev.domain.converter;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

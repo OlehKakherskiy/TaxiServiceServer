@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.repository;
+package ua.kpi.mobiledev.domain.converter;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
