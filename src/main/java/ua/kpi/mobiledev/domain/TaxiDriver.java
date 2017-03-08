@@ -5,8 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import java.util.Set;
+
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.FetchType.LAZY;
+import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 
 @NoArgsConstructor
 @Getter
@@ -16,12 +24,12 @@ import java.util.Set;
 @DiscriminatorValue("1")
 public class TaxiDriver extends User {
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "idCar")
+    @OneToOne(cascade = {PERSIST, MERGE}, fetch = LAZY)
+    @JoinColumn(name = "car_id")
     private Car car;
 
     public TaxiDriver(Integer id, String name, String email, Set<MobileNumber> mobileNumbers, Car car) {
-        super(id, name, email, UserType.TAXI_DRIVER, mobileNumbers);
+        super(id, name, email, TAXI_DRIVER, mobileNumbers);
         this.car = car;
     }
 }

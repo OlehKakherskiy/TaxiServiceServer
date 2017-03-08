@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity(name = "AdditionalRequirement")
-@Table(name = "AdditionalRequirement")
+@Table(name = "additional_requirement")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,11 +18,11 @@ public class AdditionalRequirementValue {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "idAdditionalRequirement")
-    @Convert(attributeName = "idAdditionalRequirement", converter = AdditionalRequirementIdConverter.class)
+    @Column(name = "add_req_id")
+    @Convert(attributeName = "add_req_id", converter = AdditionalRequirementIdConverter.class)
     private AdditionalRequirement additionalRequirement;
 
-    @Column(name = "idAdditionalRequirementValue")
+    @Column(name = "add_req_value_id")
     private Integer requirementValue;
 
 }

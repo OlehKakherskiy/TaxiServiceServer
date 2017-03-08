@@ -12,29 +12,29 @@ import java.util.Set;
 @Setter
 @ToString
 @Entity
-@Table(name = "TaxiOrder")
+@Table(name = "taxi_order")
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idAccount")
+    @Column(name = "taxi_order_id")
     private Long orderId;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "idCustomer", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     private User customer;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "idTaxiDriver", nullable = true)
+    @JoinColumn(name = "taxi_driver_id")
     private TaxiDriver taxiDriver;
 
-    @Column(name = "startTime")
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
-    @Column(name = "startPoint")
+    @Column(name = "start_point")
     private String startPoint;
 
-    @Column(name = "endPoint")
+    @Column(name = "end_point")
     private String endPoint;
 
     @Column(name = "price")
@@ -51,12 +51,12 @@ public class Order {
         DONE
     }
 
-    @Column(name = "statusId")
+    @Column(name = "order_status_id")
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "idAccount", referencedColumnName = "idAccount")
+    @JoinColumn(name = "taxi_order_id", referencedColumnName = "taxi_order_id")
     private Set<AdditionalRequirementValue> additionalRequirements;
 
 

@@ -10,14 +10,15 @@ import javax.persistence.*;
 @ToString
 @Setter(AccessLevel.NONE)
 @Entity
+@Table(name = "mobile_number")
 public class MobileNumber {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idMobileNumber")
+    @Column(name = "mobile_number_id")
     private Integer idMobileNumber;
 
-    @Column(name = "mobileNumber")
+    @Column(name = "mobile_number")
     @NonNull
     private String mobileNumber;
 

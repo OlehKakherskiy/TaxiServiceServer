@@ -14,7 +14,7 @@ public class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idCar")
+    @Column(name = "car_id")
     private Integer carId;
 
     @Column(name = "model")
@@ -25,11 +25,11 @@ public class Car {
     @NonNull
     private String manufacturer;
 
-    @Column(name = "plateNumber")
+    @Column(name = "plate_number")
     @NonNull
     private String plateNumber;
 
-    @Column(name = "seatNumber")
+    @Column(name = "seat_number")
     @NonNull
     private Integer seatNumber;
 
@@ -42,7 +42,7 @@ public class Car {
         MINIBUS
     }
 
-    @Column(name = "carType")
+    @Column(name = "car_type")
     @Enumerated(EnumType.ORDINAL)
     @NonNull
     private CarType carType;
