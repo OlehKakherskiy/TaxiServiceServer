@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ua.kpi.mobiledev.domain.Car;
+import ua.kpi.mobiledev.domain.DriverLicense;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.exception.SystemException;
@@ -19,9 +20,9 @@ import ua.kpi.mobiledev.web.security.model.Role;
 import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 
-import java.util.Arrays;
 import java.util.Collections;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
@@ -45,6 +46,8 @@ public class UserServiceTest {
     private CustomUserDetailsService customUserDetailsServiceMock;
     @Mock
     private Car mockCar;
+    @Mock
+    private DriverLicense mockDriverLicense;
 
     private UserService userServiceUnderTest;
     private User userToRegister = getUserMock(NO_USER_ID, User.UserType.CUSTOMER);
@@ -144,7 +147,7 @@ public class UserServiceTest {
 
     private SecurityDetails createUserDetails(User user, String password) {
         return new SecurityDetails(user.getEmail(), password, "", true,
-                Arrays.asList(new Role(new SimpleGrantedAuthority(user.getUserType().name()))));
+                singletonList(new Role(new SimpleGrantedAuthority(user.getUserType().name()))));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -159,7 +162,8 @@ public class UserServiceTest {
 
     private User getUserMock(Integer id, User.UserType userType) {
         if (userType == User.UserType.TAXI_DRIVER) {
-            return new TaxiDriver(id, "taxiDriverName", "taxiDriverEmail", Collections.emptySet(), mockCar);
+            return new TaxiDriver(id, "taxiDriverName", "taxiDriverEmail", Collections.emptySet(),
+                    mockCar, mockDriverLicense);
         } else {
             return new User(id, "username", USER_EMAIL, User.UserType.CUSTOMER, Collections.emptySet());
         }

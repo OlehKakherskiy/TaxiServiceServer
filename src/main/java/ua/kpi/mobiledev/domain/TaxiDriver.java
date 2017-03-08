@@ -11,8 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import java.util.Set;
 
-import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.*;
 import static javax.persistence.FetchType.LAZY;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 
@@ -28,8 +27,14 @@ public class TaxiDriver extends User {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    public TaxiDriver(Integer id, String name, String email, Set<MobileNumber> mobileNumbers, Car car) {
+    @OneToOne(cascade = ALL, fetch = LAZY)
+    @JoinColumn(name = "driver_license_id")
+    private DriverLicense driverLicense;
+
+    public TaxiDriver(Integer id, String name, String email,
+                      Set<MobileNumber> mobileNumbers, Car car, DriverLicense driverLicense) {
         super(id, name, email, TAXI_DRIVER, mobileNumbers);
         this.car = car;
+        this.driverLicense = driverLicense;
     }
 }

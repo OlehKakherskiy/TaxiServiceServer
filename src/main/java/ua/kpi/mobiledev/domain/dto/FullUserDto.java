@@ -35,9 +35,11 @@ public class FullUserDto {
 
     public static User toUser(FullUserDto fullUserDto) {
         Set<MobileNumber> mobileNumbers = fullUserDto.getMobileNumbers().stream().map(MobileNumberDto::from).collect(Collectors.toSet());
-        return isTaxiDriver(fullUserDto.getUserType()) ?
-                new TaxiDriver(fullUserDto.userId, fullUserDto.name, fullUserDto.email, mobileNumbers, CarDto.toCar(fullUserDto.getCar())) :
-                new User(fullUserDto.userId, fullUserDto.name, fullUserDto.email, fullUserDto.userType, mobileNumbers);
+//        return isTaxiDriver(fullUserDto.getUserType()) ?
+//                new TaxiDriver(fullUserDto.userId, fullUserDto.name, fullUserDto.email, mobileNumbers, CarDto.toCar(fullUserDto.getCar())) :
+//                new User(fullUserDto.userId, fullUserDto.name, fullUserDto.email, fullUserDto.userType, mobileNumbers);
+        //TODO: uncomment and resolve mapping driver license logic and whether it's really need
+        return null;
     }
 
     private static boolean isTaxiDriver(User.UserType userType) {

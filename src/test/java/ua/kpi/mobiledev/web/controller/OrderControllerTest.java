@@ -55,7 +55,7 @@ public class OrderControllerTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         mockUser = new User(1, "oleh", "ol@gmail.com", User.UserType.CUSTOMER, Collections.emptySet());
-        taxiDriver = new TaxiDriver(2, "taxist", "taxist@gmail.com", Collections.emptySet(), mock(Car.class));
+        taxiDriver = new TaxiDriver(2, "taxist", "taxist@gmail.com", Collections.emptySet(), mock(Car.class), mock(DriverLicense.class));
         AdditionalRequirement additionalRequirement = mock(AdditionalRequirement.class);
         when(additionalRequirement.getId()).thenReturn(1);
         AdditionalRequirement additionalRequirement1 = mock(AdditionalRequirement.class);
