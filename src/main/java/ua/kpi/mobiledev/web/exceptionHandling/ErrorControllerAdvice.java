@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.web.exceptionHandling;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
 
 @ControllerAdvice
 public class ErrorControllerAdvice {
@@ -35,8 +38,9 @@ public class ErrorControllerAdvice {
     }
 
     private CustomFieldError toCustomFieldError(FieldError basicFieldError) {
+        Locale locale = ofNullable(LocaleContextHolder.getLocale()).orElse(new Locale("en", "EN"));
         return new CustomFieldError(basicFieldError.getField(), basicFieldError.getDefaultMessage(),
-                messageSource.getMessage(new DefaultMessageSourceResolvable(basicFieldError.getCodes(), basicFieldError.getArguments()), new Locale("en", "EN")));
+                messageSource.getMessage(new DefaultMessageSourceResolvable(basicFieldError.getCodes(), basicFieldError.getArguments()), locale));
     }
 
     @RequestMapping(produces = "application/json")

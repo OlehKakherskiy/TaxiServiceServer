@@ -27,9 +27,9 @@ public class RegistrationUserDto {
     @Size(min = 1, max = 45, message = "name.invalidSize")
     private String name;
 
-    @NotNull(message = "username.required")
-    @Size(min = 1, max = 45, message = "username.invalidSize")
-    private String username;
+    @NotNull(message = "email.required")
+    @Size(min = 1, max = 45, message = "email.invalidSize")
+    private String email;
 
     @NotNull(message = "password.required")
     @Size(min = 1)
@@ -50,9 +50,9 @@ public class RegistrationUserDto {
     public static User toUser(RegistrationUserDto registrationUserDto) {
         Set<MobileNumber> mobileNumbers = toMobileNumbers(registrationUserDto.getMobileNumbers());
         return registrationUserDto.getUserType() == TAXI_DRIVER ?
-                new TaxiDriver(null, registrationUserDto.name, registrationUserDto.username, mobileNumbers,
+                new TaxiDriver(null, registrationUserDto.name, registrationUserDto.email, mobileNumbers,
                         toCar(registrationUserDto.car), toDriverLicense(registrationUserDto.driverLicense)) :
-                new User(null, registrationUserDto.name, registrationUserDto.username, registrationUserDto.userType, mobileNumbers);
+                new User(null, registrationUserDto.name, registrationUserDto.email, registrationUserDto.userType, mobileNumbers);
     }
 
     private static Set<MobileNumber> toMobileNumbers(List<String> mobileNumbers) {

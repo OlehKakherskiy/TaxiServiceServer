@@ -54,8 +54,8 @@ public class FullUserDto {
     @Size(min = 1, max = 45, message = "name.invalidSize")
     private String name;
 
-    @NotNull(message = "username.required")
-    @Size(min = 1, max = 45, message = "username.invalidSize")
+    @NotNull(message = "email.required")
+    @Size(min = 1, max = 45, message = "email.invalidSize")
     private String email;
 
     @NotNull(message = "userType.required")
