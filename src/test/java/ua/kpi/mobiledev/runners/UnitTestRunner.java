@@ -5,8 +5,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionManagerTest;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionTest;
-import ua.kpi.mobiledev.service.OrderServiceTest;
-import ua.kpi.mobiledev.service.UserServiceTest;
+import ua.kpi.mobiledev.service.TransactionalOrderServiceTest;
+import ua.kpi.mobiledev.service.TransactionalUserService;
 import ua.kpi.mobiledev.testCategories.UnitTest;
 
 @RunWith(Categories.class)
@@ -14,8 +14,8 @@ import ua.kpi.mobiledev.testCategories.UnitTest;
 @Suite.SuiteClasses({
         OrderStatusTransitionManagerTest.class,
         OrderStatusTransitionTest.class,
-        OrderServiceTest.class,
-        UserServiceTest.class
+        TransactionalOrderServiceTest.class,
+        TransactionalUserService.class
 })
 public class UnitTestRunner {
 }

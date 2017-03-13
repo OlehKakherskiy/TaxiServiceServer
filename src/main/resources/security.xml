@@ -15,7 +15,7 @@
     <http pattern="/login" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless"
           use-expressions="true">
         <csrf disabled="true"/>
-        <custom-filter ref="usernamePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
+        <custom-filter ref="usernamePasswordAuthenticationFilter" after="FILTER_SECURITY_INTERCEPTOR"/>
     </http>
 
     <http pattern="/logout" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless"

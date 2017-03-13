@@ -9,6 +9,8 @@ import ua.kpi.mobiledev.exception.SystemException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import static ua.kpi.mobiledev.exception.ErrorCode.LICENSE_SCAN_PROCESSING_FAILED;
+
 @AllArgsConstructor
 @Getter
 public class DriverLicenseDto {
@@ -22,7 +24,7 @@ public class DriverLicenseDto {
         try {
             return new DriverLicense(null, driverLicenseDto.driverLicenseId, driverLicenseDto.expirationTime, driverLicenseDto.frontSideScan.getBytes(), driverLicenseDto.backSideScan.getBytes());
         } catch (IOException e) {
-            throw new SystemException("System exception during driver license scan processing");
+            throw new SystemException(LICENSE_SCAN_PROCESSING_FAILED, e);
         }
     }
 }

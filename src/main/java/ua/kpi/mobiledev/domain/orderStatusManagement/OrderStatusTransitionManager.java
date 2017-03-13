@@ -2,94 +2,101 @@ package ua.kpi.mobiledev.domain.orderStatusManagement;
 
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.Order.OrderStatus;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.exception.RequestException;
 
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
+import static java.util.Objects.isNull;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.*;
+import static ua.kpi.mobiledev.domain.User.UserType.CUSTOMER;
+import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
+import static ua.kpi.mobiledev.exception.ErrorCode.ILLEGAL_ORDER_STATUS_TRANSITION;
+import static ua.kpi.mobiledev.exception.ErrorCode.USER_CANNOT_CHANGE_ORDER_STATUS;
 
 @Component
 public class OrderStatusTransitionManager implements OrderStatusManager {
 
-    private static Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> defaultTransitionConfig;
+    private static Map<User.UserType, Map<OrderStatus, Map<OrderStatus, OrderStatusTransition>>> defaultTransitionConfig;
 
     static {
-        Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> customerTransitions = new HashMap<>();
-        Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>> taxiDriverTransitions = new HashMap<>();
+        Map<OrderStatus, Map<OrderStatus, OrderStatusTransition>> customerTransitions = new HashMap<>();
+        Map<OrderStatus, Map<OrderStatus, OrderStatusTransition>> taxiDriverTransitions = new HashMap<>();
         defaultTransitionConfig = new HashMap<>();
 
-        defaultTransitionConfig.put(User.UserType.CUSTOMER, customerTransitions);
-        defaultTransitionConfig.put(User.UserType.TAXI_DRIVER, taxiDriverTransitions);
+        defaultTransitionConfig.put(CUSTOMER, customerTransitions);
+        defaultTransitionConfig.put(TAXI_DRIVER, taxiDriverTransitions);
 
-        Map<Order.OrderStatus, OrderStatusTransition> customerFromNewTransitions = new HashMap<>();
-        customerFromNewTransitions.put(Order.OrderStatus.CANCELLED, new CloseOrder());
-        Map<Order.OrderStatus, OrderStatusTransition> customerFromAcceptedTransitions = new HashMap<>();
-        customerFromAcceptedTransitions.put(Order.OrderStatus.CANCELLED, new CloseOrder());
+        Map<OrderStatus, OrderStatusTransition> customerFromNewTransitions = new HashMap<>();
+        customerFromNewTransitions.put(CANCELLED, new CloseOrder());
+        Map<OrderStatus, OrderStatusTransition> customerFromAcceptedTransitions = new HashMap<>();
+        customerFromAcceptedTransitions.put(CANCELLED, new CloseOrder());
 
-        customerTransitions.put(Order.OrderStatus.NEW, customerFromNewTransitions);
-        customerTransitions.put(Order.OrderStatus.ACCEPTED, customerFromAcceptedTransitions);
-        customerTransitions.put(Order.OrderStatus.DONE, Collections.emptyMap());
-        customerTransitions.put(Order.OrderStatus.CANCELLED, Collections.emptyMap());
+        customerTransitions.put(NEW, customerFromNewTransitions);
+        customerTransitions.put(ACCEPTED, customerFromAcceptedTransitions);
+        customerTransitions.put(DONE, Collections.emptyMap());
+        customerTransitions.put(CANCELLED, Collections.emptyMap());
 
-        Map<Order.OrderStatus, OrderStatusTransition> taxiDriverFromNewTransitions = new HashMap<>();
-        taxiDriverFromNewTransitions.put(Order.OrderStatus.ACCEPTED, new AcceptOrderServicing());
+        Map<OrderStatus, OrderStatusTransition> taxiDriverFromNewTransitions = new HashMap<>();
+        taxiDriverFromNewTransitions.put(ACCEPTED, new AcceptOrderServicing());
 
-        Map<Order.OrderStatus, OrderStatusTransition> taxiDriverFromAcceptedTransitions = new HashMap<>();
-        taxiDriverFromAcceptedTransitions.put(Order.OrderStatus.DONE, new MarkOrderAsDone());
-        taxiDriverFromAcceptedTransitions.put(Order.OrderStatus.NEW, new RefuseOrderServicing());
+        Map<OrderStatus, OrderStatusTransition> taxiDriverFromAcceptedTransitions = new HashMap<>();
+        taxiDriverFromAcceptedTransitions.put(DONE, new MarkOrderAsDone());
+        taxiDriverFromAcceptedTransitions.put(NEW, new RefuseOrderServicing());
 
-        taxiDriverTransitions.put(Order.OrderStatus.NEW, taxiDriverFromNewTransitions);
-        taxiDriverTransitions.put(Order.OrderStatus.ACCEPTED, taxiDriverFromAcceptedTransitions);
-        taxiDriverTransitions.put(Order.OrderStatus.DONE, Collections.emptyMap());
-        taxiDriverTransitions.put(Order.OrderStatus.CANCELLED, Collections.emptyMap());
+        taxiDriverTransitions.put(NEW, taxiDriverFromNewTransitions);
+        taxiDriverTransitions.put(ACCEPTED, taxiDriverFromAcceptedTransitions);
+        taxiDriverTransitions.put(DONE, Collections.emptyMap());
+        taxiDriverTransitions.put(CANCELLED, Collections.emptyMap());
     }
 
-    private Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> permittedTransitions;
+    private Map<User.UserType, Map<OrderStatus, Map<OrderStatus, OrderStatusTransition>>> permittedTransitions;
 
-    public OrderStatusTransitionManager(Map<User.UserType, Map<Order.OrderStatus, Map<Order.OrderStatus, OrderStatusTransition>>> permittedTransitions) {
-        this.permittedTransitions = Objects.isNull(permittedTransitions) ? defaultTransitionConfig : permittedTransitions;
+    public OrderStatusTransitionManager(Map<User.UserType, Map<OrderStatus, Map<OrderStatus, OrderStatusTransition>>> permittedTransitions) {
+        this.permittedTransitions = isNull(permittedTransitions) ? defaultTransitionConfig : permittedTransitions;
     }
-
 
     public OrderStatusTransitionManager() {
         permittedTransitions = defaultTransitionConfig;
     }
 
     @Override
-    public Order changeOrderStatus(Order order, User user, Order.OrderStatus changeTo) {
-        OrderStatusTransition orderStatusTransition;
-        if (userHaveAccessToOrder(user, order) && Objects.nonNull(orderStatusTransition = getPossibleTransition(order.getOrderStatus(), changeTo, user))) {
-            return orderStatusTransition.changeOrderStatus(order, user);
-        } else {
-            throw new IllegalStateException(MessageFormat.format("This type of user (''{0}'') can''t change order status from ''{1}'' to ''{2}''",
-                    user.getUserType(), order.getOrderStatus(), changeTo));
+    public Order changeOrderStatus(Order order, User user, OrderStatus changeTo) {
+        checkIfUserHaveAccessToOrder(user, order);
+        OrderStatusTransition orderStatusTransition = getPossibleTransition(order.getOrderStatus(), changeTo, user);
+        if (isNull(orderStatusTransition)) {
+            throw new RequestException(ILLEGAL_ORDER_STATUS_TRANSITION, user.getUserType(),
+                    order.getOrderStatus(), changeTo);
         }
+        return orderStatusTransition.changeOrderStatus(order, user);
     }
 
-    private boolean userHaveAccessToOrder(User user, Order order) {
-        boolean hasRights = isOrderOwner(user, order) || servicesOrder(user, order) || isPotentialOrderTaxiDriver(user, order);
-        if (hasRights) {
-            return true;
-        } else {
-            throw new IllegalArgumentException(MessageFormat.format("User with id = {0} has no rights to change the status of order with id = {1}", user.getId(), order.getOrderId()));
+    private void checkIfUserHaveAccessToOrder(User user, Order order) {
+        boolean hasRights
+                = isOrderOwner(user, order) || isPotentialOrderTaxiDriver(user, order) || servicesOrder(user, order);
+
+        if (!hasRights) {
+            throw new RequestException(USER_CANNOT_CHANGE_ORDER_STATUS, user.getId(), order.getOrderId());
         }
     }
 
     private boolean isOrderOwner(User user, Order order) {
-        return user.getUserType() == User.UserType.CUSTOMER && user.equals(order.getCustomer());
+        return user.getUserType() == CUSTOMER && user.getId().equals(order.getCustomer().getId());
     }
 
     private boolean servicesOrder(User user, Order order) {
-        return user.getUserType() == User.UserType.TAXI_DRIVER && user.equals(order.getTaxiDriver());
+        return user.getUserType() == TAXI_DRIVER && user.getId().equals(order.getTaxiDriver().getId());
     }
 
     private boolean isPotentialOrderTaxiDriver(User user, Order order) {
-        return order.getTaxiDriver() == null && user.getUserType() == User.UserType.TAXI_DRIVER;
+        return isNull(order.getTaxiDriver()) && user.getUserType() == TAXI_DRIVER;
     }
 
-    private OrderStatusTransition getPossibleTransition(Order.OrderStatus currentOrderStatus, Order.OrderStatus nextStatus, User user) {
+    private OrderStatusTransition getPossibleTransition(OrderStatus currentOrderStatus,
+                                                        OrderStatus nextStatus, User user) {
         return permittedTransitions.get(user.getUserType()).get(currentOrderStatus).get(nextStatus);
     }
 }

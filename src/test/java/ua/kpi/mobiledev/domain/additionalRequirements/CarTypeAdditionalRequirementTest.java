@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.Car;
+import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.testCategories.UnitTest;
 
 import java.util.Collections;
@@ -51,7 +52,7 @@ public class CarTypeAdditionalRequirementTest {
         additionalRequirement.addPrice(200.0, 5);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void addPrice_targetIdIsNull() throws Exception {
         additionalRequirement.addPrice(200.0, null);
     }

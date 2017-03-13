@@ -29,11 +29,16 @@
           class="ua.kpi.mobiledev.web.validators.OrderPriceDtoValidator">
         <constructor-arg value=""/>
     </bean>
+    <!-- END of 'must be implemented as it is ...' -->
 
     <bean id="futureTimeValidator" class="ua.kpi.mobiledev.web.validators.LocalDateTimeFutureValidator"/>
 
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basename" value="classpath:validatorMessages"/>
+    </bean>
+
+    <bean id="exceptionMessageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:exceptions"/>
     </bean>
 
     <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">

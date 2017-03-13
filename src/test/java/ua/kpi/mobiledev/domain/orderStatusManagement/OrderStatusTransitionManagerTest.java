@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoRule;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.testCategories.UnitTest;
 
 import java.text.MessageFormat;
@@ -107,7 +108,7 @@ public class OrderStatusTransitionManagerTest {
             "CANCELLED,DONE",
             "CANCELLED,CANCELLED",
     })
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RequestException.class)
     public void testCustomerIllegalTransitions(String currentStatus, String nextStatus) throws Exception {
         //given
         customerBeforeChangingStatus = updateUserId(customerBeforeChangingStatus, 1);
@@ -132,7 +133,7 @@ public class OrderStatusTransitionManagerTest {
             "CANCELLED,DONE",
             "CANCELLED,CANCELLED",
     })
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RequestException.class)
     public void testTaxiDriverIllegalTransitions(String currentStatus, String nextStatus) throws Exception {
         //given
         customerBeforeChangingStatus = updateUserId(customerBeforeChangingStatus, 1);
@@ -146,7 +147,7 @@ public class OrderStatusTransitionManagerTest {
         //then IllegalStateException is thrown
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RequestException.class)
     public void testCustomerIsNotOrderOwner() throws Exception {
         //given
         Order order = initOrder("NEW", updateUserId(customerBeforeChangingStatus, 1),
@@ -160,7 +161,7 @@ public class OrderStatusTransitionManagerTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RequestException.class)
     public void testTaxiDriverCantServiceOrder() throws Exception {
         //given
         customerBeforeChangingStatus = updateUserId(customerBeforeChangingStatus, 1);

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity(name = "users")
-@Table(name = "users")
+@Table(name = "user_credential")
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
@@ -34,7 +34,7 @@ public class SecurityDetails implements UserDetails {
     private boolean isEnabled;
 
     @ElementCollection
-    @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "username"))
+    @CollectionTable(name = "authority", joinColumns = @JoinColumn(name = "username"))
     private List<Role> authorityList;
 
     @Override

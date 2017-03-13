@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.domain.dto.CarDto.toCar;
-import static ua.kpi.mobiledev.domain.dto.DriverLicenseDto.toDriverLicense;
 
 @Data
 @NoArgsConstructor
@@ -44,14 +43,14 @@ public class RegistrationUserDto {
     @Valid
     private CarDto car;
 
-    @Valid
+    //    @Valid
     private DriverLicenseDto driverLicense;
 
     public static User toUser(RegistrationUserDto registrationUserDto) {
         Set<MobileNumber> mobileNumbers = toMobileNumbers(registrationUserDto.getMobileNumbers());
         return registrationUserDto.getUserType() == TAXI_DRIVER ?
                 new TaxiDriver(null, registrationUserDto.name, registrationUserDto.email, mobileNumbers,
-                        toCar(registrationUserDto.car), toDriverLicense(registrationUserDto.driverLicense)) :
+                        toCar(registrationUserDto.car)/*,toDriverLicense(registrationUserDto.driverLicense)//todo:uncomment when driver license feature will be ready*/,null) :
                 new User(null, registrationUserDto.name, registrationUserDto.email, registrationUserDto.userType, mobileNumbers);
     }
 

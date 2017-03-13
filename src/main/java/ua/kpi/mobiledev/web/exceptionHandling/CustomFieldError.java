@@ -6,10 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CustomFieldError {
-
     private String field;
-
     private String code;
-
     private String message;
 }

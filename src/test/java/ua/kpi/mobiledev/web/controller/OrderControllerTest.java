@@ -39,18 +39,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class OrderControllerTest {
 
+    private static final LocalDateTime NOW = LocalDateTime.now();
+    private static User mockUser;
+    private static TaxiDriver taxiDriver;
+    private static Order mockNewOrder;
+    private static Order mockOrderWithoutDriverAndAddReqs;
     @Autowired
     private WebApplicationContext wac;
-
-    private static final LocalDateTime NOW = LocalDateTime.now();
-
-    private static User mockUser;
-
-    private static TaxiDriver taxiDriver;
-
-    private static Order mockNewOrder;
-
-    private static Order mockOrderWithoutDriverAndAddReqs;
+    private MockMvc mockMvc;
+    @Autowired
+    private OrderService orderService;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -71,17 +69,13 @@ public class OrderControllerTest {
                 "Start", "End", 100.0, Order.OrderStatus.NEW, Collections.emptySet());
     }
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private OrderService orderService;
-
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
 
     public void getOrder_allFieldsExists() throws Exception {
         when(orderService.getOrder(1L)).thenReturn(mockNewOrder);
@@ -107,7 +101,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
 
     public void getOrder_illegalOrderId() throws Exception {
         when(orderService.getOrder(5L)).thenThrow(new IllegalArgumentException("test message"));
@@ -120,7 +115,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
 
     public void getOrder_hasNoTaxiDriverAndNoAddRequirements() throws Exception {
         when(orderService.getOrder(1L)).thenReturn(mockOrderWithoutDriverAndAddReqs);
@@ -135,7 +131,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void readAllOrders_validStatusLowerCased() throws Exception {
         Order additionalOrder = new Order(1L, mockUser, taxiDriver, NOW,
                 "Start1", "End1", 115.0, Order.OrderStatus.ACCEPTED, Collections.emptySet());
@@ -162,7 +159,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void readAllOrders_statusIsAll() throws Exception {
         when(orderService.getOrderList(null)).thenReturn(Collections.emptyList());
         mockMvc.perform(get("/order?orderStatus=accepted")
@@ -174,7 +172,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void readAllOrders_invalidStatus() throws Exception {
         mockMvc.perform(get("/order?orderStatus=ertretertervfddfgd")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
@@ -185,7 +184,8 @@ public class OrderControllerTest {
     }
 
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void calculateOrderPrice_allIsOk() throws Exception {
         OrderPriceDto priceDto = new OrderPriceDto(5.0, Arrays.asList(
                 new AddReqSimpleDto(1, 2),
@@ -201,7 +201,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void calculateOrderPrice_invalidDistance() throws Exception {
         OrderPriceDto priceDto = new OrderPriceDto(-100.0, Arrays.asList(
                 new AddReqSimpleDto(1, 2),
@@ -217,7 +218,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void calculateOrderPrice_nullDistance() throws Exception {
         OrderPriceDto priceDto = new OrderPriceDto(null, Arrays.asList(
                 new AddReqSimpleDto(1, 2),
@@ -232,7 +234,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void calculateOrderPrice_invalidParameterMap() throws Exception {
         OrderPriceDto priceDto = new OrderPriceDto(3.0, Arrays.asList(
                 new AddReqSimpleDto(-1, 2),
@@ -249,7 +252,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void calculateOrderPrice_nullParameterMap() throws Exception {
         OrderPriceDto priceDto = new OrderPriceDto(3.0, null);
         when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
@@ -261,7 +265,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void calculateOrderPrice_illegalParameterIdOrParamValueId() throws Exception {
         OrderPriceDto priceDto = new OrderPriceDto(3.0, Arrays.asList(
                 new AddReqSimpleDto(1, 2),
@@ -277,7 +282,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void changeOrderStatus_changeWithValidData() throws Exception {
         when(orderService.changeOrderStatus(1L, 1, Order.OrderStatus.ACCEPTED)).thenReturn(new Order());
 
@@ -290,7 +296,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void changeOrderStatus_userIdIsNull() throws Exception {
         mockMvc.perform(put("/order/1/status")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -302,7 +309,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void changeOrderStatus_userIdIsInvalid() throws Exception {
         mockMvc.perform(put("/order/1/status")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -314,7 +322,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void changeOrderStatus_orderStatusIsNull() throws Exception {
         mockMvc.perform(put("/order/1/status")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -326,7 +335,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void changeOrderStatus_throwsIllegalArgumentException() throws Exception {
         when(orderService.changeOrderStatus(1L, 1, Order.OrderStatus.ACCEPTED))
                 .thenThrow(new IllegalArgumentException("Exception message"));
@@ -340,7 +350,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void changeOrderStatus_throwsIllegalStateException() throws Exception {
         when(orderService.changeOrderStatus(1L, 1, Order.OrderStatus.ACCEPTED))
                 .thenThrow(new IllegalStateException("Exception message"));
@@ -354,18 +365,20 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void updateOrder() throws Exception {
         OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
-        when(orderService.updateOrder(1L, orderDto)).thenReturn(new Order());
+        when(orderService.updateOrder(1L, 1, orderDto)).thenReturn(new Order());
         mockMvc.perform(put("/order/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonMapper.toJson(orderDto)))
                 .andExpect(status().isOk());
-        verify(orderService).updateOrder(1L, orderDto);
+        verify(orderService).updateOrder(1L, 1, orderDto);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void updateOrder_InvalidStartTime() throws Exception {
         OrderDto orderDto = new OrderDto(null, NOW.minusHours(1), "start", "end", null, null);
         mockMvc.perform(put("/order/1")
@@ -379,19 +392,21 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void updateOrder_illegalArgumentException() throws Exception {
         OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
-        when(orderService.updateOrder(1L, orderDto)).thenThrow(new IllegalArgumentException("ExceptionMessage"));
+        when(orderService.updateOrder(1L, 1, orderDto)).thenThrow(new IllegalArgumentException("ExceptionMessage"));
         mockMvc.perform(put("/order/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(JsonMapper.toJson(orderDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("ExceptionMessage"));
-        verify(orderService).updateOrder(1L, orderDto);
+        verify(orderService).updateOrder(1L, 1, orderDto);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void addOrder_allIsOk() throws Exception {
         OrderPriceDto orderPrice = new OrderPriceDto(100.0, Collections.emptyList());
         OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", orderPrice, null);
@@ -403,7 +418,8 @@ public class OrderControllerTest {
         verify(orderService).addOrder(orderDto);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void addOrder_orderPriceExpected() throws Exception {
         OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", null, null);
         mockMvc.perform(post("/order")
@@ -416,7 +432,8 @@ public class OrderControllerTest {
         verifyNoMoreInteractions(orderService);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void addOrder_orderPriceDistanceExpected() throws Exception {
         OrderPriceDto orderPrice = new OrderPriceDto(-100.0, Collections.emptyList());
         OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end",

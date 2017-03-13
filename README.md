@@ -14,7 +14,7 @@ Request body:
 ```json
 {
   "name": "String",
-  "username" : "String", //email
+  "email" : "String",
   "password" : "String",
   "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
   "userType" : "CUSTOMER/TAXI_DRIVER",
@@ -115,7 +115,7 @@ RequestType: **POST**
 Request body:
 ```json
 {
-  "username":"String",
+  "email":"String",
   "password":"String"
 }
 ```

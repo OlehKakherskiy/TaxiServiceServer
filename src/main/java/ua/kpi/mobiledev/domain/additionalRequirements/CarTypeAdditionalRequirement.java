@@ -3,12 +3,17 @@ package ua.kpi.mobiledev.domain.additionalRequirements;
 import lombok.AllArgsConstructor;
 import ua.kpi.mobiledev.domain.AdditionalRequirement;
 import ua.kpi.mobiledev.domain.Car;
+import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
+import static ua.kpi.mobiledev.domain.Car.CarType.valueOf;
+import static ua.kpi.mobiledev.exception.ErrorCode.REQUIREMENT_VALUE_IS_NULL;
 
 @AllArgsConstructor()
 public class CarTypeAdditionalRequirement extends AdditionalRequirement {
@@ -23,7 +28,7 @@ public class CarTypeAdditionalRequirement extends AdditionalRequirement {
 
     public CarTypeAdditionalRequirement(String requirementName, String priceDescription, Map<Integer, String> requirementValues, Map<Car.CarType, Double> multiplyCoefficients) {
         super(requirementName, priceDescription, requirementValues);
-        this.multiplyCoefficients = Optional.ofNullable(multiplyCoefficients).orElse(Collections.emptyMap());
+        this.multiplyCoefficients = ofNullable(multiplyCoefficients).orElse(Collections.emptyMap());
     }
 
     @Override
@@ -32,8 +37,11 @@ public class CarTypeAdditionalRequirement extends AdditionalRequirement {
     }
 
     private Optional<Double> getMultiplyCoefficient(Integer requirementValueId) {
-        Objects.requireNonNull(requirementValueId, MessageFormat.format(CANT_BE_NULL, requirementName));
-        return Optional.ofNullable(multiplyCoefficients.get(getCarType(ofTypeString(requirementValueId), requirementValueId)));
+        if(Objects.isNull(requirementValueId)){
+            throw new ResourceNotFoundException(REQUIREMENT_VALUE_IS_NULL, CANT_BE_NULL, requirementName);
+        }
+//        Objects.requireNonNull(requirementValueId, MessageFormat.format(CANT_BE_NULL, requirementName));
+        return ofNullable(multiplyCoefficients.get(getCarType(ofTypeString(requirementValueId), requirementValueId)));
     }
 
     private String ofTypeString(Integer requirementValueId) {
@@ -43,7 +51,7 @@ public class CarTypeAdditionalRequirement extends AdditionalRequirement {
 
     private Car.CarType getCarType(String carType, Integer requirementValueId) {
         try {
-            return Car.CarType.valueOf(carType.toUpperCase());
+            return valueOf(carType.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(MessageFormat.format(ILLEGAL_REQUIREMENT_VALUE_ID,
                     requirementName, requirementValueId), e.getCause());

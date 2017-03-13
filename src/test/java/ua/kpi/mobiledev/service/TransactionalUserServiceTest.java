@@ -12,6 +12,7 @@ import ua.kpi.mobiledev.domain.Car;
 import ua.kpi.mobiledev.domain.DriverLicense;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.exception.SystemException;
 import ua.kpi.mobiledev.repository.UserRepository;
 import ua.kpi.mobiledev.testCategories.UnitTest;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.*;
 
 @Category(UnitTest.class)
 @RunWith(MockitoJUnitRunner.class)
-public class UserServiceTest {
+public class TransactionalUserServiceTest {
 
     private static final Integer NO_USER_ID = null;
     private static final Integer USER_ID = 1;
@@ -150,7 +151,7 @@ public class UserServiceTest {
                 singletonList(new Role(new SimpleGrantedAuthority(user.getUserType().name()))));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RequestException.class)
     public void shouldThrowIllegalArgumentExceptionWhenUserAlreadyExists() throws Exception {
 
         UserDetails existedUserDetails = mock(UserDetails.class);

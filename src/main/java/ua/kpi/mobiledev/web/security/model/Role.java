@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "authorities")
+@Table(name = "authority")
 public class Role {
 
     private GrantedAuthority authority;

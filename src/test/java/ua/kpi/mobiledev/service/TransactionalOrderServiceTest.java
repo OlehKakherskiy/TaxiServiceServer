@@ -7,40 +7,51 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import ua.kpi.mobiledev.domain.*;
+import ua.kpi.mobiledev.domain.AdditionalRequirement;
+import ua.kpi.mobiledev.domain.Car.CarType;
+import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.Order.OrderStatus;
+import ua.kpi.mobiledev.domain.TaxiDriver;
+import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.additionalRequirements.CarTypeAdditionalRequirement;
 import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionManager;
+import ua.kpi.mobiledev.exception.ForbiddenOperationException;
+import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
 import ua.kpi.mobiledev.testCategories.UnitTest;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
+import static ua.kpi.mobiledev.domain.Car.CarType.*;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.ACCEPTED;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.NEW;
+import static ua.kpi.mobiledev.domain.User.UserType.CUSTOMER;
 
 @Category(UnitTest.class)
 @RunWith(MockitoJUnitRunner.class)
-public class OrderServiceTest {
+public class TransactionalOrderServiceTest {
 
-    private static LocalDateTime NOW = LocalDateTime.now();
     private static final Map<Integer, AdditionalRequirement> additionalRequirementMap = new HashMap<>();
-
+    private static final int CUSTOMER_ID = 1;
+    private static final int DRIVER_ID = 2;
+    private static LocalDateTime NOW = LocalDateTime.now();
     @Mock
     private OrderRepository orderRepository;
     @Mock
     private UserService userService;
     @Mock
     private OrderStatusTransitionManager transitionManager;
-    @Mock
     private User customer;
-    @Mock
     private TaxiDriver taxiDriver;
 
-    private OrderService orderServiceUnderTest;
+    private TransactionalOrderService orderService;
 
     @BeforeClass
     public static void initAddRequirements() {
@@ -56,19 +67,22 @@ public class OrderServiceTest {
         return carTypes;
     }
 
-    private static Map<Car.CarType, Double> getMultiplyCoefficient() {
-        Map<Car.CarType, Double> multiplyCoefficient = new HashMap<>();
-        multiplyCoefficient.put(Car.CarType.TRUCK, 3.0);
-        multiplyCoefficient.put(Car.CarType.PASSENGER_CAR, 1.0);
-        multiplyCoefficient.put(Car.CarType.MINIBUS, 2.0);
+    private static Map<CarType, Double> getMultiplyCoefficient() {
+        Map<CarType, Double> multiplyCoefficient = new HashMap<>();
+        multiplyCoefficient.put(TRUCK, 3.0);
+        multiplyCoefficient.put(PASSENGER_CAR, 1.0);
+        multiplyCoefficient.put(MINIBUS, 2.0);
         return multiplyCoefficient;
     }
 
     @Before
     public void initOrderService() {
-        orderServiceUnderTest = new TransactionalOrderService(orderRepository, userService, transitionManager);
-        ((TransactionalOrderService) orderServiceUnderTest).setKmPrice(5);
-        ((TransactionalOrderService) orderServiceUnderTest).setAdditionalRequirements(additionalRequirementMap);
+        orderService = new TransactionalOrderService(orderRepository, userService, transitionManager);
+        orderService.setKmPrice(5);
+        orderService.setAdditionalRequirements(additionalRequirementMap);
+
+        customer = new User(CUSTOMER_ID, null, null, CUSTOMER, null);
+        taxiDriver = new TaxiDriver(DRIVER_ID, null, null, null, null, null);
     }
 
     @Test
@@ -77,34 +91,33 @@ public class OrderServiceTest {
         OrderDto orderDto = new OrderDto(1, NOW, "start", "end",
                 new OrderPriceDto(5.0, Collections.emptyList()), 0.0);
         Order orderBeforeSaveOperation = new Order(null, customer, null, NOW,
-                "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptySet());
+                "start", "end", 25.0, NEW, Collections.emptySet());
         Order expectedOrder = new Order(1L, customer, null, NOW,
-                "start", "end", 25.0, Order.OrderStatus.NEW, Collections.emptySet());
+                "start", "end", 25.0, NEW, Collections.emptySet());
 
         //when
         when(orderRepository.save(orderBeforeSaveOperation)).thenReturn(expectedOrder);
         when(userService.getById(anyInt())).thenReturn(customer);
-        Order actual = orderServiceUnderTest.addOrder(orderDto);
+        Order actual = orderService.addOrder(orderDto);
 
         //then
         assertEquals(expectedOrder, actual);
-        verify(userService, times(1)).getById(anyInt());
-        verify(orderRepository, times(1)).save(orderBeforeSaveOperation);
+        verify(userService).getById(anyInt());
+        verify(orderRepository).save(orderBeforeSaveOperation);
         verifyNoMoreInteractions(orderRepository, userService, transitionManager);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ForbiddenOperationException.class)
     public void addOrderByTaxiDriver() throws Exception {
         //given
         OrderDto orderDto = new OrderDto(1, NOW, "start", "end",
                 new OrderPriceDto(5.0, Collections.emptyList()), 0.0);
-        when(taxiDriver.getUserType()).thenReturn(User.UserType.TAXI_DRIVER);
         when(userService.getById(1)).thenReturn(taxiDriver);
 
         //when
-        orderServiceUnderTest.addOrder(orderDto);
+        orderService.addOrder(orderDto);
 
-        //then IllegalArgumentException is thrown
+        //then ForbiddenOperationException is thrown
     }
 
     @Test(expected = NullPointerException.class)
@@ -114,7 +127,7 @@ public class OrderServiceTest {
                 null, 0.0);
 
         //when
-        orderServiceUnderTest.addOrder(orderDto);
+        orderService.addOrder(orderDto);
 
         //then NPE is thrown
     }
@@ -122,18 +135,18 @@ public class OrderServiceTest {
     @Test
     public void changeOrderStatus() throws Exception {
         //given
-        Order.OrderStatus mockStatus = Order.OrderStatus.NEW;
+        OrderStatus mockStatus = NEW;
         initOrderRepositoryAndUserServiceForChangeOrderStatus();
         when(transitionManager.changeOrderStatus(any(), any(), eq(mockStatus))).thenReturn(mock(Order.class));
 
         //when
-        Order updatedOrder = orderServiceUnderTest.changeOrderStatus(1L, 1, mockStatus);
+        Order updatedOrder = orderService.changeOrderStatus(1L, 1, mockStatus);
 
         //then
         assertNotNull(updatedOrder);
-        verify(orderRepository, times(1)).findOne(anyLong());
-        verify(orderRepository, times(1)).save(any(Order.class));
-        verify(userService, times(1)).getById(anyInt());
+        verify(orderRepository).findOne(anyLong());
+        verify(orderRepository).save(any(Order.class));
+        verify(userService).getById(anyInt());
         verify(transitionManager).changeOrderStatus(any(), any(), eq(mockStatus));
         verifyNoMoreInteractions(orderRepository, userService, transitionManager);
     }
@@ -145,7 +158,7 @@ public class OrderServiceTest {
 
         //when
         doThrow(IllegalStateException.class).when(transitionManager).changeOrderStatus(any(), any(), any());
-        orderServiceUnderTest.changeOrderStatus(1L, 1, Order.OrderStatus.ACCEPTED);
+        orderService.changeOrderStatus(1L, 1, ACCEPTED);
 
         //then IllegalStateException is thrown
     }
@@ -157,7 +170,7 @@ public class OrderServiceTest {
 
         //when
         doThrow(IllegalArgumentException.class).when(transitionManager).changeOrderStatus(any(), any(), any());
-        orderServiceUnderTest.changeOrderStatus(1L, 1, Order.OrderStatus.ACCEPTED);
+        orderService.changeOrderStatus(1L, 1, ACCEPTED);
 
         //then IllegalArgumentException is thrown
     }
@@ -171,31 +184,31 @@ public class OrderServiceTest {
     @Test
     public void getOrderListFilteredByOrderStatus() {
         //given
-        Order.OrderStatus targetStatus = Order.OrderStatus.NEW;
+        OrderStatus targetStatus = NEW;
 
         //when
         when(orderRepository.getAllByOrderStatus(targetStatus)).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
-        List<Order> resultList = orderServiceUnderTest.getOrderList(targetStatus);
+        List<Order> resultList = orderService.getOrderList(targetStatus);
 
         //then
         assertEquals(2, resultList.size());
-        verify(orderRepository, times(1)).getAllByOrderStatus(targetStatus);
-        verifyNoMoreInteractions(orderRepository, userService, transitionManager);
+        verify(orderRepository).getAllByOrderStatus(targetStatus);
+        verifyNoMoreInteractions(orderRepository);
     }
 
     @Test
-    public void getOrderListIgnoringOrderStatus() {
+    public void shouldReturnOrdersOfAllStatusesWhenTargetStatusIsNull() {
         //given
-        Order.OrderStatus targetStatus = null; //ALL orders should be returned
+        OrderStatus targetStatus = null; //ALL orders should be returned
 
         //when
         when(orderRepository.findAll()).thenReturn(Arrays.asList(mock(Order.class), mock(Order.class)));
-        List<Order> resultList = orderServiceUnderTest.getOrderList(targetStatus);
+        List<Order> resultList = orderService.getOrderList(targetStatus);
 
         //then
         assertEquals(2, resultList.size());
-        verify(orderRepository, times(1)).findAll();
-        verifyNoMoreInteractions(orderRepository, userService, transitionManager);
+        verify(orderRepository).findAll();
+        verifyNoMoreInteractions(orderRepository);
     }
 
     @Test
@@ -205,24 +218,24 @@ public class OrderServiceTest {
 
         //when
         when(orderRepository.findOne(anyLong())).thenReturn(mock(Order.class));
-        Order resultOrder = orderServiceUnderTest.getOrder(orderId);
+        Order resultOrder = orderService.getOrder(orderId);
 
         //then
         assertNotNull(resultOrder);
-        verify(orderRepository, times(1)).findOne(orderId);
-        verifyNoMoreInteractions(orderRepository, userService, transitionManager);
+        verify(orderRepository).findOne(orderId);
+        verifyNoMoreInteractions(orderRepository);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void getOrderWithNotExistingId() throws Exception {
         //given
         Long notExistingOrderId = 1L;
 
         //when
         when(orderRepository.findOne(anyLong())).thenReturn(null);
-        Order resultOrder = orderServiceUnderTest.getOrder(notExistingOrderId);
+        orderService.getOrder(notExistingOrderId);
 
-        //then IllegalArgumentException is thrown
+        //then ResourceNotFoundException is thrown
     }
 
     @Test
@@ -231,37 +244,47 @@ public class OrderServiceTest {
         Order order = mock(Order.class);
 
         //when
-        when(customer.getId()).thenReturn(1);
+        when(userService.getById(CUSTOMER_ID)).thenReturn(customer);
         when(order.getCustomer()).thenReturn(customer);
         when(orderRepository.findOne(anyLong())).thenReturn(order);
-        boolean deleteResult = orderServiceUnderTest.deleteOrder(1L, 1);
+        orderService.deleteOrder(1L, CUSTOMER_ID);
 
         //then
-        assertTrue(deleteResult);
-        verify(order, times(1)).getCustomer();
-        verify(customer, times(1)).getId();
-        verify(orderRepository, times(1)).findOne(1L);
-        verify(orderRepository, times(1)).delete(order);
-        verifyNoMoreInteractions(customer, orderRepository, userService, transitionManager);
+        verify(userService).getById(CUSTOMER_ID);
+        verify(orderRepository).findOne(1L);
+        verify(orderRepository).delete(order);
+        verifyNoMoreInteractions(orderRepository);
     }
 
-    @Test
-    public void deleteExistingOrderWithNoUserRights() throws Exception {
+    @Test(expected = ForbiddenOperationException.class)
+    public void shouldThrowForbiddenExceptionWhenTaxiDriverDeletesOrder() {
         //given
         Order order = mock(Order.class);
 
         //when
-        when(customer.getId()).thenReturn(2);
+        when(userService.getById(anyInt())).thenReturn(taxiDriver);
+
+        orderService.deleteOrder(1L, 2);
+    }
+
+    @Test(expected = ForbiddenOperationException.class)
+    public void shouldThrowForbiddenExceptionWhenUserIsNotOrderOwner() throws Exception {
+        //given
+        Order order = mock(Order.class);
+        User user = mock(User.class);
+
+        //when
+        when(user.getUserType()).thenReturn(CUSTOMER);
+        when(user.getId()).thenReturn(3);
+        when(userService.getById(3)).thenReturn(user);
+        when(orderRepository.findOne(1L)).thenReturn(order);
         when(order.getCustomer()).thenReturn(customer);
-        when(orderRepository.findOne(anyLong())).thenReturn(order);
-        boolean deleteResult = orderServiceUnderTest.deleteOrder(1L, 1);
+        orderService.deleteOrder(1L, 3);
 
         //then
-        assertFalse(deleteResult);
-        verify(order).getCustomer();
-        verify(customer).getId();
         verify(orderRepository).findOne(1L);
-        verifyNoMoreInteractions(customer, orderRepository, userService, transitionManager);
+        verify(userService).getById(2);
+        verifyNoMoreInteractions(orderRepository);
     }
 
 
@@ -272,21 +295,21 @@ public class OrderServiceTest {
         OrderDto orderDto = new OrderDto(1, updateTime, "start", "end",
                 new OrderPriceDto(5.0, null), null);
         Order orderBeforeUpdate = new Order(1L, customer, null, NOW, "start_before", "end_before",
-                20.0, Order.OrderStatus.NEW, Collections.emptySet());
+                20.0, NEW, Collections.emptySet());
         Order updatedOrder = new Order(1L, customer, null, updateTime, "start", "end",
-                25.0, Order.OrderStatus.NEW, Collections.emptySet());
+                25.0, NEW, Collections.emptySet());
         Order expectedOrder = new Order(1L, customer, null, updateTime, "start", "end",
-                25.0, Order.OrderStatus.NEW, Collections.emptySet());
+                25.0, NEW, Collections.emptySet());
 
         //when
         when(orderRepository.findOne(1L)).thenReturn(orderBeforeUpdate);
         when(orderRepository.save(updatedOrder)).thenReturn(updatedOrder);
-        Order actualOrder = orderServiceUnderTest.updateOrder(1L, orderDto);
+        Order actualOrder = orderService.updateOrder(1L, 1, orderDto);
 
         //then
         assertEquals(expectedOrder, actualOrder);
-        verify(orderRepository, times(1)).findOne(1L);
-        verify(orderRepository, times(1)).save(updatedOrder);
+        verify(orderRepository).findOne(1L);
+        verify(orderRepository).save(updatedOrder);
         verifyNoMoreInteractions(orderRepository, userService, transitionManager);
     }
 
@@ -296,7 +319,7 @@ public class OrderServiceTest {
         OrderPriceDto orderPrice = new OrderPriceDto(5.0, Collections.emptyList());
 
         //when
-        Double actualPrice = orderServiceUnderTest.calculatePrice(orderPrice);
+        Double actualPrice = orderService.calculatePrice(orderPrice);
 
         //then
         assertEquals(25.0, actualPrice, 1e-7);
@@ -310,7 +333,7 @@ public class OrderServiceTest {
                 Collections.singletonList(new AddReqSimpleDto(1, 1)));
 
         //when
-        Double actualPrice = orderServiceUnderTest.calculatePrice(orderPrice);
+        Double actualPrice = orderService.calculatePrice(orderPrice);
 
         //then
         assertEquals(100.0, actualPrice, 1e-7);
@@ -323,7 +346,7 @@ public class OrderServiceTest {
         OrderPriceDto orderPriceDto = null;
 
         //when
-        Double actualPrice = orderServiceUnderTest.calculatePrice(orderPriceDto);
+        Double actualPrice = orderService.calculatePrice(orderPriceDto);
 
         //then
         assertEquals(0.0, actualPrice, 1e-7);
