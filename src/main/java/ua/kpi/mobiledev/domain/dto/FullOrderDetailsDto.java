@@ -5,7 +5,6 @@ import ua.kpi.mobiledev.domain.Order;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Getter
 public class FullOrderDetailsDto {
@@ -14,17 +13,12 @@ public class FullOrderDetailsDto {
         FullOrderDetailsDto orderDetailsDto = new FullOrderDetailsDto();
         orderDetailsDto.orderId = order.getOrderId();
         orderDetailsDto.startTime = order.getStartTime().toString();
-        orderDetailsDto.startPoint = order.getStartPoint();
-        orderDetailsDto.endPoint = order.getEndPoint();
         orderDetailsDto.status = order.getOrderStatus().name();
         orderDetailsDto.customer = new UserSimpleDto(order.getCustomer().getId(), order.getCustomer().getName());
         if (Objects.nonNull(order.getTaxiDriver())) {
             orderDetailsDto.taxiDriver = new TaxiDriverSimpleDto(order.getTaxiDriver().getId(), order.getTaxiDriver().getName());
         }
         orderDetailsDto.price = order.getPrice();
-        orderDetailsDto.additionalRequirements = order.getAdditionalRequirements().stream()
-                .map(entry -> new AddReqSimpleDto(entry.getAdditionalRequirement().getId(), entry.getRequirementValue()))
-                .collect(Collectors.toList());
         return orderDetailsDto;
     }
 

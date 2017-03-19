@@ -17,8 +17,9 @@ import java.time.LocalDateTime;
 public class OrderSimpleDto {
 
     public static OrderSimpleDto of(Order order) {
-        return new OrderSimpleDto(order.getOrderId(), order.getStartTime(), order.getStartPoint(),
-                order.getEndPoint(), order.getPrice(), order.getOrderStatus());
+        return null;
+//        return new OrderSimpleDto(order.getOrderId(), order.getStartTime(), order.getStartPoint(),
+//                order.getEndPoint(), order.getPrice(), order.getOrderStatus());
     }
 
     private Long orderId;

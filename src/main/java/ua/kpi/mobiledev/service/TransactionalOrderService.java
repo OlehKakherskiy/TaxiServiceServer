@@ -2,8 +2,6 @@ package ua.kpi.mobiledev.service;
 
 import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
-import ua.kpi.mobiledev.domain.AdditionalRequirement;
-import ua.kpi.mobiledev.domain.AdditionalRequirementValue;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
@@ -13,13 +11,10 @@ import ua.kpi.mobiledev.exception.ForbiddenOperationException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
 
-import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.exception.ErrorCode.*;
@@ -29,7 +24,6 @@ public class TransactionalOrderService implements OrderService {
 
     private OrderRepository orderRepository;
     private UserService userService;
-    private Map<Integer, AdditionalRequirement> additionalRequirements;
     private OrderStatusManager orderStatusManager;
     private Integer kmPrice;
 
@@ -37,7 +31,6 @@ public class TransactionalOrderService implements OrderService {
                                      OrderStatusManager orderStatusManager) {
         this.orderRepository = orderRepository;
         this.userService = userService;
-        this.additionalRequirements = emptyMap();
         this.orderStatusManager = orderStatusManager;
     }
 
@@ -47,12 +40,12 @@ public class TransactionalOrderService implements OrderService {
         OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
         User user = findUser(orderDto.getCustomerId());
         checkIfCustomer(user);
-        Order order = new Order(null, user, null, orderDto.getStartTime(),
-                orderDto.getStartPoint(), orderDto.getEndPoint(),
-                calculatePrice(orderPriceDto),
-                Order.OrderStatus.NEW,
-                getAdditionalRequirementValueSet(orderPriceDto));
-        return orderRepository.save(order);
+//        Order order = new Order(null, user, null, orderDto.getStartTime(),
+//                orderDto.getStartPoint(), orderDto.getEndPoint(),
+//                calculatePrice(orderPriceDto),
+//                Order.OrderStatus.NEW);
+//        return orderRepository.save(order);
+        return orderRepository.save(new Order());
     }
 
     private void checkIfCustomer(User user) {
@@ -67,46 +60,12 @@ public class TransactionalOrderService implements OrderService {
             return 0.0;
         }
         double basicPrice = ofNullable(orderPriceDto.getDistance()).orElse(0.0) * kmPrice;
-        double extraPrice = getAdditionalRequirementValueSet(orderPriceDto)
+        double extraPrice = 0.0/*getAdditionalRequirementValueSet(orderPriceDto)
                 .stream()
                 .map(reqEntry -> reqEntry.getAdditionalRequirement().addPrice(basicPrice, reqEntry.getRequirementValue()))
                 .reduce(Double::sum)
-                .orElse(0.0);
+                .orElse(0.0)*/;
         return basicPrice + extraPrice;
-    }
-
-    private Set<AdditionalRequirementValue> getAdditionalRequirementValueSet(OrderPriceDto orderPriceDto) {
-        if (isNull(orderPriceDto)) {
-            return emptySet();
-        }
-        Map<Integer, Integer> orderRequirements = orderPriceDto.paramsToMap();
-        if (isNull(orderRequirements) || orderRequirements.isEmpty()) {
-            return emptySet();
-        }
-        Set<AdditionalRequirementValue> result = new HashSet<>();
-        for (Map.Entry<Integer, Integer> orderRequirement : orderRequirements.entrySet()) {
-            AdditionalRequirement additionalRequirement = convertToRequirement(orderRequirement.getKey());
-            if (isValidRequirementValueId(additionalRequirement, orderRequirement.getValue())) {
-                result.add(new AdditionalRequirementValue(null, additionalRequirement, orderRequirement.getValue()));
-            }
-        }
-        return result;
-
-    }
-
-    private AdditionalRequirement convertToRequirement(Integer requirementId) {
-        AdditionalRequirement result = additionalRequirements.get(requirementId);
-        if (isNull(result)) {
-            throw new ResourceNotFoundException(INVALID_REQUIREMENT_ID, requirementId);
-        }
-        return result;
-    }
-
-    private boolean isValidRequirementValueId(AdditionalRequirement additionalRequirement, Integer reqValueId) {
-        requireNonNull(additionalRequirement.getRequirementValues().get(reqValueId),
-                MessageFormat.format("There''s no value id in additional requirement with id={0}. Value id={1}",
-                        additionalRequirement.getId(), reqValueId));
-        return true;
     }
 
     @Override
@@ -156,11 +115,8 @@ public class TransactionalOrderService implements OrderService {
         checkIfOrderOwner(order, userId);
 
         order.setStartTime(orderDto.getStartTime());
-        order.setStartPoint(orderDto.getStartPoint());
-        order.setEndPoint(orderDto.getEndPoint());
         OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
         order.setPrice(calculatePrice(orderPriceDto));
-        order.setAdditionalRequirements(getAdditionalRequirementValueSet(orderPriceDto));
 
         return orderRepository.save(order);
     }
@@ -180,7 +136,4 @@ public class TransactionalOrderService implements OrderService {
         this.kmPrice = kmPrice;
     }
 
-    public void setAdditionalRequirements(Map<Integer, AdditionalRequirement> additionalRequirements) {
-        this.additionalRequirements = additionalRequirements;
-    }
 }

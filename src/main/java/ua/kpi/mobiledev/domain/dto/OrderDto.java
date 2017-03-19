@@ -29,8 +29,6 @@ public class OrderDto {
         OrderDto orderDto = new OrderDto();
         orderDto.customerId = order.getCustomer().getId();
         orderDto.startTime = order.getStartTime();
-        orderDto.startPoint = order.getStartPoint();
-        orderDto.endPoint = order.getEndPoint();
         orderDto.price = order.getPrice();
         return orderDto;
     }

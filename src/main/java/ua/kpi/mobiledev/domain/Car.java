@@ -21,7 +21,7 @@ public class Car {
     @NonNull
     private String model;
 
-    @Column(name = "manufacturer")
+    @Column(name = "brand")
     @NonNull
     private String manufacturer;
 
@@ -42,7 +42,7 @@ public class Car {
         MINIBUS
     }
 
-    @Column(name = "car_type")
+    @Column(name = "car_type_id")
     @Enumerated(EnumType.ORDINAL)
     @NonNull
     private CarType carType;
