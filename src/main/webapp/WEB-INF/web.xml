@@ -39,4 +39,30 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!--security exceptions handling -->
+    <error-page>
+        <exception-type>org.springframework.security.authentication.BadCredentialsException</exception-type>
+        <location>/exception/badCredentials</location>
+    </error-page>
+
+    <error-page>
+        <exception-type>org.springframework.security.core.AuthenticationException</exception-type>
+        <location>/exception/authenticationFailure</location>
+    </error-page>
+
+    <error-page>
+        <exception-type>org.springframework.web.client.HttpStatusCodeException</exception-type>
+        <location>/exception/statusCodeException</location>
+    </error-page>
+
+    <error-page>
+        <exception-type></exception-type>
+        <location>/exception/statusCodeException</location>
+    </error-page>
+
+    <error-page>
+        <exception-type>java.lang.RuntimeException</exception-type>
+        <location>/exception/runtimeException</location>
+    </error-page>
+
 </web-app>

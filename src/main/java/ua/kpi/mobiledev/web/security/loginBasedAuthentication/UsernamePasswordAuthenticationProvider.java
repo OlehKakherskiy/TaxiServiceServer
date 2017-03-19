@@ -4,21 +4,22 @@ import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import java.util.Collection;
 import java.util.Objects;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Component(value = "userCredentialsProvider")
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
@@ -41,7 +42,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         final String password = (String) authentication.getCredentials();
 
         if (invalidPassword(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Authentication Failed. Username or Password not valid.");
+            throw new HttpClientErrorException(BAD_REQUEST, "Authentication Failed. Username or Password not valid.");
         }
         User user = getFullInfoByUserName(userName);
         UserContext userContext = new UserContext(user.getId(), userDetails.getUsername(), user.getUserType());

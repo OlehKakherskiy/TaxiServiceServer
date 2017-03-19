@@ -3,13 +3,12 @@ package ua.kpi.mobiledev.web.security.loginBasedAuthentication;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.client.HttpClientErrorException;
 import ua.kpi.mobiledev.web.security.model.LoginRequest;
 
 import javax.servlet.FilterChain;
@@ -18,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 public class UsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -39,11 +40,11 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         if (notPostMethod(request)) {
-            throw new HttpRequestMethodNotSupportedException("Authentication method not supported for " + request.getMethod());
+            throw new HttpClientErrorException(BAD_REQUEST, "Authentication method not supported for " + request.getMethod());
         }
         LoginRequest loginRequest = mapFromJson(request);
         if (Objects.isNull(loginRequest)) {
-            throw new SecurityException("Bad request. Invalid request body");
+            throw new HttpClientErrorException(BAD_REQUEST, "Bad request. Invalid request body");
         }
         return this.getAuthenticationManager().authenticate(mapToToken(ifValidLoginRequest(loginRequest)));
     }
@@ -62,7 +63,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
 
     private LoginRequest ifValidLoginRequest(LoginRequest loginRequest) {
         if (isEmptyOrBlank(loginRequest.getUsername()) || isEmptyOrBlank(loginRequest.getPassword())) {
-            throw new BadCredentialsException("Username or Password not provided");
+            throw new HttpClientErrorException(BAD_REQUEST, "Username or Password not provided");
         }
         return loginRequest;
     }
