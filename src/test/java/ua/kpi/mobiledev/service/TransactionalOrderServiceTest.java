@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.service;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -10,10 +11,8 @@ import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.Order.OrderStatus;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
-import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
-import ua.kpi.mobiledev.domain.dto.OrderDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionManager;
+import ua.kpi.mobiledev.domain.priceCalculationManagement.PriceCalculationManager;
 import ua.kpi.mobiledev.exception.ForbiddenOperationException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
@@ -21,9 +20,10 @@ import ua.kpi.mobiledev.testCategories.UnitTest;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -37,46 +37,23 @@ public class TransactionalOrderServiceTest {
 
     private static final int CUSTOMER_ID = 1;
     private static final int DRIVER_ID = 2;
-    private static LocalDateTime NOW = LocalDateTime.now();
+    private static final LocalDateTime NOW = LocalDateTime.now();
     @Mock
     private OrderRepository orderRepository;
     @Mock
     private UserService userService;
     @Mock
     private OrderStatusTransitionManager transitionManager;
+    @Mock
+    private PriceCalculationManager priceCalculationManager;
     private User customer;
     private TaxiDriver taxiDriver;
 
     private TransactionalOrderService orderService;
 
-//    @BeforeClass
-//    public static void initAddRequirements() {
-//        additionalRequirementMap.put(1, new CarTypeAdditionalRequirement("", "",
-//                getCarTypes(), getMultiplyCoefficient()));
-//    }
-//
-//    private static Map<Integer, String> getCarTypes() {
-//        Map<Integer, String> carTypes = new HashMap<>();
-//        carTypes.put(1, "TRUCK");
-//        carTypes.put(2, "PASSENGER_CAR");
-//        carTypes.put(3, "MINIBUS");
-//        return carTypes;
-//    }
-//
-//    private static Map<CarType, Double> getMultiplyCoefficient() {
-//        Map<CarType, Double> multiplyCoefficient = new HashMap<>();
-//        multiplyCoefficient.put(TRUCK, 3.0);
-//        multiplyCoefficient.put(PASSENGER_CAR, 1.0);
-//        multiplyCoefficient.put(MINIBUS, 2.0);
-//        return multiplyCoefficient;
-//    }
-
     @Before
     public void initOrderService() {
-        orderService = new TransactionalOrderService(orderRepository, userService, transitionManager);
-        orderService.setKmPrice(5);
-//        orderService.setAdditionalRequirements(additionalRequirementMap);
-
+        orderService = new TransactionalOrderService(orderRepository, userService, transitionManager, priceCalculationManager);
         customer = new User(CUSTOMER_ID, null, null, CUSTOMER, null);
         taxiDriver = new TaxiDriver(DRIVER_ID, null, null, null, null, null);
     }
@@ -103,27 +80,29 @@ public class TransactionalOrderServiceTest {
 //        verifyNoMoreInteractions(orderRepository, userService, transitionManager);
 //    }
 
+    @Ignore
     @Test(expected = ForbiddenOperationException.class)
     public void addOrderByTaxiDriver() throws Exception {
-        //given
-        OrderDto orderDto = new OrderDto(1, NOW, "start", "end",
-                new OrderPriceDto(5.0, Collections.emptyList()), 0.0);
-        when(userService.getById(1)).thenReturn(taxiDriver);
-
-        //when
-        orderService.addOrder(orderDto);
-
-        //then ForbiddenOperationException is thrown
+//        //given
+//        OrderDto orderDto = new OrderDto(1, NOW, "start", "end",
+//                new OrderPriceDto(5.0, Collections.emptyList()), 0.0);
+//        when(userService.getById(1)).thenReturn(taxiDriver);
+//
+//        //when
+//        orderService.addOrder(orderDto);
+//
+//        //then ForbiddenOperationException is thrown
     }
 
+    @Ignore
     @Test(expected = NullPointerException.class)
     public void addOrderWithoutPriceInfo() throws Exception {
         //given
-        OrderDto orderDto = new OrderDto(1, NOW, "start", "end",
-                null, 0.0);
-
-        //when
-        orderService.addOrder(orderDto);
+//        OrderDto orderDto = new OrderDto(1, NOW, "start", "end",
+//                null, 0.0);
+//
+//        //when
+//        orderService.addOrder(orderDto);
 
         //then NPE is thrown
     }
@@ -310,41 +289,17 @@ public class TransactionalOrderServiceTest {
 //    }
 
     @Test
-    public void calculatePriceWithoutAdditionalParams() {
-        //given
-        OrderPriceDto orderPrice = new OrderPriceDto(5.0, Collections.emptyList());
-
-        //when
-        Double actualPrice = orderService.calculatePrice(orderPrice);
-
-        //then
-        assertEquals(25.0, actualPrice, 1e-7);
-        verifyNoMoreInteractions(orderRepository, userService, transitionManager);
+    public void shouldReturnZeroWhenCalculatePriceOfNull() {
+        assertThat(orderService.calculatePrice(null), is(0.0));
     }
 
     @Test
-    public void calculatePriceWithAdditionalParams() {
-        //given
-        OrderPriceDto orderPrice = new OrderPriceDto(5.0,
-                Collections.singletonList(new AddReqSimpleDto(1, 1)));
+    public void shouldCalculateOrderPrice() {
+        Order order = mock(Order.class);
+        when(priceCalculationManager.calculateOrderPrice(any(Order.class))).thenReturn(order);
+        when(order.getPrice()).thenReturn(100.0);
 
-        //when
-        Double actualPrice = orderService.calculatePrice(orderPrice);
-
-        //then
-        assertEquals(100.0, actualPrice, 1e-7);
-        verifyNoMoreInteractions(orderRepository, userService, transitionManager);
-    }
-
-    @Test
-    public void calculatePriceWhenDtoIsNull() {
-        //given
-        OrderPriceDto orderPriceDto = null;
-
-        //when
-        Double actualPrice = orderService.calculatePrice(orderPriceDto);
-
-        //then
-        assertEquals(0.0, actualPrice, 1e-7);
+        assertThat(orderService.calculatePrice(order), is(100.0));
+        verify(priceCalculationManager).calculateOrderPrice(order);
     }
 }

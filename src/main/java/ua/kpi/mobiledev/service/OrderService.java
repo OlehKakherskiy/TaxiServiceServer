@@ -2,7 +2,6 @@ package ua.kpi.mobiledev.service;
 
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 
 import java.util.List;
 
@@ -10,7 +9,7 @@ public interface OrderService {
 
     Order addOrder(OrderDto orderDto);
 
-    Double calculatePrice(OrderPriceDto orderPriceDto);
+    Double calculatePrice(Order notCompletedOrder);
 
     Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus);
 

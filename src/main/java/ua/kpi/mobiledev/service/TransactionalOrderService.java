@@ -7,6 +7,7 @@ import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
+import ua.kpi.mobiledev.domain.priceCalculationManagement.PriceCalculationManager;
 import ua.kpi.mobiledev.exception.ForbiddenOperationException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.isNull;
-import static java.util.Optional.ofNullable;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.exception.ErrorCode.*;
 
@@ -25,13 +25,14 @@ public class TransactionalOrderService implements OrderService {
     private OrderRepository orderRepository;
     private UserService userService;
     private OrderStatusManager orderStatusManager;
-    private Integer kmPrice;
+    private PriceCalculationManager priceCalculationManager;
 
     public TransactionalOrderService(OrderRepository orderRepository, UserService userService,
-                                     OrderStatusManager orderStatusManager) {
+                                     OrderStatusManager orderStatusManager, PriceCalculationManager priceCalculationManager) {
         this.orderRepository = orderRepository;
         this.userService = userService;
         this.orderStatusManager = orderStatusManager;
+        this.priceCalculationManager = priceCalculationManager;
     }
 
     @Override
@@ -55,17 +56,10 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
-    public Double calculatePrice(OrderPriceDto orderPriceDto) {
-        if (isNull(orderPriceDto)) {
-            return 0.0;
-        }
-        double basicPrice = ofNullable(orderPriceDto.getDistance()).orElse(0.0) * kmPrice;
-        double extraPrice = 0.0/*getAdditionalRequirementValueSet(orderPriceDto)
-                .stream()
-                .map(reqEntry -> reqEntry.getAdditionalRequirement().addPrice(basicPrice, reqEntry.getRequirementValue()))
-                .reduce(Double::sum)
-                .orElse(0.0)*/;
-        return basicPrice + extraPrice;
+    public Double calculatePrice(Order notCompletedOrder) {
+        return isNull(notCompletedOrder)
+                ? 0.0
+                : priceCalculationManager.calculateOrderPrice(notCompletedOrder).getPrice();
     }
 
     @Override
@@ -116,7 +110,7 @@ public class TransactionalOrderService implements OrderService {
 
         order.setStartTime(orderDto.getStartTime());
         OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
-        order.setPrice(calculatePrice(orderPriceDto));
+        order.setPrice(calculatePrice(null));
 
         return orderRepository.save(order);
     }
@@ -130,10 +124,6 @@ public class TransactionalOrderService implements OrderService {
 
     private User findUser(Integer userId) {
         return userService.getById(userId);
-    }
-
-    public void setKmPrice(Integer kmPrice) {
-        this.kmPrice = kmPrice;
     }
 
 }
