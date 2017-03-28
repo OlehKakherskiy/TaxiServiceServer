@@ -24,12 +24,12 @@ import static ua.kpi.mobiledev.exception.ErrorCode.*;
 @Transactional(readOnly = true)
 public class TransactionalUserService implements UserService {
 
-    private UserRepository userRepository;
+    private UserRepository<User, Integer> userRepository;
     private CustomUserDetailsService securityDetailsRepository;
     private LazyInitializationUtil lazyInitializationUtil;
 
     @Autowired
-    public TransactionalUserService(UserRepository userRepository, CustomUserDetailsService securityDetailsRepository,
+    public TransactionalUserService(UserRepository<User, Integer> userRepository, CustomUserDetailsService securityDetailsRepository,
                                     LazyInitializationUtil lazyInitializationUtil) {
         this.userRepository = userRepository;
         this.securityDetailsRepository = securityDetailsRepository;

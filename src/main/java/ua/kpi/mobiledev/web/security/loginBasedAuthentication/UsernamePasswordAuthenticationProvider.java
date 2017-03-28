@@ -9,12 +9,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.security.model.UserContext;
+import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -26,10 +26,10 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
     private final UserService userService;
 
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
     @Autowired
-    public UsernamePasswordAuthenticationProvider(UserService userService, UserDetailsService userDetailsService) {
+    public UsernamePasswordAuthenticationProvider(UserService userService, CustomUserDetailsService userDetailsService) {
         this.userService = userService;
         this.userDetailsService = userDetailsService;
     }
@@ -66,7 +66,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
     }
 
     private UserDetails getByUserName(String userName) {
-        return userDetailsService.loadUserByUsername(userName);
+        return userDetailsService.fullLoadWithAuthorities(userName);
     }
 
     private User getFullInfoByUserName(String userName) {

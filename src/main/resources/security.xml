@@ -70,9 +70,9 @@
         <b:value>/logout</b:value>
     </util:list>
 
-    <b:bean id="daoSupport" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
-        <b:property name="dataSource" ref="dataSource"/>
-    </b:bean>
+    <!--<b:bean id="daoSupport" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">-->
+        <!--<b:property name="dataSource" ref="dataSource"/>-->
+    <!--</b:bean>-->
 
     <b:bean id="jedisConnFactory"
             class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">

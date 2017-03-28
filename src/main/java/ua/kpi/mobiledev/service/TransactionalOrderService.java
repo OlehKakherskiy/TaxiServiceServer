@@ -22,12 +22,12 @@ import static ua.kpi.mobiledev.exception.ErrorCode.*;
 @Transactional(readOnly = true)
 public class TransactionalOrderService implements OrderService {
 
-    private OrderRepository orderRepository;
+    private OrderRepository<Order, Long> orderRepository;
     private UserService userService;
     private OrderStatusManager orderStatusManager;
     private PriceCalculationManager priceCalculationManager;
 
-    public TransactionalOrderService(OrderRepository orderRepository, UserService userService,
+    public TransactionalOrderService(OrderRepository<Order, Long> orderRepository, UserService userService,
                                      OrderStatusManager orderStatusManager, PriceCalculationManager priceCalculationManager) {
         this.orderRepository = orderRepository;
         this.userService = userService;

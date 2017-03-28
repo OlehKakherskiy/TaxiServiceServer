@@ -39,7 +39,7 @@ public class TransactionalOrderServiceTest {
     private static final int DRIVER_ID = 2;
     private static final LocalDateTime NOW = LocalDateTime.now();
     @Mock
-    private OrderRepository orderRepository;
+    private OrderRepository<Order, Long> orderRepository;
     @Mock
     private UserService userService;
     @Mock
