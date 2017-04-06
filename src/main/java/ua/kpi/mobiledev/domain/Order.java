@@ -5,9 +5,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ua.kpi.mobiledev.domain.Car.CarType;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -71,13 +81,7 @@ public class Order {
     @Enumerated(EnumType.ORDINAL)
     private CarType carType;
 
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(name = "taxi_order_has_address",
-            joinColumns = {@JoinColumn(name = "taxi_order_id", referencedColumnName = "taxi_order_id")},
-            inverseJoinColumns = {@JoinColumn(name = "address_id", referencedColumnName = "address_id")}
-    )
-    @OrderColumn(name = "point_index")
-    private Set<Address> routePoints;
+    private List<RoutePoint> routePoints;
 
     public enum OrderStatus {
 

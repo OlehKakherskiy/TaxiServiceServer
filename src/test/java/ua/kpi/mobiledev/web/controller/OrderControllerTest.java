@@ -15,9 +15,12 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import ua.kpi.mobiledev.domain.*;
+import ua.kpi.mobiledev.domain.Car;
+import ua.kpi.mobiledev.domain.DriverLicense;
+import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.TaxiDriver;
+import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
-import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
 import ua.kpi.mobiledev.service.OrderService;
@@ -26,9 +29,17 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -186,18 +197,18 @@ public class OrderControllerTest {
     @Test
     @Ignore
     public void calculateOrderPrice_allIsOk() throws Exception {
-        OrderPriceDto priceDto = new OrderPriceDto(5.0, Arrays.asList(
-                new AddReqSimpleDto(1, 2),
-                new AddReqSimpleDto(2, 3),
-                new AddReqSimpleDto(3, 3)));
-        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
-        mockMvc.perform(post("/order/price")
-                .content(JsonMapper.toJson(priceDto))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.price").value(100.0));
-        verify(orderService).calculatePrice(priceDto);
-        verifyNoMoreInteractions(orderService);
+//        OrderPriceDto priceDto = new OrderPriceDto(5.0, Arrays.asList(
+//                new AddReqSimpleDto(1, 2),
+//                new AddReqSimpleDto(2, 3),
+//                new AddReqSimpleDto(3, 3)));
+//        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
+//        mockMvc.perform(post("/order/price")
+//                .content(JsonMapper.toJson(priceDto))
+//                .contentType(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.price").value(100.0));
+//        verify(orderService).calculatePrice(priceDto);
+//        verifyNoMoreInteractions(orderService);
     }
 
     @Test
@@ -220,65 +231,65 @@ public class OrderControllerTest {
     @Test
     @Ignore
     public void calculateOrderPrice_nullDistance() throws Exception {
-        OrderPriceDto priceDto = new OrderPriceDto(null, Arrays.asList(
-                new AddReqSimpleDto(1, 2),
-                new AddReqSimpleDto(2, 3),
-                new AddReqSimpleDto(3, 3)));
-        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
-        mockMvc.perform(post("/order/price")
-                .content(JsonMapper.toJson(priceDto))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
-        verify(orderService).calculatePrice(priceDto);
-        verifyNoMoreInteractions(orderService);
+//        OrderPriceDto priceDto = new OrderPriceDto(null, Arrays.asList(
+//                new AddReqSimpleDto(1, 2),
+//                new AddReqSimpleDto(2, 3),
+//                new AddReqSimpleDto(3, 3)));
+//        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
+//        mockMvc.perform(post("/order/price")
+//                .content(JsonMapper.toJson(priceDto))
+//                .contentType(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(status().isOk());
+//        verify(orderService).calculatePrice(priceDto);
+//        verifyNoMoreInteractions(orderService);
     }
 
     @Test
     @Ignore
     public void calculateOrderPrice_invalidParameterMap() throws Exception {
-        OrderPriceDto priceDto = new OrderPriceDto(3.0, Arrays.asList(
-                new AddReqSimpleDto(-1, 2),
-                new AddReqSimpleDto(2, 3),
-                new AddReqSimpleDto(3, 3)));
-        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
-        mockMvc.perform(post("/order/price")
-                .content(JsonMapper.toJson(priceDto))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.[0].field").value("additionalRequirements"))
-                .andExpect(jsonPath("$.[0].code").value("additionalRequirements.invalidKey"))
-                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
-        verifyNoMoreInteractions(orderService);
+//        OrderPriceDto priceDto = new OrderPriceDto(3.0, Arrays.asList(
+//                new AddReqSimpleDto(-1, 2),
+//                new AddReqSimpleDto(2, 3),
+//                new AddReqSimpleDto(3, 3)));
+//        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
+//        mockMvc.perform(post("/order/price")
+//                .content(JsonMapper.toJson(priceDto))
+//                .contentType(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.[0].field").value("additionalRequirements"))
+//                .andExpect(jsonPath("$.[0].code").value("additionalRequirements.invalidKey"))
+//                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
+//        verifyNoMoreInteractions(orderService);
     }
 
     @Test
     @Ignore
     public void calculateOrderPrice_nullParameterMap() throws Exception {
-        OrderPriceDto priceDto = new OrderPriceDto(3.0, null);
-        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
-        mockMvc.perform(post("/order/price")
-                .content(JsonMapper.toJson(priceDto))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
-        verify(orderService).calculatePrice(priceDto);
+//        OrderPriceDto priceDto = new OrderPriceDto(3.0, null);
+//        when(orderService.calculatePrice(priceDto)).thenReturn(100.0);
+//        mockMvc.perform(post("/order/price")
+//                .content(JsonMapper.toJson(priceDto))
+//                .contentType(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(status().isOk());
+//        verify(orderService).calculatePrice(priceDto);
         verifyNoMoreInteractions(orderService);
     }
 
     @Test
     @Ignore
     public void calculateOrderPrice_illegalParameterIdOrParamValueId() throws Exception {
-        OrderPriceDto priceDto = new OrderPriceDto(3.0, Arrays.asList(
-                new AddReqSimpleDto(1, 2),
-                new AddReqSimpleDto(2, 3),
-                new AddReqSimpleDto(3, 3)));
-        when(orderService.calculatePrice(priceDto)).thenThrow(new NullPointerException("exMessage"));
-        mockMvc.perform(post("/order/price")
-                .content(JsonMapper.toJson(priceDto))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("exMessage"));
-        verify(orderService).calculatePrice(priceDto);
-        verifyNoMoreInteractions(orderService);
+//        OrderPriceDto priceDto = new OrderPriceDto(3.0, Arrays.asList(
+//                new AddReqSimpleDto(1, 2),
+//                new AddReqSimpleDto(2, 3),
+//                new AddReqSimpleDto(3, 3)));
+//        when(orderService.calculatePrice(priceDto)).thenThrow(new NullPointerException("exMessage"));
+//        mockMvc.perform(post("/order/price")
+//                .content(JsonMapper.toJson(priceDto))
+//                .contentType(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.message").value("exMessage"));
+//        verify(orderService).calculatePrice(priceDto);
+//        verifyNoMoreInteractions(orderService);
     }
 
     @Test
@@ -367,83 +378,85 @@ public class OrderControllerTest {
     @Test
     @Ignore
     public void updateOrder() throws Exception {
-        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
-        when(orderService.updateOrder(1L, 1, orderDto)).thenReturn(new Order());
-        mockMvc.perform(put("/order/1")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(orderDto)))
-                .andExpect(status().isOk());
-        verify(orderService).updateOrder(1L, 1, orderDto);
+//        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
+//        when(orderService.updateOrder(1L, 1, orderDto)).thenReturn(new Order());
+//        mockMvc.perform(put("/order/1")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .content(JsonMapper.toJson(orderDto)))
+//                .andExpect(status().isOk());
+//        verify(orderService).updateOrder(1L, 1, orderDto);
     }
 
     @Test
     @Ignore
     public void updateOrder_InvalidStartTime() throws Exception {
-        OrderDto orderDto = new OrderDto(null, NOW.minusHours(1), "start", "end", null, null);
-        mockMvc.perform(put("/order/1")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(orderDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.length()").value(3))
-                .andExpect(jsonPath("$.[2].field").value("startTime"))
-                .andExpect(jsonPath("$.[2].code").value("startTime.futureTimeRequired"))
-                .andExpect(jsonPath("$.[2].message").value(Matchers.notNullValue()));
-        verifyNoMoreInteractions(orderService);
+//        OrderDto orderDto = new OrderDto(null, NOW.minusHours(1), "start", "end", null, null);
+//        mockMvc.perform(put("/order/1")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .content(JsonMapper.toJson(orderDto)))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.length()").value(3))
+//                .andExpect(jsonPath("$.[2].field").value("startTime"))
+//                .andExpect(jsonPath("$.[2].code").value("startTime.futureTimeRequired"))
+//                .andExpect(jsonPath("$.[2].message").value(Matchers.notNullValue()));
+//        verifyNoMoreInteractions(orderService);
     }
 
     @Test
     @Ignore
     public void updateOrder_illegalArgumentException() throws Exception {
-        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
-        when(orderService.updateOrder(1L, 1, orderDto)).thenThrow(new IllegalArgumentException("ExceptionMessage"));
-        mockMvc.perform(put("/order/1")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(orderDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("ExceptionMessage"));
-        verify(orderService).updateOrder(1L, 1, orderDto);
+//        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", new OrderPriceDto(10.0, Collections.emptyList()), null);
+//        when(orderService.updateOrder(1L, 1, orderDto)).thenThrow(new IllegalArgumentException("ExceptionMessage"));
+//        mockMvc.perform(put("/order/1")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .content(JsonMapper.toJson(orderDto)))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.message").value("ExceptionMessage"));
+//        verify(orderService).updateOrder(1L, 1, orderDto);
     }
 
     @Test
     @Ignore
     public void addOrder_allIsOk() throws Exception {
-        OrderPriceDto orderPrice = new OrderPriceDto(100.0, Collections.emptyList());
-        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", orderPrice, null);
-        when(orderService.addOrder(orderDto)).thenReturn(new Order());
-        mockMvc.perform(post("/order")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(orderDto)))
-                .andExpect(status().isOk());
-        verify(orderService).addOrder(orderDto);
+//        OrderPriceDto orderPrice = new OrderPriceDto(100.0, Collections.emptyList());
+//        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", orderPrice, null);
+//        when(orderService.addOrder(orderDto)).thenReturn(new Order());
+//        mockMvc.perform(post("/order")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .content(JsonMapper.toJson(orderDto)))
+//                .andExpect(status().isOk());
+//        verify(orderService).addOrder(orderDto);
     }
 
     @Test
     @Ignore
     public void addOrder_orderPriceExpected() throws Exception {
-        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", null, null);
-        mockMvc.perform(post("/order")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(orderDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.[0].field").value("orderPrice"))
-                .andExpect(jsonPath("$.[0].code").value("orderPrice.required"))
-                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
-        verifyNoMoreInteractions(orderService);
+//        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end", null, null);
+//        mockMvc.perform(post("/order")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .content(JsonMapper.toJson(orderDto)))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.[0].field").value("orderPrice"))
+//                .andExpect(jsonPath("$.[0].code").value("orderPrice.required"))
+//                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
+//        verifyNoMoreInteractions(orderService);
     }
 
-    @Test
+//    @Test
     @Ignore
     public void addOrder_orderPriceDistanceExpected() throws Exception {
-        OrderPriceDto orderPrice = new OrderPriceDto(-100.0, Collections.emptyList());
-        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end",
-                orderPrice, null);
-        mockMvc.perform(post("/order")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(orderDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.[0].field").value("orderPrice.distance"))
-                .andExpect(jsonPath("$.[0].code").value("distance.invalidValue"))
-                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
-        verifyNoMoreInteractions(orderService);
+//        OrderPriceDto orderPrice = new OrderPriceDto(-100.0, Collections.emptyList());
+//        OrderDto orderDto = new OrderDto(1, NOW.plusHours(1), "start", "end",
+//                orderPrice, null);
+//        mockMvc.perform(post("/order")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .content(JsonMapper.toJson(orderDto)))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.[0].field").value("orderPrice.distance"))
+//                .andExpect(jsonPath("$.[0].code").value("distance.invalidValue"))
+//                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
+//        verifyNoMoreInteractions(orderService);
+        System.out.println(JsonMapper.toJson(new Order()));
     }
+
 }

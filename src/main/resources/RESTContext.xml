@@ -18,6 +18,7 @@
     <context:component-scan base-package="ua.kpi.mobiledev.web.controller"/>
     <context:component-scan base-package="ua.kpi.mobiledev.web.validators"/>
     <context:component-scan base-package="ua.kpi.mobiledev.web.exceptionHandling"/>
+    <context:component-scan base-package="ua.kpi.mobiledev.web.converter"/>
 
     <!--must be implemented as it is, because addOrder method requires path "orderPrice.distance"
     for field "distance" and 'calculateOrderPrice' requires simple "distance" path -->

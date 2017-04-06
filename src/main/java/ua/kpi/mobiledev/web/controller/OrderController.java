@@ -1,22 +1,34 @@
 package ua.kpi.mobiledev.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.Order.OrderStatus;
-import ua.kpi.mobiledev.domain.dto.*;
-import ua.kpi.mobiledev.exception.ForbiddenOperationException;
+import ua.kpi.mobiledev.domain.dto.FullOrderDetailsDto;
+import ua.kpi.mobiledev.domain.dto.OrderDto;
+import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
+import ua.kpi.mobiledev.domain.dto.OrderSimpleDto;
+import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
+import ua.kpi.mobiledev.domain.dto.PriceDto;
 import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.service.OrderService;
+import ua.kpi.mobiledev.web.converter.OrderConverter;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -25,11 +37,10 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import static java.util.Arrays.stream;
-import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
-import static ua.kpi.mobiledev.exception.ErrorCode.*;
+import static org.springframework.http.HttpStatus.OK;
+import static ua.kpi.mobiledev.exception.ErrorCode.INVALID_ORDER_STATUS;
 
 @RestController
 public class OrderController {
@@ -41,6 +52,9 @@ public class OrderController {
                 .map(OrderStatus::name)
                 .collect(joining(","));
     }
+
+    @Resource
+    private OrderConverter orderConverter;
 
     private OrderService orderService;
 
@@ -69,22 +83,15 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.POST, consumes = "application/json")
-    public HttpStatus addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
+    @ResponseStatus(OK)
+    public void addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
         checkIfValid(bindingResult);
         validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
 
         UserContext userContext = (UserContext) authentication.getDetails();
-        if (userContext.getUserType() == TAXI_DRIVER) {
-            throw new ForbiddenOperationException(TAXI_DRIVER_CANT_ADD_ORDER);
-        }
-        if (!userContext.getId().equals(orderDto.getCustomerId())) {
-            throw new ForbiddenOperationException(USER_SHOULD_BE_ORDER_OWNER_WHEN_ADD, userContext.getId(), orderDto.getCustomerId());
-        }
-
-        Order order = orderService.addOrder(orderDto);
-        return (nonNull(order) && nonNull(order.getOrderId()))
-                ? HttpStatus.OK
-                : HttpStatus.INTERNAL_SERVER_ERROR;
+        Order order = new Order();
+        orderConverter.convert(orderDto, order);
+        orderService.addOrder(order, userContext.getId());
     }
 
     private void validate(Validator validator, Object object, BindingResult bindingResult) throws MethodArgumentNotValidException {
@@ -99,21 +106,21 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public PriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
-        Double price = orderService.calculatePrice(orderPriceDto);
+        Double price = orderService.calculatePrice(null);
         Double roundedPrice = new BigDecimal(price).setScale(2, RoundingMode.UP).doubleValue();
         return new PriceDto(roundedPrice);
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public void changeOrderStatus(@Valid @RequestBody OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
         orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public List<OrderSimpleDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
         String uppercaseOrderStatus = orderStatus.toUpperCase();
         return (uppercaseOrderStatus.equals("ALL"))
@@ -135,14 +142,15 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public FullOrderDetailsDto getOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId) {
-        return FullOrderDetailsDto.from(orderService.getOrder(orderId));
+//        return FullOrderDetailsDto.from(orderService.getOrder(orderId));
+        return null; //TODO:
     }
 
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     @Secured("ROLE_CUSTOMER")
     public void deleteOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId, Authentication authentication) {
 
@@ -150,7 +158,7 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     @Secured("ROLE_CUSTOMER")
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
                             @RequestBody @Valid OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {

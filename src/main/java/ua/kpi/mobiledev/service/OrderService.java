@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    Order addOrder(OrderDto orderDto);
+    Order addOrder(Order order, Integer userId);
 
     Double calculatePrice(Order notCompletedOrder);
 

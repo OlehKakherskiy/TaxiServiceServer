@@ -27,11 +27,11 @@ public class RegistrationUserDto {
     private String name;
 
     @NotNull(message = "email.required")
-    @Size(min = 1, max = 45, message = "email.invalidSize")
+    @Size(min = 1, max = 100, message = "email.invalidSize")
     private String email;
 
     @NotNull(message = "password.required")
-    @Size(min = 1)
+    @Size(min = 1, max = 100)
     private String password;
 
     @NotNull(message = "mobileNumbers.required")

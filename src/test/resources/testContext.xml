@@ -12,4 +12,8 @@
     <bean id="userService" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="ua.kpi.mobiledev.service.TransactionalUserService"/>
     </bean>
+
+    <bean id="addressFacade" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.facade.AddressFacade"/>
+    </bean>
 </beans>

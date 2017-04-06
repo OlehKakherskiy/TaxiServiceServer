@@ -17,7 +17,9 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
-import static ua.kpi.mobiledev.exception.ErrorCode.*;
+import static ua.kpi.mobiledev.exception.ErrorCode.DRIVER_CANNOT_PERFORM_OPERATION;
+import static ua.kpi.mobiledev.exception.ErrorCode.ORDER_NOT_FOUND_WITH_ID;
+import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
 
 @Transactional(readOnly = true)
 public class TransactionalOrderService implements OrderService {
@@ -37,22 +39,16 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     @Transactional
-    public Order addOrder(OrderDto orderDto) {
-        OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
-        User user = findUser(orderDto.getCustomerId());
-        checkIfCustomer(user);
-//        Order order = new Order(null, user, null, orderDto.getStartTime(),
-//                orderDto.getStartPoint(), orderDto.getEndPoint(),
-//                calculatePrice(orderPriceDto),
-//                Order.OrderStatus.NEW);
-//        return orderRepository.save(order);
-        return orderRepository.save(new Order());
+    public Order addOrder(Order order, Integer userId) {
+        order.setCustomer(checkIfCustomer(findUser(userId)));
+        return orderRepository.save(priceCalculationManager.calculateOrderPrice(order));
     }
 
-    private void checkIfCustomer(User user) {
+    private User checkIfCustomer(User user) {
         if (user.getUserType() == TAXI_DRIVER) {
             throw new ForbiddenOperationException(DRIVER_CANNOT_PERFORM_OPERATION);
         }
+        return user;
     }
 
     @Override

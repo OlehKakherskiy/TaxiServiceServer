@@ -196,10 +196,16 @@ Request body:
 
 ```json
 {
-  "customerId" : "Long",
   "startTime" : "DateTime",
-  "startPoint" : "String",
-  "endPoint" : "String",
+  "comment" : "String",
+  "routePoint":[{
+    "adminArea":"String",
+    "latitude":"String",
+    "longtitude":"String",
+    "street":"String",
+    "houseNumber":"String",
+    "city":"String"
+  }],
   "orderPrice":{
         "distance":"Double",
         "additionalRequirements" : [{
@@ -211,6 +217,7 @@ Request body:
 ```
 **NOTES:**
 * Only customer can perform operation
+* if "startTime" is null - quick request
 
 **_4. Accept order / Refuse order / Mark as done_**
 ```
