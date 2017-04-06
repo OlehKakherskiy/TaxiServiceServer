@@ -3,17 +3,15 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 DROP SCHEMA IF EXISTS `taxiservice` ;
-CREATE SCHEMA IF NOT EXISTS `taxiservice` DEFAULT CHARACTER SET latin1 ;
+CREATE SCHEMA IF NOT EXISTS `taxiservice` DEFAULT CHARACTER SET utf8 ;
 SHOW WARNINGS;
 USE `taxiservice` ;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`user_credential`
+-- Table `user_credential`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`user_credential` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`user_credential` (
+CREATE TABLE IF NOT EXISTS `user_credential` (
   `username` VARCHAR(40) NOT NULL,
   `password` VARCHAR(360) NOT NULL,
   `salt` VARCHAR(45) NOT NULL,
@@ -25,19 +23,17 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`authority`
+-- Table `authority`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`authority` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`authority` (
+CREATE TABLE IF NOT EXISTS `authority` (
   `authority` VARCHAR(25) NOT NULL,
   `username` VARCHAR(40) NOT NULL,
   PRIMARY KEY (`username`),
   INDEX `fk_roles_userdetails1_idx` (`username` ASC),
   CONSTRAINT `fk_roles_userdetails1`
     FOREIGN KEY (`username`)
-    REFERENCES `taxiservice`.`user_credential` (`username`)
+    REFERENCES `user_credential` (`username`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -46,12 +42,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`car_type`
+-- Table `car_type`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`car_type` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`car_type` (
+CREATE TABLE IF NOT EXISTS `car_type` (
   `car_type_id` INT(11) NOT NULL,
   `type` CHAR(30) NOT NULL,
   PRIMARY KEY (`car_type_id`))
@@ -61,12 +55,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`car`
+-- Table `car`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`car` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`car` (
+CREATE TABLE IF NOT EXISTS `car` (
   `car_id` INT(11) NOT NULL AUTO_INCREMENT,
   `model` VARCHAR(20) NOT NULL,
   `brand` VARCHAR(20) NOT NULL,
@@ -77,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`car` (
   INDEX `fk_car_car_type2_idx` (`car_type_id` ASC),
   CONSTRAINT `fk_car_car_type2`
     FOREIGN KEY (`car_type_id`)
-    REFERENCES `taxiservice`.`car_type` (`car_type_id`)
+    REFERENCES `car_type` (`car_type_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -87,17 +79,15 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`driver_license`
+-- Table `driver_license`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`driver_license` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`driver_license` (
+CREATE TABLE IF NOT EXISTS `driver_license` (
   `driver_license_id` INT(11) NOT NULL,
   `driver_license` CHAR(20) NOT NULL,
   `expiration_time` DATETIME NOT NULL,
-  `front_side_scan` BLOB NOT NULL,
-  `back_side_scan` BLOB NOT NULL,
+  `front_side_scan` BLOB NULL,
+  `back_side_scan` BLOB NULL,
   PRIMARY KEY (`driver_license_id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -105,12 +95,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`user_type`
+-- Table `user_type`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`user_type` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`user_type` (
+CREATE TABLE IF NOT EXISTS `user_type` (
   `user_type_id` INT(11) NOT NULL AUTO_INCREMENT,
   `user_type` ENUM('CUSTOMER', 'TAXI_DRIVER') NOT NULL DEFAULT 'CUSTOMER',
   PRIMARY KEY (`user_type_id`))
@@ -121,34 +109,33 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`user`
+-- Table `user`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`user` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`user` (
+CREATE TABLE IF NOT EXISTS `user` (
   `user_id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `email` VARCHAR(45) NOT NULL,
   `user_type` INT(11) NOT NULL,
-  `driver_license_id` INT(11) NOT NULL,
-  `car_id` INT(11) NOT NULL,
+  `driver_license_id` INT(11) NULL,
+  `car_id` INT(11) NULL,
   PRIMARY KEY (`user_id`),
   INDEX `user_user_type_user_type_id_fk` (`user_type` ASC),
   INDEX `fk_user_driver_license1_idx` (`driver_license_id` ASC),
   INDEX `fk_user_car1_idx` (`car_id` ASC),
   CONSTRAINT `user_user_type_user_type_id_fk`
     FOREIGN KEY (`user_type`)
-    REFERENCES `taxiservice`.`user_type` (`user_type_id`)
+    REFERENCES `user_type` (`user_type_id`)
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `fk_user_driver_license1`
     FOREIGN KEY (`driver_license_id`)
-    REFERENCES `taxiservice`.`driver_license` (`driver_license_id`)
+    REFERENCES `driver_license` (`driver_license_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_car1`
     FOREIGN KEY (`car_id`)
-    REFERENCES `taxiservice`.`car` (`car_id`)
+    REFERENCES `car` (`car_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -158,12 +145,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`mobile_number`
+-- Table `mobile_number`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`mobile_number` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`mobile_number` (
+CREATE TABLE IF NOT EXISTS `mobile_number` (
   `mobile_number_id` INT(11) NOT NULL AUTO_INCREMENT,
   `mobile_number` CHAR(13) NOT NULL,
   `user_id` INT(11) NULL,
@@ -171,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`mobile_number` (
   INDEX `fk_mobile_number_user1_idx` (`user_id` ASC),
   CONSTRAINT `fk_mobile_number_user1`
     FOREIGN KEY (`user_id`)
-    REFERENCES `taxiservice`.`user` (`user_id`)
+    REFERENCES `user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -181,12 +166,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`payment_method`
+-- Table `payment_method`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`payment_method` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`payment_method` (
+CREATE TABLE IF NOT EXISTS `payment_method` (
   `payment_method_id` INT(11) NOT NULL,
   `payment_method` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`payment_method_id`))
@@ -196,12 +179,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`order_status`
+-- Table `order_status`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`order_status` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`order_status` (
+CREATE TABLE IF NOT EXISTS `order_status` (
   `order_status_id` INT(11) NOT NULL,
   `order_status` CHAR(30) NOT NULL,
   PRIMARY KEY (`order_status_id`))
@@ -211,12 +192,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`taxi_order`
+-- Table `taxi_order`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`taxi_order` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`taxi_order` (
+CREATE TABLE IF NOT EXISTS `taxi_order` (
   `taxi_order_id` INT(11) NOT NULL AUTO_INCREMENT,
   `start_time` DATETIME NOT NULL,
   `price` DECIMAL(10,2) NOT NULL,
@@ -241,27 +220,27 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`taxi_order` (
   INDEX `fk_taxi_order_car_type2_idx` (`car_type_id` ASC),
   CONSTRAINT `fk_Account_User1`
     FOREIGN KEY (`customer_id`)
-    REFERENCES `taxiservice`.`user` (`user_id`)
+    REFERENCES `user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Account_User2`
     FOREIGN KEY (`taxi_driver_id`)
-    REFERENCES `taxiservice`.`user` (`user_id`)
+    REFERENCES `user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_taxi_order_payment_method2`
     FOREIGN KEY (`payment_method_id`)
-    REFERENCES `taxiservice`.`payment_method` (`payment_method_id`)
+    REFERENCES `payment_method` (`payment_method_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_taxi_order_order_status2`
     FOREIGN KEY (`order_status_id`)
-    REFERENCES `taxiservice`.`order_status` (`order_status_id`)
+    REFERENCES `order_status` (`order_status_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_taxi_order_car_type2`
     FOREIGN KEY (`car_type_id`)
-    REFERENCES `taxiservice`.`car_type` (`car_type_id`)
+    REFERENCES `car_type` (`car_type_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -271,12 +250,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`administration_area`
+-- Table `administration_area`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`administration_area` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`administration_area` (
+CREATE TABLE IF NOT EXISTS `administration_area` (
   `admin_area_id` INT(11) NOT NULL AUTO_INCREMENT,
   `admin_area_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`admin_area_id`))
@@ -286,12 +263,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`city`
+-- Table `city`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`city` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`city` (
+CREATE TABLE IF NOT EXISTS `city` (
   `city_id` INT(11) NOT NULL AUTO_INCREMENT,
   `city_name` VARCHAR(45) NOT NULL,
   `admin_area_id` INT(11) NOT NULL,
@@ -299,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`city` (
   INDEX `fk_city_administration_area1_idx` (`admin_area_id` ASC),
   CONSTRAINT `fk_city_administration_area1`
     FOREIGN KEY (`admin_area_id`)
-    REFERENCES `taxiservice`.`administration_area` (`admin_area_id`)
+    REFERENCES `administration_area` (`admin_area_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -308,12 +283,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`district`
+-- Table `district`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`district` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`district` (
+CREATE TABLE IF NOT EXISTS `district` (
   `district_id` INT(11) NOT NULL AUTO_INCREMENT,
   `district_name` VARCHAR(45) NOT NULL,
   `city_id` INT(11) NOT NULL,
@@ -321,7 +294,7 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`district` (
   INDEX `fk_district_city1_idx` (`city_id` ASC),
   CONSTRAINT `fk_district_city1`
     FOREIGN KEY (`city_id`)
-    REFERENCES `taxiservice`.`city` (`city_id`)
+    REFERENCES `city` (`city_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -330,12 +303,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`street`
+-- Table `street`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`street` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`street` (
+CREATE TABLE IF NOT EXISTS `street` (
   `street_id` INT(11) NOT NULL AUTO_INCREMENT,
   `street_name` VARCHAR(45) NOT NULL,
   `district_id` INT(11) NOT NULL,
@@ -343,7 +314,7 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`street` (
   INDEX `fk_street_district1_idx` (`district_id` ASC),
   CONSTRAINT `fk_street_district1`
     FOREIGN KEY (`district_id`)
-    REFERENCES `taxiservice`.`district` (`district_id`)
+    REFERENCES `district` (`district_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -352,12 +323,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`address`
+-- Table `address`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`address` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`address` (
+CREATE TABLE IF NOT EXISTS `address` (
   `address_id` INT(11) NOT NULL AUTO_INCREMENT,
   `house_number` VARCHAR(10) NOT NULL,
   `street_id` INT(11) NOT NULL,
@@ -365,7 +334,7 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`address` (
   INDEX `fk_address_street_idx` (`street_id` ASC),
   CONSTRAINT `fk_address_street`
     FOREIGN KEY (`street_id`)
-    REFERENCES `taxiservice`.`street` (`street_id`)
+    REFERENCES `street` (`street_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -374,12 +343,10 @@ DEFAULT CHARACTER SET = utf8;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `taxiservice`.`taxi_order_has_address`
+-- Table `taxi_order_has_address`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxiservice`.`taxi_order_has_address` ;
-
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `taxiservice`.`taxi_order_has_address` (
+CREATE TABLE IF NOT EXISTS `taxi_order_has_address` (
   `taxi_order_id` INT(11) NOT NULL,
   `address_id` INT(11) NOT NULL,
   `point_index` INT(11) NOT NULL,
@@ -390,12 +357,12 @@ CREATE TABLE IF NOT EXISTS `taxiservice`.`taxi_order_has_address` (
   INDEX `fk_taxi_order_has_address_taxi_order1_idx` (`taxi_order_id` ASC),
   CONSTRAINT `fk_taxi_order_has_address_taxi_order1`
     FOREIGN KEY (`taxi_order_id`)
-    REFERENCES `taxiservice`.`taxi_order` (`taxi_order_id`)
+    REFERENCES `taxi_order` (`taxi_order_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_taxi_order_has_address_address1`
     FOREIGN KEY (`address_id`)
-    REFERENCES `taxiservice`.`address` (`address_id`)
+    REFERENCES `address` (`address_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -406,3 +373,4 @@ SHOW WARNINGS;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
