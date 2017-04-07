@@ -146,7 +146,7 @@ Response:
     "startPoint" : "String",
     "endPoint" : "String",
     "price" : "Double",
-    "status":"NEW/ACCEPTED/CANCELLED/DONE"
+    "status":"NEW/ACCEPTED/CANCELLED/DONE/WAITING/PROCESSING"
 }]
 ```
 **NOTES:**

@@ -26,6 +26,7 @@ import ua.kpi.mobiledev.domain.dto.PriceDto;
 import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.service.OrderService;
 import ua.kpi.mobiledev.web.converter.OrderConverter;
+import ua.kpi.mobiledev.web.converter.OrderToSimpleOrderDtoConverter;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.annotation.Resource;
@@ -55,6 +56,8 @@ public class OrderController {
 
     @Resource
     private OrderConverter orderConverter;
+    @Resource
+    private OrderToSimpleOrderDtoConverter orderToSimpleOrderDtoConverter;
 
     private OrderService orderService;
 
@@ -90,6 +93,7 @@ public class OrderController {
 
         UserContext userContext = (UserContext) authentication.getDetails();
         Order order = new Order();
+        order.setOrderStatus(OrderStatus.NEW);
         orderConverter.convert(orderDto, order);
         orderService.addOrder(order, userContext.getId());
     }
@@ -123,10 +127,18 @@ public class OrderController {
     @ResponseStatus(OK)
     public List<OrderSimpleDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
         String uppercaseOrderStatus = orderStatus.toUpperCase();
-        return (uppercaseOrderStatus.equals("ALL"))
-                ? mapToDto(orderService.getOrderList(null))
-                : mapToDto(orderService.getOrderList(getFromName(uppercaseOrderStatus)));
+        OrderStatus status = uppercaseOrderStatus.equals("ALL") ? null : getFromName(uppercaseOrderStatus);
+        return mapToDto(orderService.getOrderList(status));
+    }
 
+    private List<OrderSimpleDto> mapToDto(List<Order> orderList) {
+        return orderList.stream().map(this::convertToDto).collect(toList());
+    }
+
+    private OrderSimpleDto convertToDto(Order order) {
+        OrderSimpleDto orderSimpleDto = new OrderSimpleDto();
+        orderToSimpleOrderDtoConverter.convert(order, orderSimpleDto);
+        return orderSimpleDto;
     }
 
     private OrderStatus getFromName(String uppercaseOrderStatus) {
@@ -135,10 +147,6 @@ public class OrderController {
         } catch (IllegalArgumentException e) {
             throw new RequestException(INVALID_ORDER_STATUS, uppercaseOrderStatus, VALID_ORDER_STATUSES);
         }
-    }
-
-    private List<OrderSimpleDto> mapToDto(List<Order> orderList) {
-        return orderList.stream().map(OrderSimpleDto::of).collect(toList());
     }
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET)

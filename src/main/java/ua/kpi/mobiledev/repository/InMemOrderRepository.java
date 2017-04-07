@@ -44,7 +44,7 @@ public class InMemOrderRepository implements OrderRepository<Order, Long> {
 
     @Override
     public Iterable<Order> findAll() {
-        return null;
+        return dbMock.getOrders();
     }
 
     @Override

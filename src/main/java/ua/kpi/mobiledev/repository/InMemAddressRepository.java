@@ -18,7 +18,7 @@ public class InMemAddressRepository implements AddressRepository<Address, Long> 
 
     @Override
     public <S extends Address> S save(S entity) {
-        return null;
+        return entity;
     }
 
     @Override

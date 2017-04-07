@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.Order.OrderStatus;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeDeserializer;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeSerializer;
 
@@ -15,12 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderSimpleDto {
-
-    public static OrderSimpleDto of(Order order) {
-        return null;
-//        return new OrderSimpleDto(order.getOrderId(), order.getStartTime(), order.getStartPoint(),
-//                order.getEndPoint(), order.getPrice(), order.getOrderStatus());
-    }
 
     private Long orderId;
 
@@ -34,5 +28,5 @@ public class OrderSimpleDto {
 
     private Double price;
 
-    private Order.OrderStatus status;
+    private OrderStatus status;
 }
