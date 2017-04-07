@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.domain.orderStatusManagement;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import ua.kpi.mobiledev.domain.Order;
@@ -15,6 +16,7 @@ import static ua.kpi.mobiledev.domain.Order.OrderStatus.ACCEPTED;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.NEW;
 
 @Category(UnitTest.class)
+@Ignore
 public class OrderStatusTransitionTest {
 
     @Test
