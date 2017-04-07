@@ -164,17 +164,17 @@ Response:
 {
     "orderId" : "Long",
     "startTime" : "DateTime",
-    "startPoint" : "String",
-    "endPoint" : "String",
-    "status" : "NEW/ACCEPTED/CANCELLED/DONE",
-    "customer" :{
-        "customerId" : "Long",
-        "name" : "String"
-    },
-    "taxiDriver":{
-        "taxiDriverId" : "Long",
-        "name" : "String"
-    },
+     "routePoint":[{
+        "adminArea":"String",
+        "latitude":"String",
+        "longtitude":"String",
+        "street":"String",
+        "houseNumber":"String",
+        "city":"String"
+     }],
+    "status" : "NEW/ACCEPTED/CANCELLED/DONE/WAITING/PROCESSING",
+    "customerId": "Integer",
+    "driverId" : "Integer",
     "price" : "Double",
     "additionalRequirements" : [{  
         "reqId" : "Integer",

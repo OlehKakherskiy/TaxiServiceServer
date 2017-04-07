@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.Order.OrderStatus;
-import ua.kpi.mobiledev.domain.dto.FullOrderDetailsDto;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.dto.OrderSimpleDto;
@@ -151,9 +150,10 @@ public class OrderController {
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.GET)
     @ResponseStatus(OK)
-    public FullOrderDetailsDto getOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId) {
-//        return FullOrderDetailsDto.from(orderService.getOrder(orderId));
-        return null; //TODO:
+    public OrderDto getOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId) {
+        OrderDto responseBody = new OrderDto();
+        orderConverter.reverseConvert(orderService.getOrder(orderId), responseBody);
+        return responseBody;
     }
 
 

@@ -1,8 +1,6 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import ua.kpi.mobiledev.domain.Car.CarType;
 
 import javax.persistence.Column;
@@ -20,8 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "taxi_order")
 public class Order {
@@ -82,6 +78,16 @@ public class Order {
     private CarType carType;
 
     private List<RoutePoint> routePoints;
+
+    public Order() {
+        carType = Car.CarType.PASSENGER_CAR;
+        paymentMethod = Order.PaymentMethod.CASH;
+        withPet = false;
+        withLuggage = false;
+        extraPrice = 0.0;
+        driveMyCar = false;
+        passengerCount = 1;
+    }
 
     public enum OrderStatus {
 
