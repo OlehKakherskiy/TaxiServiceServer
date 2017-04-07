@@ -9,7 +9,7 @@ import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Component("orderPriceConverter")
 public class OrderPriceConverter implements CustomConverter<OrderPriceDto, Order> {
 
     @Override

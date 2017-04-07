@@ -24,8 +24,7 @@ import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
 import ua.kpi.mobiledev.domain.dto.PriceDto;
 import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.service.OrderService;
-import ua.kpi.mobiledev.web.converter.OrderConverter;
-import ua.kpi.mobiledev.web.converter.OrderToSimpleOrderDtoConverter;
+import ua.kpi.mobiledev.web.converter.CustomConverter;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.annotation.Resource;
@@ -53,10 +52,14 @@ public class OrderController {
                 .collect(joining(","));
     }
 
-    @Resource
-    private OrderConverter orderConverter;
-    @Resource
-    private OrderToSimpleOrderDtoConverter orderToSimpleOrderDtoConverter;
+    @Resource(name = "orderConverter")
+    private CustomConverter<OrderDto, Order> orderConverter;
+
+    @Resource(name = "simpleOrderDtoConverter")
+    private CustomConverter<Order, OrderSimpleDto> orderToSimpleOrderDtoConverter;
+
+    @Resource(name = "orderPriceConverter")
+    private CustomConverter<OrderPriceDto, Order> orderPriceConverter;
 
     private OrderService orderService;
 

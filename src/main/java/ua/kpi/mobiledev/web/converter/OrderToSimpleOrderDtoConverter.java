@@ -5,7 +5,7 @@ import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.dto.OrderSimpleDto;
 
-@Component("orderToSimpleOrderDtoConverter")
+@Component("simpleOrderDtoConverter")
 public class OrderToSimpleOrderDtoConverter implements CustomConverter<Order, OrderSimpleDto> {
 
     public static final int FIRST = 0;
