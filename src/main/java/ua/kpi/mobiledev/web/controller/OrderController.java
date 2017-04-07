@@ -114,7 +114,9 @@ public class OrderController {
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
     @ResponseStatus(OK)
     public PriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
-        Double price = orderService.calculatePrice(null);
+        Order orderWithPriceData = new Order();
+        orderPriceConverter.convert(orderPriceDto, orderWithPriceData);
+        Double price = orderService.calculatePrice(orderWithPriceData);
         Double roundedPrice = new BigDecimal(price).setScale(2, RoundingMode.UP).doubleValue();
         return new PriceDto(roundedPrice);
     }
