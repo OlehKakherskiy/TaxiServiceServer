@@ -75,6 +75,11 @@ Response:
     "plateNumber" : "String",
     "seatsNumber" : "Integer",
     "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+  },
+  "driverLicense":{
+    "driverLicenseId":"Integer",
+    "driverLicense":"String",
+    "expirationTime":"Date"
   }
 }
 ```

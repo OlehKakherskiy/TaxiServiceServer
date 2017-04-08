@@ -9,7 +9,8 @@ public class MobileNumberConverter implements CustomConverter<MobileNumber, Mobi
 
     @Override
     public void convert(MobileNumber source, MobileNumberDto target) {
-
+        target.setIdMobileNumber(source.getIdMobileNumber());
+        target.setMobileNumber(source.getMobileNumber());
     }
 
     @Override

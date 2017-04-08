@@ -9,7 +9,9 @@ public class DriverLicenseConverter implements CustomConverter<DriverLicense, Dr
 
     @Override
     public void convert(DriverLicense source, DriverLicenseDto target) {
-
+        target.setDriverLicenseId(source.getId());
+        target.setCode(source.getDriverLicense());
+        target.setExpirationTime(source.getExpirationTime());
     }
 
     @Override

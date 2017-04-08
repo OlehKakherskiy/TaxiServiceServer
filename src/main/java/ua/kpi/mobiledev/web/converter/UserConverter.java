@@ -30,7 +30,37 @@ public class UserConverter<T extends User> implements CustomConverter<T, UserDto
 
     @Override
     public void convert(T source, UserDto target) {
+        target.setName(source.getName());
+        target.setEmail(source.getEmail());
+        target.setUserType(source.getUserType());
+        target.setMobileNumbers(mapMobileNumbersToDtos(source.getMobileNumbers()));
+        if (userIsDriver(source)) {
+            TaxiDriver driver = (TaxiDriver) source;
+            target.setCar(mapCarToDto(driver.getCar()));
+            target.setDriverLicense(mapDriverLicenceToDto(driver.getDriverLicense()));
+        }
+    }
 
+    private List<MobileNumberDto> mapMobileNumbersToDtos(Set<MobileNumber> mobileNumbers) {
+        return mobileNumbers.stream().map(this::mapMobileNumberToDto).collect(Collectors.toList());
+    }
+
+    private MobileNumberDto mapMobileNumberToDto(MobileNumber mobileNumber) {
+        MobileNumberDto mobileNumberDto = new MobileNumberDto();
+        mobileNumberConverter.convert(mobileNumber, mobileNumberDto);
+        return mobileNumberDto;
+    }
+
+    private CarDto mapCarToDto(Car car) {
+        CarDto carDto = new CarDto();
+        carConverter.convert(car, carDto);
+        return carDto;
+    }
+
+    private DriverLicenseDto mapDriverLicenceToDto(DriverLicense driverLicense) {
+        DriverLicenseDto driverLicenseDto = new DriverLicenseDto();
+        driverLicenseConverter.convert(driverLicense, driverLicenseDto);
+        return driverLicenseDto;
     }
 
     @Override

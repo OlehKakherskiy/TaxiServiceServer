@@ -2,6 +2,7 @@ package ua.kpi.mobiledev.web.controller;
 
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,7 +39,13 @@ public class UserController {
         return userType == User.UserType.CUSTOMER;
     }
 
-
+    @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUserProfile(@PathVariable Integer userId) {
+        UserDto result = new UserDto();
+        userConverter.convert(userService.getById(userId), result);
+        return result;
+    }
 //    @RequestMapping(path = "/user", method = RequestMethod.PUT, consumes = "application/json")
 //    @PreAuthorize("#userDto.userId == authentication.details.id")
 //    public void updateUserProfile(@Valid @RequestBody FullUserDto userDto) {
