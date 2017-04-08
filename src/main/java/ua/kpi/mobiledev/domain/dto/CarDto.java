@@ -14,15 +14,6 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class CarDto {
 
-    public static Car toCar(CarDto carDto) {
-        return new Car(carDto.carId, carDto.model, carDto.manufacturer, carDto.plateNumber, carDto.seatsNumber, carDto.carType);
-    }
-
-    public static CarDto fromCar(Car car) {
-        return new CarDto(car.getCarId(), car.getModel(), car.getManufacturer(), car.getPlateNumber(),
-                car.getSeatNumber(), car.getCarType());
-    }
-
     private Integer carId;
 
     @NotNull(message = "model.required")

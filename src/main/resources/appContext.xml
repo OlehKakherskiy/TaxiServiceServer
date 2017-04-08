@@ -28,7 +28,7 @@
     <bean id="orderService" class="ua.kpi.mobiledev.service.TransactionalOrderService">
         <constructor-arg name="orderRepository" ref="orderRepository"/>
         <constructor-arg name="orderStatusManager" ref="orderStatusTransitionManager"/>
-        <constructor-arg name="userService" ref="transactionalUserService"/>
+        <constructor-arg name="userService" ref="userService"/>
         <constructor-arg name="priceCalculationManager" ref="priceCalculationManager"/>
     </bean>
 

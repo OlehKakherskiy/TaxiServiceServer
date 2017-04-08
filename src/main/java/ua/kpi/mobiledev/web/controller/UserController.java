@@ -1,42 +1,48 @@
 package ua.kpi.mobiledev.web.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import ua.kpi.mobiledev.domain.dto.FullUserDto;
-import ua.kpi.mobiledev.domain.dto.RegistrationUserDto;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import ua.kpi.mobiledev.domain.TaxiDriver;
+import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.domain.dto.UserDto;
 import ua.kpi.mobiledev.service.UserService;
+import ua.kpi.mobiledev.web.converter.CustomConverter;
 
-import javax.validation.Valid;
+import javax.annotation.Resource;
 
 @RestController
+@Setter
 public class UserController {
 
+    @Resource(name = "userService")
     private UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
+    @Resource(name = "userConverter")
+    private CustomConverter<User, UserDto> userConverter;
 
     @RequestMapping(path = "/user/register", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void registerUser(@RequestBody @Valid RegistrationUserDto registrationUserDto) {
-        userService.register(RegistrationUserDto.toUser(registrationUserDto), registrationUserDto.getPassword());
+    public void registerUser(@RequestBody /*@Valid*/ UserDto userDto) {
+        User user = isCustomer(userDto.getUserType()) ? new User() : new TaxiDriver();
+        userConverter.reverseConvert(userDto, user);
+
+        userService.register(user, userDto.getPassword());
     }
 
-    @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
-    public FullUserDto getUserProfile(@PathVariable("userId") Integer userId) {
-        return FullUserDto.toUserDto(userService.getById(userId));
+    private boolean isCustomer(User.UserType userType) {
+        return userType == User.UserType.CUSTOMER;
     }
 
 
-    @RequestMapping(path = "/user", method = RequestMethod.PUT, consumes = "application/json")
-    @PreAuthorize("#userDto.userId == authentication.details.id")
-    public void updateUserProfile(@Valid @RequestBody FullUserDto userDto) {
-        userService.update(FullUserDto.toUser(userDto));
-    }
+//    @RequestMapping(path = "/user", method = RequestMethod.PUT, consumes = "application/json")
+//    @PreAuthorize("#userDto.userId == authentication.details.id")
+//    public void updateUserProfile(@Valid @RequestBody FullUserDto userDto) {
+//        userService.update(FullUserDto.toUser(userDto));
+//    }
 
 }

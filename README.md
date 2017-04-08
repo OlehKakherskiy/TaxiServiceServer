@@ -16,7 +16,9 @@ Request body:
   "name": "String",
   "email" : "String",
   "password" : "String",
-  "mobileNumbers" : ["mobileNumber1","mobileNumber2"],
+  "mobileNumbers" :[
+  	  {"mobileNumber":"String"}
+  ],
   "userType" : "CUSTOMER/TAXI_DRIVER",
   "car" : {
     "manufacturer" : "String",
@@ -24,12 +26,16 @@ Request body:
     "plateNumber" : "String",
     "seatsNumber" : "Integer",
     "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+  },
+  "driverLicense":{
+    "code":"String",
+    "expirationTime":"DateTime"
   }
 }
 ```
 **NOTES**
 * If userType is TAXI_DRIVER, car object **MUST** contain all fields.
-* If userType is CUSTOMER, car object will be omitted even if it exists.
+* If userType is CUSTOMER, car/driverLicense object will be omitted even if it exists.
 
 **_2. Recovery password_** (could be reviewed)
 ```

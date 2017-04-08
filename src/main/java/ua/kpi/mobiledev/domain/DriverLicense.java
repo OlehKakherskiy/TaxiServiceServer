@@ -3,8 +3,15 @@ package ua.kpi.mobiledev.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -15,6 +22,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 @Entity
 @Getter
+@Setter
 @Table(name = "driver_license")
 public class DriverLicense {
 

@@ -2,6 +2,7 @@ package ua.kpi.mobiledev.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.TaxiDriver;
@@ -18,10 +19,13 @@ import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static ua.kpi.mobiledev.exception.ErrorCode.*;
+import static ua.kpi.mobiledev.exception.ErrorCode.REGISTRATION_GENERAL_SYSTEM_EXCEPTION;
+import static ua.kpi.mobiledev.exception.ErrorCode.USER_ALREADY_EXISTS;
+import static ua.kpi.mobiledev.exception.ErrorCode.USER_NOT_FOUND_WITH_ID;
 
 @Service
 @Transactional(readOnly = true)
+@Component("userService")
 public class TransactionalUserService implements UserService {
 
     private UserRepository<User, Integer> userRepository;
