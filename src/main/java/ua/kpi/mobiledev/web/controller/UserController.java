@@ -2,6 +2,7 @@ package ua.kpi.mobiledev.web.controller;
 
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.UserDto;
 import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.converter.CustomConverter;
+import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.annotation.Resource;
 
@@ -46,10 +48,18 @@ public class UserController {
         userConverter.convert(userService.getById(userId), result);
         return result;
     }
-//    @RequestMapping(path = "/user", method = RequestMethod.PUT, consumes = "application/json")
-//    @PreAuthorize("#userDto.userId == authentication.details.id")
-//    public void updateUserProfile(@Valid @RequestBody FullUserDto userDto) {
-//        userService.update(FullUserDto.toUser(userDto));
-//    }
+
+    @RequestMapping(path = "/user", method = RequestMethod.PATCH, consumes = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateUserProfile(/*@Valid*/ @RequestBody UserDto userDto, Authentication authentication) {
+        UserContext userContext = (UserContext) authentication.getDetails();
+        Integer userId = userContext.getId();
+        User user = (userContext.getUserType() == User.UserType.TAXI_DRIVER) ? new TaxiDriver() : new User();
+        user.setId(userId);
+        userDto.setUserType(userContext.getUserType());
+        userConverter.reverseConvert(userDto, user);
+        user.setUserType(null); //to not update user type
+        userService.update(user);
+    }
 
 }

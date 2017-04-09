@@ -5,6 +5,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.kpi.mobiledev.domain.Car;
+import ua.kpi.mobiledev.domain.DriverLicense;
+import ua.kpi.mobiledev.domain.MobileNumber;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.exception.RequestException;
@@ -16,9 +19,20 @@ import ua.kpi.mobiledev.web.security.model.Role;
 import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static ua.kpi.mobiledev.exception.ErrorCode.CANNOT_UPDATE_EMAIL;
+import static ua.kpi.mobiledev.exception.ErrorCode.CANNOT_UPDATE_USER_TYPE;
+import static ua.kpi.mobiledev.exception.ErrorCode.INVALID_MOBILE_NUMBER_ID;
 import static ua.kpi.mobiledev.exception.ErrorCode.REGISTRATION_GENERAL_SYSTEM_EXCEPTION;
 import static ua.kpi.mobiledev.exception.ErrorCode.USER_ALREADY_EXISTS;
 import static ua.kpi.mobiledev.exception.ErrorCode.USER_NOT_FOUND_WITH_ID;
@@ -28,6 +42,7 @@ import static ua.kpi.mobiledev.exception.ErrorCode.USER_NOT_FOUND_WITH_ID;
 @Component("userService")
 public class TransactionalUserService implements UserService {
 
+    private static final Predicate<MobileNumber> IS_NEW_NUMBER = mobileNumber -> isNull(mobileNumber.getIdMobileNumber());
     private UserRepository<User, Integer> userRepository;
     private CustomUserDetailsService securityDetailsRepository;
     private LazyInitializationUtil lazyInitializationUtil;
@@ -47,7 +62,7 @@ public class TransactionalUserService implements UserService {
             throw new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID, userId);
         }
         lazyInitializationUtil.initMobileNumbers(user);
-        if (user instanceof TaxiDriver) {
+        if (isTaxiDriver(user)) {
             lazyInitializationUtil.initCar((TaxiDriver) user);
         }
         return user;
@@ -87,7 +102,98 @@ public class TransactionalUserService implements UserService {
 
     @Override
     @Transactional
-    public User update(User user) {
-        return userRepository.save(user);
+    public User update(User userPrototype) {
+        if (nonNull(userPrototype.getEmail())) {
+            throw new RequestException(CANNOT_UPDATE_EMAIL);
+        }
+        if (nonNull(userPrototype.getUserType())) {
+            throw new RequestException(CANNOT_UPDATE_USER_TYPE);
+        }
+
+        User actualUser = getById(userPrototype.getId());
+
+        if (nonNull(userPrototype.getName())) {
+            actualUser.setName(userPrototype.getName());
+        }
+        updateMobileNumbers(actualUser, userPrototype);
+        if (isTaxiDriver(actualUser)) {
+            TaxiDriver taxiDriver = (TaxiDriver) actualUser;
+            TaxiDriver taxiDriverPrototype = (TaxiDriver) userPrototype;
+            taxiDriver.setCar(updateCar(taxiDriver.getCar(), taxiDriverPrototype.getCar()));
+            taxiDriver.setDriverLicense(updateDriverLicense(taxiDriver.getDriverLicense(), taxiDriverPrototype.getDriverLicense()));
+        }
+
+        return userRepository.save(actualUser);
+    }
+
+    private boolean isTaxiDriver(User user) {
+        return user.getUserType() == User.UserType.TAXI_DRIVER;
+    }
+
+    private void updateMobileNumbers(User actualUser, User userPrototype) {
+        if (isNull(userPrototype.getMobileNumbers())) {
+            return;
+        }
+
+        Map<Integer, MobileNumber> mPhones = actualUser.getMobileNumbers().stream()
+                .collect(LinkedHashMap::new,
+                        (map, mobileNumber) -> map.put(mobileNumber.getIdMobileNumber(), mobileNumber),
+                        HashMap::putAll);
+
+        List<MobileNumber> numbersToUpdate = userPrototype.getMobileNumbers();
+        List<MobileNumber> newNumbers = numbersToUpdate.stream()
+                .filter(IS_NEW_NUMBER)
+                .collect(toList());
+        numbersToUpdate.removeIf(IS_NEW_NUMBER);
+
+        for (MobileNumber mobileNumber : userPrototype.getMobileNumbers()) {
+            MobileNumber targetNumber = ofNullable(mPhones.get(mobileNumber.getIdMobileNumber()))
+                    .orElseThrow(() -> new RequestException(INVALID_MOBILE_NUMBER_ID, mobileNumber.getIdMobileNumber()));
+
+            if (mobileNumber.getMobileNumber() == null) { //delete
+                mPhones.remove(targetNumber.getIdMobileNumber());
+            } else {//update
+                targetNumber.setMobileNumber(mobileNumber.getMobileNumber());
+            }
+        }
+
+        List<MobileNumber> resultNumbers = mPhones.values().stream().collect(toList());
+        resultNumbers.addAll(newNumbers);
+        actualUser.setMobileNumbers(resultNumbers);
+    }
+
+    private Car updateCar(Car toUpdate, Car prototype) {
+        if (isNull(prototype)) {
+            return toUpdate;
+        }
+        if (nonNull(prototype.getManufacturer())) {
+            toUpdate.setManufacturer(prototype.getManufacturer());
+        }
+        if (nonNull(prototype.getModel())) {
+            toUpdate.setModel(prototype.getModel());
+        }
+        if (nonNull(prototype.getCarType())) {
+            toUpdate.setCarType(prototype.getCarType());
+        }
+        if (nonNull(prototype.getPlateNumber())) {
+            toUpdate.setPlateNumber(prototype.getPlateNumber());
+        }
+        if (nonNull(prototype.getSeatNumber())) {
+            toUpdate.setSeatNumber(prototype.getSeatNumber());
+        }
+        return toUpdate;
+    }
+
+    private DriverLicense updateDriverLicense(DriverLicense toUpdate, DriverLicense prototype) {
+        if (isNull(prototype)) {
+            return toUpdate;
+        }
+        if (nonNull(prototype.getDriverLicense())) {
+            toUpdate.setDriverLicense(prototype.getDriverLicense());
+        }
+        if (nonNull(prototype.getExpirationTime())) {
+            toUpdate.setExpirationTime(prototype.getExpirationTime());
+        }
+        return toUpdate;
     }
 }

@@ -15,8 +15,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import ua.kpi.mobiledev.domain.Car;
-import ua.kpi.mobiledev.domain.DriverLicense;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
@@ -29,7 +27,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -61,8 +58,8 @@ public class OrderControllerTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        mockUser = new User(1, "oleh", "ol@gmail.com", User.UserType.CUSTOMER, Collections.emptySet());
-        taxiDriver = new TaxiDriver(2, "taxist", "taxist@gmail.com", Collections.emptySet(), mock(Car.class), mock(DriverLicense.class));
+//        mockUser = new User(1, "oleh", "ol@gmail.com", User.UserType.CUSTOMER, Collections.emptySet());
+//        taxiDriver = new TaxiDriver(2, "taxist", "taxist@gmail.com", Collections.emptySet(), mock(Car.class), mock(DriverLicense.class));
 //        AdditionalRequirement additionalRequirement = mock(AdditionalRequirement.class);
 //        when(additionalRequirement.getId()).thenReturn(1);
 //        AdditionalRequirement additionalRequirement1 = mock(AdditionalRequirement.class);

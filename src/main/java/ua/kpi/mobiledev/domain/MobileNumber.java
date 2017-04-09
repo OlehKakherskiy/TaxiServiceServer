@@ -1,6 +1,5 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -15,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @ToString
 @Setter
@@ -32,4 +30,27 @@ public class MobileNumber {
     @NonNull
     private String mobileNumber;
 
+    public MobileNumber(Integer idMobileNumber, String mobileNumber) {
+        this.idMobileNumber = idMobileNumber;
+        this.mobileNumber = mobileNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MobileNumber that = (MobileNumber) o;
+
+        if (idMobileNumber != null ? !idMobileNumber.equals(that.idMobileNumber) : that.idMobileNumber != null)
+            return false;
+        return mobileNumber.equals(that.mobileNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = idMobileNumber != null ? idMobileNumber.hashCode() : 0;
+        result = 31 * result + mobileNumber.hashCode();
+        return result;
+    }
 }

@@ -13,8 +13,10 @@ import ua.kpi.mobiledev.domain.dto.UserDto;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 
 @Component("userConverter")
 public class UserConverter<T extends User> implements CustomConverter<T, UserDto> {
@@ -41,7 +43,7 @@ public class UserConverter<T extends User> implements CustomConverter<T, UserDto
         }
     }
 
-    private List<MobileNumberDto> mapMobileNumbersToDtos(Set<MobileNumber> mobileNumbers) {
+    private List<MobileNumberDto> mapMobileNumbersToDtos(List<MobileNumber> mobileNumbers) {
         return mobileNumbers.stream().map(this::mapMobileNumberToDto).collect(Collectors.toList());
     }
 
@@ -68,7 +70,7 @@ public class UserConverter<T extends User> implements CustomConverter<T, UserDto
         target.setName(source.getName());
         target.setEmail(source.getEmail());
         target.setUserType(source.getUserType());
-        target.setMobileNumbers(convertToMobileNumbers(source.getMobileNumbers()));
+        target.setMobileNumbers(convertToMobileNumbers(ofNullable(source.getMobileNumbers()).orElse(emptyList())));
         if (userIsDriver(target)) {
             TaxiDriver driver = (TaxiDriver) target;
             driver.setCar(convertCar(source.getCar()));
@@ -80,8 +82,8 @@ public class UserConverter<T extends User> implements CustomConverter<T, UserDto
         return target.getUserType() == User.UserType.TAXI_DRIVER;
     }
 
-    private Set<MobileNumber> convertToMobileNumbers(List<MobileNumberDto> mobileNumbers) {
-        return mobileNumbers.stream().map(this::convertToMobileNumber).collect(Collectors.toSet());
+    private List<MobileNumber> convertToMobileNumbers(List<MobileNumberDto> mobileNumbers) {
+        return mobileNumbers.stream().map(this::convertToMobileNumber).collect(Collectors.toList());
     }
 
     private MobileNumber convertToMobileNumber(MobileNumberDto mobileNumberDto) {
