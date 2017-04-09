@@ -10,7 +10,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import java.util.Set;
+import java.util.List;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
@@ -36,7 +36,7 @@ public class TaxiDriver extends User {
     private DriverLicense driverLicense;
 
     public TaxiDriver(Integer id, String name, String email,
-                      Set<MobileNumber> mobileNumbers, Car car, DriverLicense driverLicense) {
+                      List<MobileNumber> mobileNumbers, Car car, DriverLicense driverLicense) {
         super(id, name, email, TAXI_DRIVER, mobileNumbers);
         this.car = car;
         this.driverLicense = driverLicense;

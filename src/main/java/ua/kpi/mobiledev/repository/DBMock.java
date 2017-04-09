@@ -3,15 +3,18 @@ package ua.kpi.mobiledev.repository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import ua.kpi.mobiledev.domain.*;
+import ua.kpi.mobiledev.domain.Car;
+import ua.kpi.mobiledev.domain.DriverLicense;
+import ua.kpi.mobiledev.domain.MobileNumber;
+import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.TaxiDriver;
+import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.web.security.model.Role;
 import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,13 +30,13 @@ public class DBMock {
     private static TaxiDriver taxiDriver;
 
     static {
-        Set<MobileNumber> customerMobileNumbers = new HashSet<>(
+        List<MobileNumber> customerMobileNumbers = new ArrayList<>(
                 asList(new MobileNumber(1, "+380975106619"),
                         new MobileNumber(2, "+380123456789")));
 
         customer = new User(1, "Customer, just Customer", "customer@gmail.com", CUSTOMER, customerMobileNumbers);
 
-        Set<MobileNumber> driverMobileNumbers = new HashSet<>(asList(new MobileNumber(1, "+380987654321")));
+        List<MobileNumber> driverMobileNumbers = new ArrayList<>(asList(new MobileNumber(1, "+380987654321")));
         Car car = new Car(1, "DBR", "Aston Martin", "AA-0000-BB", 3, PASSENGER_CAR);
         DriverLicense driverLicense = new DriverLicense(1, "BXX 990664", LocalDateTime.now().plusYears(3), new byte[0], new byte[0]);
         taxiDriver = new TaxiDriver(2, "James Bond", "driver@gmail.com", driverMobileNumbers, car, driverLicense);
