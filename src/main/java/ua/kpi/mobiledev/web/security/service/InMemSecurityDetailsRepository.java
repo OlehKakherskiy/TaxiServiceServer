@@ -28,5 +28,7 @@ public class InMemSecurityDetailsRepository implements CustomUserDetailsService{
         String plainPassword = newUser.getPassword();
         String encodedPassword = argon2.hash(2, 65536, 1, plainPassword);
         securityDetails.setPassword(encodedPassword);
+
+        dbMock.addUserDetails(securityDetails);
     }
 }
