@@ -14,7 +14,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static ua.kpi.mobiledev.exception.ErrorCode.INVALID_ROUTE_POINT_COUNT;
 
-@Service("googleMapsClientService")
+@Service("googleMapsService")
 public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
 
     private static final String ORIGINS = "origins";

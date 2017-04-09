@@ -1,47 +1,64 @@
 package ua.kpi.mobiledev.service;
 
+import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.domain.priceCalculationManagement.PriceCalculationManager;
 import ua.kpi.mobiledev.exception.ForbiddenOperationException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
+import ua.kpi.mobiledev.service.googlemaps.GeographicalPoint;
+import ua.kpi.mobiledev.service.googlemaps.GoogleMapsClientService;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.exception.ErrorCode.DRIVER_CANNOT_PERFORM_OPERATION;
 import static ua.kpi.mobiledev.exception.ErrorCode.ORDER_NOT_FOUND_WITH_ID;
 import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
 
 @Transactional(readOnly = true)
+@Setter
+@Service("orderService")
 public class TransactionalOrderService implements OrderService {
 
+    @Resource(name = "orderRepository")
     private OrderRepository<Order, Long> orderRepository;
+
+    @Resource(name = "userService")
     private UserService userService;
+
+    @Resource(name = "orderStatusManager")
     private OrderStatusManager orderStatusManager;
+
+    @Resource(name = "priceCalculationManager")
     private PriceCalculationManager priceCalculationManager;
 
-    public TransactionalOrderService(OrderRepository<Order, Long> orderRepository, UserService userService,
-                                     OrderStatusManager orderStatusManager, PriceCalculationManager priceCalculationManager) {
-        this.orderRepository = orderRepository;
-        this.userService = userService;
-        this.orderStatusManager = orderStatusManager;
-        this.priceCalculationManager = priceCalculationManager;
-    }
+    @Resource(name = "googleMapsService")
+    private GoogleMapsClientService googleMapsService;
 
     @Override
     @Transactional
     public Order addOrder(Order order, Integer userId) {
         order.setCustomer(checkIfCustomer(findUser(userId)));
+        order.setDistance(calculateDistance(order));
         return orderRepository.save(priceCalculationManager.calculateOrderPrice(order));
+    }
+
+    private Double calculateDistance(Order order) {
+        List<GeographicalPoint> geographicalPoints = order.getRoutePoints().stream()
+                .map(routePoint -> new GeographicalPoint(routePoint.getLatitude(), routePoint.getLongtitude()))
+                .collect(toList());
+        return googleMapsService.calculateDistance(geographicalPoints);
     }
 
     private User checkIfCustomer(User user) {
@@ -105,7 +122,6 @@ public class TransactionalOrderService implements OrderService {
         checkIfOrderOwner(order, userId);
 
         order.setStartTime(orderDto.getStartTime());
-        OrderPriceDto orderPriceDto = orderDto.getOrderPrice();
         order.setPrice(calculatePrice(null));
 
         return orderRepository.save(order);

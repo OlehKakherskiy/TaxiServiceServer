@@ -4,18 +4,15 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Car;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Component("orderPriceConverter")
-public class OrderPriceConverter implements CustomConverter<OrderPriceDto, Order> {
+@Component("additionalRequirementsConverter")
+public class AdditionalRequirementsConverter implements CustomConverter<List<AddReqSimpleDto>, Order> {
 
     @Override
-    public void convert(OrderPriceDto orderPriceDto, Order order) {
-        order.setDistance(orderPriceDto.getDistance());
-        for (AddReqSimpleDto req : orderPriceDto.getAdditionalRequirements()) {
+    public void convert(List<AddReqSimpleDto> addRequirements, Order order) {
+        for (AddReqSimpleDto req : addRequirements) {
             int reqValue = req.getReqValueId();
             switch (req.getReqId()) {
                 case 1: {
@@ -50,8 +47,7 @@ public class OrderPriceConverter implements CustomConverter<OrderPriceDto, Order
     }
 
     @Override
-    public void reverseConvert(Order order, OrderPriceDto orderPriceDto) {
-        List<AddReqSimpleDto> addRequirements = new ArrayList<>();
+    public void reverseConvert(Order order, List<AddReqSimpleDto> addRequirements) {
         addRequirements.add(new AddReqSimpleDto(1, order.getCarType().ordinal()));
         addRequirements.add(new AddReqSimpleDto(2, order.getPaymentMethod().ordinal()));
         addRequirements.add(new AddReqSimpleDto(3, order.getWithPet() ? 1 : 0));
@@ -59,7 +55,5 @@ public class OrderPriceConverter implements CustomConverter<OrderPriceDto, Order
         addRequirements.add(new AddReqSimpleDto(5, order.getExtraPrice().intValue()));
         addRequirements.add(new AddReqSimpleDto(6, order.getDriveMyCar() ? 1 : 0));
         addRequirements.add(new AddReqSimpleDto(7, order.getPassengerCount()));
-
-        orderPriceDto.setAdditionalRequirements(addRequirements);
     }
 }

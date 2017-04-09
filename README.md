@@ -216,20 +216,21 @@ Request body:
   "startTime" : "DateTime",
   "comment" : "String",
   "routePoint":[{
-    "adminArea":"String",
     "latitude":"String",
     "longtitude":"String",
+    //TODO: will be removed
+    "adminArea":"String",
     "street":"String",
     "houseNumber":"String",
     "city":"String"
+    //TODO: end of will be removed
   }],
-  "orderPrice":{
-        "distance":"Double",
-        "additionalRequirements" : [{
-            "reqId" : "Integer",
-            "reqValueId" : "Integer"
-      }]
-  }
+  
+  //TODO: removed orderPrice object and 'distance' field
+  "additionalRequirements" : [{
+    "reqId" : "Integer",
+    "reqValueId" : "Integer"
+  }]
 }
 ```
 **NOTES:**
@@ -297,7 +298,13 @@ Request type: **POST**
 Request body:
 ```json
 {
-  "distance" : "Double",
+  "distance" : "Double", //TODO: will be removed 10.04.2017
+    //TODO: will be added 10.04.2017
+  "routePoint":{
+    "latitude":"String",
+    "longtitude":"String"
+  },
+  //TODO: end of will be added 10.04.2017
   "additionalRequirements":[{
     "reqId" : "Integer",
     "reqValueId" : "Integer"

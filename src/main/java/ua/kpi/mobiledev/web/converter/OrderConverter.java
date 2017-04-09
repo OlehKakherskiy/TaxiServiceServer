@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.RoutePoint;
 import ua.kpi.mobiledev.domain.TaxiDriver;
+import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.dto.RoutePointDto;
 
 import javax.annotation.Resource;
@@ -21,14 +21,15 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
     @Resource(name = "routePointConverter")
     private CustomConverter<RoutePointDto, RoutePoint> routePointConverter;
 
-    @Resource(name = "orderPriceConverter")
-    private CustomConverter<OrderPriceDto, Order> orderPriceConverter;
+    @Resource(name = "additionalRequirementsConverter")
+    private CustomConverter<List<AddReqSimpleDto>, Order> additionalRequirementsConverter;
 
     @Override
     public void convert(OrderDto source, Order target) {
         target.setStartTime(source.getStartTime());
         target.setRoutePoints(convertRoutePoints(source.getRoutePoint()));
-        orderPriceConverter.convert(source.getOrderPrice(), target);
+        target.setComment(source.getComment());
+        additionalRequirementsConverter.convert(source.getAdditionalRequirements(), target);
     }
 
     private List<RoutePoint> convertRoutePoints(List<RoutePointDto> routePointDtoList) {
@@ -78,8 +79,8 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
     }
 
     private void convertAdditionalRequirements(Order source, OrderDto target) {
-        OrderPriceDto orderPriceDto = new OrderPriceDto();
-        orderPriceConverter.reverseConvert(source, orderPriceDto);
-        target.setAdditionalRequirements(orderPriceDto.getAdditionalRequirements());
+        List<AddReqSimpleDto> additionalRequirements = new ArrayList<>();
+        additionalRequirementsConverter.reverseConvert(source, additionalRequirements);
+        target.setAdditionalRequirements(additionalRequirements);
     }
 }

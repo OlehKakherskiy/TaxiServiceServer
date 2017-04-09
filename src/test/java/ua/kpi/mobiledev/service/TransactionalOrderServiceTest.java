@@ -26,7 +26,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.ACCEPTED;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.NEW;
 import static ua.kpi.mobiledev.domain.User.UserType.CUSTOMER;
@@ -53,7 +61,11 @@ public class TransactionalOrderServiceTest {
 
     @Before
     public void initOrderService() {
-        orderService = new TransactionalOrderService(orderRepository, userService, transitionManager, priceCalculationManager);
+        orderService = new TransactionalOrderService();
+        orderService.setOrderRepository(orderRepository);
+        orderService.setOrderStatusManager(transitionManager);
+        orderService.setPriceCalculationManager(priceCalculationManager);
+        orderService.setUserService(userService);
         customer = new User(CUSTOMER_ID, null, null, CUSTOMER, null);
         taxiDriver = new TaxiDriver(DRIVER_ID, null, null, null, null, null);
     }

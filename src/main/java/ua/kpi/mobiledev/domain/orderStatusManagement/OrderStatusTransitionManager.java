@@ -11,13 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.isNull;
-import static ua.kpi.mobiledev.domain.Order.OrderStatus.*;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.ACCEPTED;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.CANCELLED;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.DONE;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.NEW;
 import static ua.kpi.mobiledev.domain.User.UserType.CUSTOMER;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.exception.ErrorCode.ILLEGAL_ORDER_STATUS_TRANSITION;
 import static ua.kpi.mobiledev.exception.ErrorCode.USER_CANNOT_CHANGE_ORDER_STATUS;
 
-@Component
+@Component("orderStatusManager")
 public class OrderStatusTransitionManager implements OrderStatusManager {
 
     private static Map<User.UserType, Map<OrderStatus, Map<OrderStatus, OrderStatusTransition>>> defaultTransitionConfig;

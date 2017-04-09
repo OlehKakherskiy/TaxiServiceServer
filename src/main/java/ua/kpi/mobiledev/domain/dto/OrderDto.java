@@ -1,6 +1,5 @@
 package ua.kpi.mobiledev.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
@@ -12,8 +11,6 @@ import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeDeserializer;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeSerializer;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,9 +35,4 @@ public class OrderDto {
 //    @NotNull(message = "startTime.required") //TODO: uncomment and add custom validation tag
 //    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
-
-    @NotNull(message = "orderPrice.required")
-    @Valid
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private OrderPriceDto orderPrice;
 }

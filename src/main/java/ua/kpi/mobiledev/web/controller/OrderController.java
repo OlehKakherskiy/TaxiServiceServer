@@ -58,9 +58,7 @@ public class OrderController {
     @Resource(name = "simpleOrderDtoConverter")
     private CustomConverter<Order, OrderSimpleDto> orderToSimpleOrderDtoConverter;
 
-    @Resource(name = "orderPriceConverter")
-    private CustomConverter<OrderPriceDto, Order> orderPriceConverter;
-
+    @Resource(name = "orderService")
     private OrderService orderService;
 
     private Validator orderPriceDtoValidatorForAdd;
@@ -70,8 +68,7 @@ public class OrderController {
     private Validator futureTimeValidator;
 
     @Autowired
-    public OrderController(OrderService orderService, Validator orderPriceDtoValidatorForAddOrder, Validator orderPriceDtoValidatorForCalculateOrderPrice, Validator futureTimeValidator) {
-        this.orderService = orderService;
+    public OrderController(Validator orderPriceDtoValidatorForAddOrder, Validator orderPriceDtoValidatorForCalculateOrderPrice, Validator futureTimeValidator) {
         this.orderPriceDtoValidatorForAdd = orderPriceDtoValidatorForAddOrder;
         this.orderPriceDtoValidatorForCalculatePrice = orderPriceDtoValidatorForCalculateOrderPrice;
         this.futureTimeValidator = futureTimeValidator;
@@ -91,7 +88,7 @@ public class OrderController {
     @ResponseStatus(OK)
     public void addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
         checkIfValid(bindingResult);
-        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
+//        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
 
         UserContext userContext = (UserContext) authentication.getDetails();
         Order order = new Order();
@@ -111,11 +108,11 @@ public class OrderController {
         }
     }
 
-    @RequestMapping(value = "/order/price", method = RequestMethod.POST)
+//    @RequestMapping(value = "/order/price", method = RequestMethod.POST) //TODO: will be reimplemented 10.04.2017
     @ResponseStatus(OK)
     public PriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
         Order orderWithPriceData = new Order();
-        orderPriceConverter.convert(orderPriceDto, orderWithPriceData);
+//        orderPriceConverter.convert(orderPriceDto, orderWithPriceData);
         Double price = orderService.calculatePrice(orderWithPriceData);
         Double roundedPrice = new BigDecimal(price).setScale(2, RoundingMode.UP).doubleValue();
         return new PriceDto(roundedPrice);
@@ -176,7 +173,7 @@ public class OrderController {
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
                             @RequestBody @Valid OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
         checkIfValid(bindingResult);
-        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
+//        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
         orderService.updateOrder(orderId, getUserId(authentication), orderDto);
     }
 
