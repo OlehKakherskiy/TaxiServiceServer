@@ -89,33 +89,39 @@ Response:
 /user
 ```
 
-RequestType: **PUT**
+RequestType: **PATCH**
 
 Request body:
 ```json
 {
-  "userId":"String",
   "name": "String",
-  "email" : "String",
   "mobileNumbers" : [{
      "idMobileNumber":"Integer",
      "mobileNumber": "String"
   }],
-  "userType" : "CUSTOMER/TAXI_DRIVER",
   "car" : {
-    "carId":"Integer",
     "manufacturer" : "String",
     "model" : "String",
     "plateNumber" : "String",
     "seatsNumber" : "Integer",
     "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+  },
+  "driverLicense":{
+    "driverLicense":"String",
+    "expirationTime":"Date"
   }
 }
 ```
 
 **NOTES:**
-* Car object will be omitted if userType = CUSTOMER. 
-
+* Car and driver license objects will be omitted if userType = CUSTOMER.
+* Fields can be omitted because of PATCH function usage
+* Exception will be thrown if **'email'** field is present (you cannot update your login)
+* Exception will be thrown if **'userType'** field is present (you cannot change yours role in system)
+* If you want to delete mobile number - add it id and set **'mobileNumber'** to **NULL**
+* If you want to add mobile number - just set it id to null and fill **mobileNumber** field
+* If you want to update mobile number - just set it id and fill **mobileNumber** field
+* No guarantee that mobile numbers will be added in order they came in request
 
 **_5. Login_**
 ```
