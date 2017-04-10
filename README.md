@@ -298,13 +298,10 @@ Request type: **POST**
 Request body:
 ```json
 {
-  "distance" : "Double", //TODO: will be removed 10.04.2017
-    //TODO: will be added 10.04.2017
   "routePoint":{
     "latitude":"String",
     "longtitude":"String"
   },
-  //TODO: end of will be added 10.04.2017
   "additionalRequirements":[{
     "reqId" : "Integer",
     "reqValueId" : "Integer"

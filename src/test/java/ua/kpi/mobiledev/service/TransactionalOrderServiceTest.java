@@ -22,8 +22,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.any;
@@ -299,19 +297,19 @@ public class TransactionalOrderServiceTest {
 //        verify(orderRepository).save(updatedOrder);
 //        verifyNoMoreInteractions(orderRepository, userService, transitionManager);
 //    }
-
-    @Test
-    public void shouldReturnZeroWhenCalculatePriceOfNull() {
-        assertThat(orderService.calculatePrice(null), is(0.0));
-    }
-
-    @Test
-    public void shouldCalculateOrderPrice() {
-        Order order = mock(Order.class);
-        when(priceCalculationManager.calculateOrderPrice(any(Order.class))).thenReturn(order);
-        when(order.getPrice()).thenReturn(100.0);
-
-        assertThat(orderService.calculatePrice(order), is(100.0));
-        verify(priceCalculationManager).calculateOrderPrice(order);
-    }
+//
+//    @Test
+//    public void shouldReturnZeroWhenCalculatePriceOfNull() {
+//        assertThat(orderService.calculatePrice(null), is(0.0));
+//    }
+//
+//    @Test
+//    public void shouldCalculateOrderPrice() {
+//        Order order = mock(Order.class);
+//        when(priceCalculationManager.calculateOrderPrice(any(Order.class))).thenReturn(order);
+//        when(order.getPrice()).thenReturn(100.0);
+//
+//        assertThat(orderService.calculatePrice(order), is(100.0));
+//        verify(priceCalculationManager).calculateOrderPrice(order);
+//    }
 }

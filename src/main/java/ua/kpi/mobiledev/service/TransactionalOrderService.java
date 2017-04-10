@@ -70,6 +70,7 @@ public class TransactionalOrderService implements OrderService {
 
     @Override
     public Double calculatePrice(Order notCompletedOrder) {
+        notCompletedOrder.setDistance(calculateDistance(notCompletedOrder));
         return isNull(notCompletedOrder)
                 ? 0.0
                 : priceCalculationManager.calculateOrderPrice(notCompletedOrder).getPrice();

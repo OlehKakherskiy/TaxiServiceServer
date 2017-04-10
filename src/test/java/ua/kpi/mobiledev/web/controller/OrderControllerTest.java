@@ -18,8 +18,6 @@ import org.springframework.web.context.WebApplicationContext;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
-import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
 import ua.kpi.mobiledev.service.OrderService;
 
@@ -32,7 +30,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -211,18 +208,18 @@ public class OrderControllerTest {
     @Test
     @Ignore
     public void calculateOrderPrice_invalidDistance() throws Exception {
-        OrderPriceDto priceDto = new OrderPriceDto(-100.0, Arrays.asList(
-                new AddReqSimpleDto(1, 2),
-                new AddReqSimpleDto(2, 3),
-                new AddReqSimpleDto(3, 3)));
-        mockMvc.perform(post("/order/price")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(priceDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.[0].field").value("distance"))
-                .andExpect(jsonPath("$.[0].code").value("distance.invalidValue"))
-                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
-        verifyNoMoreInteractions(orderService);
+//        OrderPriceDto priceDto = new OrderPriceDto(-100.0, Arrays.asList(
+//                new AddReqSimpleDto(1, 2),
+//                new AddReqSimpleDto(2, 3),
+//                new AddReqSimpleDto(3, 3)));
+//        mockMvc.perform(post("/order/price")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .content(JsonMapper.toJson(priceDto)))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.[0].field").value("distance"))
+//                .andExpect(jsonPath("$.[0].code").value("distance.invalidValue"))
+//                .andExpect(jsonPath("$.[0].message").value(Matchers.notNullValue()));
+//        verifyNoMoreInteractions(orderService);
     }
 
     @Test

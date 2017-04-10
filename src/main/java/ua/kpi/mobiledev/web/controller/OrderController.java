@@ -21,7 +21,6 @@ import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 import ua.kpi.mobiledev.domain.dto.OrderSimpleDto;
 import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
-import ua.kpi.mobiledev.domain.dto.PriceDto;
 import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.service.OrderService;
 import ua.kpi.mobiledev.web.converter.CustomConverter;
@@ -54,6 +53,9 @@ public class OrderController {
 
     @Resource(name = "orderConverter")
     private CustomConverter<OrderDto, Order> orderConverter;
+
+    @Resource(name = "orderPricePopulator")
+    private CustomConverter<OrderPriceDto, Order> orderPricePopulator;
 
     @Resource(name = "simpleOrderDtoConverter")
     private CustomConverter<Order, OrderSimpleDto> orderToSimpleOrderDtoConverter;
@@ -108,14 +110,14 @@ public class OrderController {
         }
     }
 
-//    @RequestMapping(value = "/order/price", method = RequestMethod.POST) //TODO: will be reimplemented 10.04.2017
+    @RequestMapping(value = "/order/price", method = RequestMethod.POST)
     @ResponseStatus(OK)
-    public PriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
+    public OrderPriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
         Order orderWithPriceData = new Order();
-//        orderPriceConverter.convert(orderPriceDto, orderWithPriceData);
+        orderPricePopulator.convert(orderPriceDto, orderWithPriceData);
         Double price = orderService.calculatePrice(orderWithPriceData);
         Double roundedPrice = new BigDecimal(price).setScale(2, RoundingMode.UP).doubleValue();
-        return new PriceDto(roundedPrice);
+        return new OrderPriceDto(roundedPrice);
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)

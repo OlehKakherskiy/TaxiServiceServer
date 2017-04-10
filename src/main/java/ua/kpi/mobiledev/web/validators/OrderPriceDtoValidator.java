@@ -4,7 +4,8 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 
 public class OrderPriceDtoValidator implements Validator {
 
@@ -24,17 +25,17 @@ public class OrderPriceDtoValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        OrderPriceDto orderPriceDto = (OrderPriceDto) target;
-        checkDistance(orderPriceDto, errors);
-        Map<Integer, Integer> requirementValueMap = orderPriceDto.paramsToMap();
-        checkSetForNegativeValuesOrZero(requirementValueMap.keySet(), errors, "additionalRequirements.invalidKey");
-        checkSetForNegativeValuesOrZero(new HashSet<>(requirementValueMap.values()), errors, "additionalRequirements.invalidValue");
+//        OrderPriceDto orderPriceDto = (OrderPriceDto) target;
+//        checkDistance(orderPriceDto, errors);
+//        Map<Integer, Integer> requirementValueMap = orderPriceDto.getAdditionalRequirements();
+//        checkSetForNegativeValuesOrZero(requirementValueMap.keySet(), errors, "additionalRequirements.invalidKey");
+//        checkSetForNegativeValuesOrZero(new HashSet<>(requirementValueMap.values()), errors, "additionalRequirements.invalidValue");
     }
 
     private void checkDistance(OrderPriceDto orderPriceDto, Errors errors) {
-        if (Objects.nonNull(orderPriceDto.getDistance()) && orderPriceDto.getDistance() <= 0.0) {
-            errors.rejectValue(distanceField, "distance.invalidValue", "distance.invalidValue");
-        }
+//        if (Objects.nonNull(orderPriceDto.getDistance()) && orderPriceDto.getDistance() <= 0.0) {
+//            errors.rejectValue(distanceField, "distance.invalidValue", "distance.invalidValue");
+//        }
     }
 
     private void checkSetForNegativeValuesOrZero(Set<Integer> values, Errors errors, String errorKey) {
