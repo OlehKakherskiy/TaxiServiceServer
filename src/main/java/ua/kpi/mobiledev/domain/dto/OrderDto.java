@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderDto {
 
     private Long orderId;
@@ -28,7 +30,9 @@ public class OrderDto {
     private List<AddReqSimpleDto> additionalRequirements;
     private List<RoutePointDto> routePoint;
     private String comment;
+    private Double distance;
     private Double price;
+    private Double extraPrice;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

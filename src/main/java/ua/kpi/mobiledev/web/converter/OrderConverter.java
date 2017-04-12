@@ -10,6 +10,7 @@ import ua.kpi.mobiledev.domain.dto.RoutePointDto;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,20 +34,11 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
     }
 
     private List<RoutePoint> convertRoutePoints(List<RoutePointDto> routePointDtoList) {
-        List<RoutePoint> routePoints = new ArrayList<>();
-        int routePointIndex = 0;
-
-        for (RoutePointDto routePointDto : routePointDtoList) {
-            routePoints.add(convertRoutePoint(routePointDto, routePointIndex));
-            routePointIndex++;
-        }
-
-        return routePoints;
+        return routePointDtoList.stream().map(this::convertRoutePoint).collect(Collectors.toList());
     }
 
-    private RoutePoint convertRoutePoint(RoutePointDto routePointDto, int routePointIndex) {
+    private RoutePoint convertRoutePoint(RoutePointDto routePointDto) {
         RoutePoint routePoint = new RoutePoint();
-        routePoint.setRoutePointPosition(routePointIndex);
         routePointConverter.convert(routePointDto, routePoint);
         return routePoint;
     }
@@ -61,12 +53,15 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
         target.setStartTime(source.getStartTime());
         target.setComment(source.getComment());
         target.setPrice(source.getPrice());
+        target.setDistance(source.getDistance());
+        target.setExtraPrice(source.getExtraPrice());
         convertRoutePoints(source, target);
         convertAdditionalRequirements(source, target);
     }
 
     private void convertRoutePoints(Order source, OrderDto target) {
         List<RoutePointDto> routePointDtos = source.getRoutePoints().stream()
+                .sorted(Comparator.comparing(RoutePoint::getRoutePointPosition))
                 .map(this::convertRoutePoint)
                 .collect(Collectors.toList());
         target.setRoutePoint(routePointDtos);

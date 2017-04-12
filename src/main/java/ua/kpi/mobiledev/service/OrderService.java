@@ -1,7 +1,6 @@
 package ua.kpi.mobiledev.service;
 
 import ua.kpi.mobiledev.domain.Order;
-import ua.kpi.mobiledev.domain.dto.OrderDto;
 
 import java.util.List;
 
@@ -19,5 +18,5 @@ public interface OrderService {
 
     void deleteOrder(Long orderId, Integer userId);
 
-    Order updateOrder(Long orderId, Integer userId, OrderDto orderDto);
+    Order updateOrder(Order orderPrototype, Integer userId);
 }

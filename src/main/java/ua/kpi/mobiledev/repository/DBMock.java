@@ -7,6 +7,7 @@ import ua.kpi.mobiledev.domain.Car;
 import ua.kpi.mobiledev.domain.DriverLicense;
 import ua.kpi.mobiledev.domain.MobileNumber;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.RoutePoint;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.web.security.model.Role;
@@ -50,12 +51,14 @@ public class DBMock {
     private ConcurrentHashMap<String, UserDetails> userDetails;
 
     private AtomicLong orderIndex;
+    private AtomicLong routePointIndex;
 
     private AtomicInteger userIndex;
 
     public DBMock() {
         orderIndex = new AtomicLong(0);
         userIndex = new AtomicInteger(2);
+        routePointIndex = new AtomicLong(0);
         users = new ConcurrentHashMap<>();
         orders = new ConcurrentHashMap<>();
         userDetails = new ConcurrentHashMap<>();
@@ -73,7 +76,15 @@ public class DBMock {
     public void addOrder(Order order) {
         Long index = orderIndex.incrementAndGet();
         orders.put(index, order);
+        updateRoutePointIndexes(order);
         order.setOrderId(index);
+    }
+
+    private void updateRoutePointIndexes(Order order){
+        order.getRoutePoints().forEach(this::setRoutePointId);
+    }
+    private void setRoutePointId(RoutePoint routePoint) {
+        routePoint.setRoutePointId(routePointIndex.getAndIncrement());
     }
 
     public void addUser(User user) {
@@ -100,6 +111,7 @@ public class DBMock {
 
     public void replace(Order order) {
         orders.put(order.getOrderId(), order);
+        updateRoutePointIndexes(order);
     }
 
     public List<Order> getOrders() {

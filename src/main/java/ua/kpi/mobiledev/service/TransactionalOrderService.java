@@ -5,8 +5,8 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.RoutePoint;
 import ua.kpi.mobiledev.domain.User;
-import ua.kpi.mobiledev.domain.dto.OrderDto;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.domain.priceCalculationManagement.PriceCalculationManager;
 import ua.kpi.mobiledev.exception.ForbiddenOperationException;
@@ -16,13 +16,19 @@ import ua.kpi.mobiledev.service.googlemaps.GeographicalPoint;
 import ua.kpi.mobiledev.service.googlemaps.GoogleMapsClientService;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
+import static java.time.LocalDateTime.MIN;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.exception.ErrorCode.DRIVER_CANNOT_PERFORM_OPERATION;
+import static ua.kpi.mobiledev.exception.ErrorCode.NO_ROUTE_POINT_WITH_ID;
 import static ua.kpi.mobiledev.exception.ErrorCode.ORDER_NOT_FOUND_WITH_ID;
 import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
 
@@ -51,6 +57,9 @@ public class TransactionalOrderService implements OrderService {
     public Order addOrder(Order order, Integer userId) {
         order.setCustomer(checkIfCustomer(findUser(userId)));
         order.setDistance(calculateDistance(order));
+        for (int i = 0; i < order.getRoutePoints().size(); i++) {
+            order.getRoutePoints().get(i).setRoutePointPosition(i);
+        }
         return orderRepository.save(priceCalculationManager.calculateOrderPrice(order));
     }
 
@@ -68,6 +77,10 @@ public class TransactionalOrderService implements OrderService {
         return user;
     }
 
+    private User findUser(Integer userId) {
+        return userService.getById(userId);
+    }
+
     @Override
     public Double calculatePrice(Order notCompletedOrder) {
         notCompletedOrder.setDistance(calculateDistance(notCompletedOrder));
@@ -79,9 +92,7 @@ public class TransactionalOrderService implements OrderService {
     @Override
     @Transactional
     public Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus) {
-        Order updatedOrder = orderStatusManager.changeOrderStatus(getOrder(orderId), findUser(userId), orderStatus);
-        updatedOrder = orderRepository.save(updatedOrder);
-        return updatedOrder;
+        return orderRepository.save(orderStatusManager.changeOrderStatus(getOrder(orderId), findUser(userId), orderStatus));
     }
 
     @Override
@@ -115,19 +126,6 @@ public class TransactionalOrderService implements OrderService {
         orderRepository.delete(order);
     }
 
-    @Override
-    @Transactional
-    public Order updateOrder(Long orderId, Integer userId, OrderDto orderDto) {
-        Order order = getOrder(orderId);
-
-        checkIfOrderOwner(order, userId);
-
-        order.setStartTime(orderDto.getStartTime());
-        order.setPrice(calculatePrice(null));
-
-        return orderRepository.save(order);
-    }
-
     private void checkIfOrderOwner(Order order, Integer userId) {
         Integer customerId = order.getCustomer().getId();
         if (!customerId.equals(userId)) {
@@ -135,8 +133,114 @@ public class TransactionalOrderService implements OrderService {
         }
     }
 
-    private User findUser(Integer userId) {
-        return userService.getById(userId);
+    @Override
+    @Transactional
+    public Order updateOrder(Order orderPrototype, Integer userId) {
+        User customer = checkIfCustomer(findUser(userId));
+        Order originalOrder = getOrder(orderPrototype.getOrderId());
+        checkIfOrderOwner(originalOrder, customer.getId());
+
+        updateStartTime(orderPrototype.getStartTime(), originalOrder);
+        updateParameterIfPresent(orderPrototype.getExtraPrice(), originalOrder::setExtraPrice);
+        updateParameterIfPresent(orderPrototype.getWithPet(), originalOrder::setWithPet);
+        updateParameterIfPresent(orderPrototype.getWithLuggage(), originalOrder::setWithLuggage);
+        updateParameterIfPresent(orderPrototype.getDriveMyCar(), originalOrder::setDriveMyCar);
+        updateParameterIfPresent(orderPrototype.getPassengerCount(), originalOrder::setPassengerCount);
+        updateParameterIfPresent(orderPrototype.getComment(), originalOrder::setComment);
+        updateParameterIfPresent(orderPrototype.getPaymentMethod(), originalOrder::setPaymentMethod);
+        updateParameterIfPresent(orderPrototype.getCarType(), originalOrder::setCarType);
+        boolean routeWasUpdated = updateRoutePoints(orderPrototype.getRoutePoints(), originalOrder);
+        if (routeWasUpdated) {
+            originalOrder.setDistance(calculateDistance(originalOrder));
+        }
+
+        priceCalculationManager.calculateOrderPrice(originalOrder);
+
+        return orderRepository.save(originalOrder);
     }
 
+    private void updateStartTime(LocalDateTime startTime, Order originalOrder) {
+        if (MIN == startTime) {
+            originalOrder.setStartTime(null);
+        } else if (nonNull(startTime)) {
+            originalOrder.setStartTime(startTime);
+        }
+    }
+
+    private <T> void updateParameterIfPresent(T param, Consumer<T> set) {
+        ofNullable(param).ifPresent(set);
+    }
+
+    private boolean updateRoutePoints(List<RoutePoint> routePoints, Order originalOrder) {
+        if (isNull(routePoints) || routePoints.size() == 0) {
+            return false;
+        }
+        List<RoutePoint> originalRoutePoints = originalOrder.getRoutePoints();
+        for (RoutePoint routePointPrototype : routePoints) {
+            if (routePointIsNew(routePointPrototype)) {
+                addNewRoutePoint(originalRoutePoints, routePointPrototype);
+            } else {
+                updateExistedRoutePoint(routePointPrototype, originalRoutePoints);
+            }
+        }
+        for (int i = 0; i < originalRoutePoints.size(); i++) {
+            originalRoutePoints.get(i).setRoutePointPosition(i);
+        }
+
+        return !routePoints.isEmpty();
+    }
+
+    private void addNewRoutePoint(List<RoutePoint> originalRoutePoints, RoutePoint routePointPrototype) {
+        int position = processNewPosition(routePointPrototype.getRoutePointPosition(), originalRoutePoints);
+        originalRoutePoints.add(position, routePointPrototype);
+    }
+
+    private int processNewPosition(Integer routePointPosition, List<RoutePoint> originalRoutePoints) {
+        return isNull(routePointPosition) ? originalRoutePoints.size() : routePointPosition;
+    }
+
+    private boolean routePointIsNew(RoutePoint routePointPrototype) {
+        return isNull(routePointPrototype.getRoutePointId());
+    }
+
+    private void updateExistedRoutePoint(RoutePoint routePointPrototype, List<RoutePoint> originalRoutePoints) {
+        RoutePoint toUpdate = originalRoutePoints.stream()
+                .filter(routePoint -> routePointPrototype.getRoutePointId().equals(routePoint.getRoutePointId()))
+                .findAny()
+                .orElseThrow(() -> new ResourceNotFoundException(NO_ROUTE_POINT_WITH_ID, routePointPrototype.getRoutePointId()));
+        if (needRemove(routePointPrototype)) {
+            originalRoutePoints.remove(toUpdate);
+            return;
+        }
+        if (needReplacePosition(routePointPrototype, toUpdate)) {
+            replacePosition(toUpdate, routePointPrototype.getRoutePointPosition(), originalRoutePoints);
+        }
+        tryUpdate(toUpdate, routePointPrototype);
+    }
+
+    private void tryUpdate(RoutePoint toUpdate, RoutePoint routePointPrototype) {
+        if (isNull(routePointPrototype.getLatitude()) || isNull(routePointPrototype.getLongtitude())) {
+            return;
+        }
+        if (toUpdate.getLatitude().equals(routePointPrototype.getLatitude()) &&
+                toUpdate.getLongtitude().equals(routePointPrototype.getLongtitude())) {
+            return;
+        }
+        toUpdate.setAddress(routePointPrototype.getAddress());
+        toUpdate.setLatitude(routePointPrototype.getLatitude());
+        toUpdate.setLongtitude(routePointPrototype.getLongtitude());
+    }
+
+    private boolean needRemove(RoutePoint routePointPrototype) {
+        return isNull(routePointPrototype.getRoutePointPosition());
+    }
+
+    private boolean needReplacePosition(RoutePoint routePointPrototype, RoutePoint toUpdate) {
+        return !routePointPrototype.getRoutePointPosition().equals(toUpdate.getRoutePointPosition());
+    }
+
+    private void replacePosition(RoutePoint toUpdate, int newPosition, List<RoutePoint> originalRoutePoints) {
+        originalRoutePoints.remove(toUpdate);
+        originalRoutePoints.add(newPosition, toUpdate);
+    }
 }

@@ -23,9 +23,11 @@ public class RoutePointConverter implements CustomConverter<RoutePointDto, Route
 
     @Override
     public void convert(RoutePointDto routePointDto, RoutePoint routePoint) {
+        routePoint.setRoutePointId(routePointDto.getRoutePointId());
+        routePoint.setRoutePointPosition(routePointDto.getRoutePointIndex());
         routePoint.setAddress(addressFacade.createAndGet(routePointDto));
-        routePoint.setLatitude(parseDouble(routePointDto.getLatitude()));
-        routePoint.setLongtitude(parseDouble(routePointDto.getLongtitude()));
+        routePoint.setLatitude(routePointDto.getLatitude() == null ? null : parseDouble(routePointDto.getLatitude()));
+        routePoint.setLongtitude(routePointDto.getLongtitude() == null ? null : parseDouble(routePointDto.getLongtitude()));
     }
 
     @Override
@@ -34,6 +36,7 @@ public class RoutePointConverter implements CustomConverter<RoutePointDto, Route
         Street street = routePoint.getAddress().getStreet();
         City city = street.getDistrict().getCity();
         AdministrationArea administrationArea = city.getAdministrationArea();
+        routePointDto.setRoutePointId(routePoint.getRoutePointId());
         routePointDto.setAdminArea(administrationArea.getName());
         routePointDto.setLocality(city.getName());
         routePointDto.setStreet(street.getStreetName());

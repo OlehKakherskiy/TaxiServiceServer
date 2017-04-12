@@ -60,6 +60,9 @@ public class OrderController {
     @Resource(name = "simpleOrderDtoConverter")
     private CustomConverter<Order, OrderSimpleDto> orderToSimpleOrderDtoConverter;
 
+    @Resource(name = "orderPricePopulator")
+    private CustomConverter<OrderPriceDto, Order> orderPriceConverter;
+
     @Resource(name = "orderService")
     private OrderService orderService;
 
@@ -91,9 +94,9 @@ public class OrderController {
     public void addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
         checkIfValid(bindingResult);
 //        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
-
         UserContext userContext = (UserContext) authentication.getDetails();
         Order order = new Order();
+        order.fillDefaultAdditionalParameters();
         order.setOrderStatus(OrderStatus.NEW);
         orderConverter.convert(orderDto, order);
         orderService.addOrder(order, userContext.getId());
@@ -120,7 +123,7 @@ public class OrderController {
         return new OrderPriceDto(roundedPrice);
     }
 
-    @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PUT)
+    @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PATCH)
     @ResponseStatus(OK)
     public void changeOrderStatus(@Valid @RequestBody OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
         orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
@@ -169,14 +172,17 @@ public class OrderController {
         orderService.deleteOrder(orderId, getUserId(authentication));
     }
 
-    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/order/{orderId}", method = RequestMethod.PATCH)
     @ResponseStatus(OK)
-    @Secured("ROLE_CUSTOMER")
+//    @Secured("CUSTOMER")
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
-                            @RequestBody @Valid OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
-        checkIfValid(bindingResult);
+                            @RequestBody /*@Valid*/ OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
+//        checkIfValid(bindingResult);
 //        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
-        orderService.updateOrder(orderId, getUserId(authentication), orderDto);
+        Order orderToUpdate = new Order();
+        orderToUpdate.setOrderId(orderId);
+        orderConverter.convert(orderDto, orderToUpdate);
+        orderService.updateOrder(orderToUpdate, getUserId(authentication));
     }
 
     private Integer getUserId(Authentication authentication) {

@@ -1,6 +1,8 @@
 package ua.kpi.mobiledev.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ua.kpi.mobiledev.domain.Car.CarType;
 
 import javax.persistence.Column;
@@ -17,8 +19,10 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "taxi_order")
 public class Order {
 
@@ -79,16 +83,6 @@ public class Order {
 
     private List<RoutePoint> routePoints;
 
-    public Order() {
-        carType = Car.CarType.PASSENGER_CAR;
-        paymentMethod = Order.PaymentMethod.CASH;
-        withPet = false;
-        withLuggage = false;
-        extraPrice = 0.0;
-        driveMyCar = false;
-        passengerCount = 1;
-    }
-
     public enum OrderStatus {
 
         NEW,
@@ -106,6 +100,16 @@ public class Order {
         CREDIT_CARD
     }
 
+    public void fillDefaultAdditionalParameters(){
+        carType = Car.CarType.PASSENGER_CAR;
+        paymentMethod = Order.PaymentMethod.CASH;
+        withPet = false;
+        withLuggage = false;
+        extraPrice = 0.0;
+        driveMyCar = false;
+        passengerCount = 1;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -113,21 +117,44 @@ public class Order {
 
         Order order = (Order) o;
 
+        if (orderId != null ? !orderId.equals(order.orderId) : order.orderId != null) return false;
         if (!customer.equals(order.customer)) return false;
         if (taxiDriver != null ? !taxiDriver.equals(order.taxiDriver) : order.taxiDriver != null) return false;
-        if (!startTime.equals(order.startTime)) return false;
+        if (startTime != null ? !startTime.equals(order.startTime) : order.startTime != null) return false;
+        if (addTime != null ? !addTime.equals(order.addTime) : order.addTime != null) return false;
+        if (!distance.equals(order.distance)) return false;
         if (!price.equals(order.price)) return false;
-        return orderStatus == order.orderStatus;
-
+        if (!extraPrice.equals(order.extraPrice)) return false;
+        if (!withPet.equals(order.withPet)) return false;
+        if (!withLuggage.equals(order.withLuggage)) return false;
+        if (!driveMyCar.equals(order.driveMyCar)) return false;
+        if (!passengerCount.equals(order.passengerCount)) return false;
+        if (!comment.equals(order.comment)) return false;
+        if (orderStatus != order.orderStatus) return false;
+        if (paymentMethod != order.paymentMethod) return false;
+        if (carType != order.carType) return false;
+        return routePoints.equals(order.routePoints);
     }
 
     @Override
     public int hashCode() {
-        int result = customer.hashCode();
+        int result = orderId != null ? orderId.hashCode() : 0;
+        result = 31 * result + customer.hashCode();
         result = 31 * result + (taxiDriver != null ? taxiDriver.hashCode() : 0);
-        result = 31 * result + startTime.hashCode();
+        result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
+        result = 31 * result + (addTime != null ? addTime.hashCode() : 0);
+        result = 31 * result + distance.hashCode();
         result = 31 * result + price.hashCode();
+        result = 31 * result + extraPrice.hashCode();
+        result = 31 * result + withPet.hashCode();
+        result = 31 * result + withLuggage.hashCode();
+        result = 31 * result + driveMyCar.hashCode();
+        result = 31 * result + passengerCount.hashCode();
+        result = 31 * result + comment.hashCode();
         result = 31 * result + orderStatus.hashCode();
+        result = 31 * result + paymentMethod.hashCode();
+        result = 31 * result + carType.hashCode();
+        result = 31 * result + routePoints.hashCode();
         return result;
     }
 }

@@ -192,7 +192,10 @@ Response:
     "status" : "NEW/ACCEPTED/CANCELLED/DONE/WAITING/PROCESSING",
     "customerId": "Integer",
     "driverId" : "Integer",
+    "distance": "Double",
     "price" : "Double",
+    "extraPrice":"Double",
+    "comment":"String",
     "additionalRequirements" : [{  
         "reqId" : "Integer",
         "reqValueId":"Integer"
@@ -225,8 +228,6 @@ Request body:
     "city":"String"
     //TODO: end of will be removed
   }],
-  
-  //TODO: removed orderPrice object and 'distance' field
   "additionalRequirements" : [{
     "reqId" : "Integer",
     "reqValueId" : "Integer"
@@ -269,25 +270,41 @@ Request type: **DELETE**
 ```
 /order/{orderId}
 ```
-Request type: **PUT**
+Request type: **PATCH**
 
 Request body:
 
 ```json
 {
-  "customerId" : "Long",
+  "quickRequest":"Boolean",
   "startTime" : "DateTime",
-  "startPoint" : "String",
-  "endPoint" : "String",
-  "orderPrice":{
-          "distance":"Double",
-          "additionalRequirements" : [{
-              "reqId" : "Integer",
-              "reqValueId" : "Integer"
-        }]
-    }
+  "comment":"String",
+  "routePoint":[{
+      "routePointId":"Long",
+      "routePointIndex":"Integer",
+      "latitude":"String",
+      "longtitude":"String"
+    }],
+    "additionalRequirements" : [{
+      "reqId" : "Integer",
+      "reqValueId" : "Integer"
+    }]
 }
 ```
+
+**NOTES**
+* if 'quickRequest' is true, 'startTime' will be omitted
+* 'orderPrice' can be omitted if there are no changes in additional requirements.
+* if there are some changes in additional requirements - add just changed ones.
+* 'routePoint' can be omitted if there are no changes in route.
+* to remove or change existed route point - add it's 'lat', 'long' and id.
+* to add route point to the end of list - omit 'routePointIndex'.
+* to add route point to the specific position - fill 'routePointIndex'.
+* to remove route point - add it's 'routePointId' and fill 'routePointIndex' to **NULL**.
+* to change route point position - specify its 'routePointIndex'.
+* if any route point was update - distance recalculation process will be triggered.
+* price recalculation will perform automatically.
+* all another params will be ignored.
 
 **_7. Calculate order price_**
 ```
