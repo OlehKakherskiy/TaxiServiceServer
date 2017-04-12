@@ -70,7 +70,7 @@ public class DBMock {
 
     private SecurityDetails prepareSecurityDetails(User user, String password) {
         return new SecurityDetails(user.getEmail(), password, "", true,
-                asList(new Role(new SimpleGrantedAuthority(user.getUserType().name()))));
+                asList(new Role(new SimpleGrantedAuthority("ROLE_"+user.getUserType().name()))));
     }
 
     public void addOrder(Order order) {

@@ -1,7 +1,6 @@
 package ua.kpi.mobiledev.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
@@ -166,9 +165,7 @@ public class OrderController {
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.DELETE)
     @ResponseStatus(OK)
-    @Secured("ROLE_CUSTOMER")
     public void deleteOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId, Authentication authentication) {
-
         orderService.deleteOrder(orderId, getUserId(authentication));
     }
 

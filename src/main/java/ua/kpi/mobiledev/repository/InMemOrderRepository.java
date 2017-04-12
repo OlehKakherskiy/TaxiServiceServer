@@ -59,12 +59,15 @@ public class InMemOrderRepository implements OrderRepository<Order, Long> {
 
     @Override
     public void delete(Long aLong) {
-
+        dbMock.getOrders().stream()
+                .filter(order -> order.getOrderId().equals(aLong))
+                .findAny()
+                .ifPresent(order -> dbMock.getOrders().remove(order));
     }
 
     @Override
     public void delete(Order entity) {
-
+        dbMock.getOrders().remove(entity);
     }
 
     @Override
