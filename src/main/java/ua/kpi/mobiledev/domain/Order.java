@@ -84,14 +84,12 @@ public class Order {
     private List<RoutePoint> routePoints;
 
     public enum OrderStatus {
-
         NEW,
-
         ACCEPTED,
-
         CANCELLED,
-
-        DONE
+        DONE,
+        WAITING,
+        PROCESSING
     }
 
     public enum PaymentMethod {

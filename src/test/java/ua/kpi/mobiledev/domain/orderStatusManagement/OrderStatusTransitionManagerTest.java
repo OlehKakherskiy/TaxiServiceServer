@@ -20,7 +20,9 @@ import ua.kpi.mobiledev.testCategories.UnitTest;
 import java.text.MessageFormat;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,11 +61,15 @@ public class OrderStatusTransitionManagerTest {
             //id = 1 - customer's id
             //id = 2 - driver's id
             //id = -1 - should be null
-            "NEW,CANCELLED,1,1,-1,-1,1",              //user cancelled new order
-            "ACCEPTED,CANCELLED,1,1,2,2,1",           //user cancelled accepted order by driver
-            "NEW,ACCEPTED,1,1,-1,2,2",                //driver accepted order for servicing
-            "ACCEPTED,NEW,1,1,2,-1,2",                //driver declined order processing
-            "ACCEPTED,DONE,1,1,2,2,2"                 //driver finished order processing
+            "NEW,CANCELLED,1,1,-1,-1,1",                //user cancelled new order
+            "ACCEPTED,CANCELLED,1,1,2,2,1",             //user cancelled accepted order by driver
+            "NEW,ACCEPTED,1,1,-1,2,2",                  //driver accepted order for servicing
+            "ACCEPTED,NEW,1,1,2,-1,2",                  //driver declined order processing
+            "ACCEPTED,WAITING,1,1,2,2,2",               //driver waiting for customer
+            "WAITING,ACCEPTED,1,1,2,2,2",               //driver was waiting, but need to move to a new start point
+            "WAITING,NEW,1,1,2,-1,2",                   //driver declined order processing
+            "WAITING,PROCESSING,1,1,2,2,2",             //driver with customer moves to next route point
+            "PROCESSING,DONE,1,1,2,2,2"                 //driver finished order processing
     })
     public void testValidTransitions(String currentStatus, String nextStatus,
                                      Integer customerIdBefore, Integer customerIdAfter,
@@ -124,12 +130,23 @@ public class OrderStatusTransitionManagerTest {
     @Parameters({
             "NEW,NEW",
             "NEW,CANCELLED",
+            "NEW,WAITING",
+            "NEW,PROCESSING",
+            "NEW,DONE",
             "ACCEPTED,CANCELLED",
+            "ACCEPTED,PROCESSING",
+            "ACCEPTED,DONE",
+            "WAITING,DONE",
+            "WAITING,CANCELLED",
             "DONE,NEW",
             "DONE,ACCEPTED",
+            "DONE,WAITING",
+            "DONE,PROCESSING",
             "DONE,CANCELLED",
             "CANCELLED,NEW",
             "CANCELLED,ACCEPTED",
+            "CANCELLED,WAITING",
+            "CANCELLED,PROCESSING",
             "CANCELLED,DONE",
             "CANCELLED,CANCELLED",
     })

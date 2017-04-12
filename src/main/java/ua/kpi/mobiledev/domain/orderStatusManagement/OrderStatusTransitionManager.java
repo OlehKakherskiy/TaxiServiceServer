@@ -15,6 +15,8 @@ import static ua.kpi.mobiledev.domain.Order.OrderStatus.ACCEPTED;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.CANCELLED;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.DONE;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.NEW;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.PROCESSING;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.WAITING;
 import static ua.kpi.mobiledev.domain.User.UserType.CUSTOMER;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.exception.ErrorCode.ILLEGAL_ORDER_STATUS_TRANSITION;
@@ -41,17 +43,29 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
         customerTransitions.put(NEW, customerFromNewTransitions);
         customerTransitions.put(ACCEPTED, customerFromAcceptedTransitions);
         customerTransitions.put(DONE, Collections.emptyMap());
+        customerTransitions.put(PROCESSING, Collections.emptyMap());
+        customerTransitions.put(WAITING, Collections.emptyMap());
         customerTransitions.put(CANCELLED, Collections.emptyMap());
 
         Map<OrderStatus, OrderStatusTransition> taxiDriverFromNewTransitions = new HashMap<>();
         taxiDriverFromNewTransitions.put(ACCEPTED, new AcceptOrderServicing());
 
         Map<OrderStatus, OrderStatusTransition> taxiDriverFromAcceptedTransitions = new HashMap<>();
-        taxiDriverFromAcceptedTransitions.put(DONE, new MarkOrderAsDone());
+        taxiDriverFromAcceptedTransitions.put(WAITING, new MarkAsWaiting());
         taxiDriverFromAcceptedTransitions.put(NEW, new RefuseOrderServicing());
+
+        Map<OrderStatus, OrderStatusTransition> taxiDriverFromWaitingTransitions = new HashMap<>();
+        taxiDriverFromWaitingTransitions.put(NEW, new RefuseOrderServicing());
+        taxiDriverFromWaitingTransitions.put(ACCEPTED, new AcceptOrderServicing());
+        taxiDriverFromWaitingTransitions.put(PROCESSING, new MarkAsProcessing());
+
+        Map<OrderStatus, OrderStatusTransition> taxiDriverFromProcessingTransitions = new HashMap<>();
+        taxiDriverFromProcessingTransitions.put(DONE, new MarkOrderAsDone());
 
         taxiDriverTransitions.put(NEW, taxiDriverFromNewTransitions);
         taxiDriverTransitions.put(ACCEPTED, taxiDriverFromAcceptedTransitions);
+        taxiDriverTransitions.put(WAITING, taxiDriverFromWaitingTransitions);
+        taxiDriverTransitions.put(PROCESSING, taxiDriverFromProcessingTransitions);
         taxiDriverTransitions.put(DONE, Collections.emptyMap());
         taxiDriverTransitions.put(CANCELLED, Collections.emptyMap());
     }
