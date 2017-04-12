@@ -12,6 +12,8 @@ INSERT INTO order_status (order_status_id, order_status) VALUES (0, 'NEW');
 INSERT INTO order_status (order_status_id, order_status) VALUES (1, 'ACCEPTED');
 INSERT INTO order_status (order_status_id, order_status) VALUES (2, 'CANCELLED');
 INSERT INTO order_status (order_status_id, order_status) VALUES (3, 'DONE');
+INSERT INTO order_status (order_status_id, order_status) VALUES (4, 'WAITING');
+INSERT INTO order_status (order_status_id, order_status) VALUES (5, 'PROCESSING');
 
 INSERT INTO car (car_id,model, brand, plate_number, seat_number, car_type_id) VALUES (1,'307', 'Pejo', '5411', 4, 1);
 INSERT INTO car (car_id,model, brand, plate_number, seat_number, car_type_id) VALUES (2,'X5', 'BMW', '5143', 5, 1);

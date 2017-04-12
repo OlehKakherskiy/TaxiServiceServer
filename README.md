@@ -238,7 +238,7 @@ Request body:
 * Only customer can perform operation
 * if "startTime" is null - quick request
 
-**_4. Accept order / Refuse order / Mark as done_**
+**_4. Change order status _**
 ```
 /order/{orderId}/status
 ```
@@ -249,7 +249,7 @@ Request body:
 ```json
 {
   "userId" : "Long",
-  "orderStatus" : "ACCEPTED/CANCELLED/DONE"
+  "orderStatus" : "NEW/ACCEPTED/WAITING/PROCESSING/CANCELLED/DONE"
 }
 ```
 **NOTES:**
