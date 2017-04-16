@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 
 @Component("userConverter")
@@ -73,8 +74,8 @@ public class UserConverter<T extends User> implements CustomConverter<T, UserDto
         target.setMobileNumbers(convertToMobileNumbers(ofNullable(source.getMobileNumbers()).orElse(emptyList())));
         if (userIsDriver(target)) {
             TaxiDriver driver = (TaxiDriver) target;
-            driver.setCar(convertCar(source.getCar()));
-            driver.setDriverLicense(convertDriverLicense(source.getDriverLicense()));
+            driver.setCar(reverseCarConvert(source.getCar()));
+            driver.setDriverLicense(reverseDriverLicenseConvert(source.getDriverLicense()));
         }
     }
 
@@ -92,13 +93,19 @@ public class UserConverter<T extends User> implements CustomConverter<T, UserDto
         return result;
     }
 
-    private Car convertCar(CarDto carDto) {
+    private Car reverseCarConvert(CarDto carDto) {
+        if (isNull(carDto)) {
+            return null;
+        }
         Car car = new Car();
         carConverter.reverseConvert(carDto, car);
         return car;
     }
 
-    private DriverLicense convertDriverLicense(DriverLicenseDto driverLicense) {
+    private DriverLicense reverseDriverLicenseConvert(DriverLicenseDto driverLicense) {
+        if (isNull(driverLicense)) {
+            return null;
+        }
         DriverLicense license = new DriverLicense();
         driverLicenseConverter.reverseConvert(driverLicense, license);
         return license;

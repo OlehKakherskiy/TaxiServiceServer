@@ -8,7 +8,9 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
 public class ExceptionController {
@@ -32,11 +34,11 @@ public class ExceptionController {
     public ResponseEntity<ErrorMessage> handleStatusCodeException(HttpServletRequest request) {
         HttpStatusCodeException exception =
                 (HttpStatusCodeException) request.getAttribute("javax.servlet.error.exception");
-        return new ResponseEntity<>(new ErrorMessage(exception.getLocalizedMessage()), exception.getStatusCode());
+        return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), exception.getStatusCode());
     }
 
     private ResponseEntity<ErrorMessage> createResponseWithCode(HttpServletRequest request, HttpStatus status) {
         Exception exception = (Exception) request.getAttribute("javax.servlet.error.exception");
-        return new ResponseEntity<>(new ErrorMessage(exception.getLocalizedMessage()), status);
+        return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), status);
     }
 }

@@ -21,9 +21,19 @@ import java.util.Locale;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.HttpStatus.*;
-import static ua.kpi.mobiledev.exception.ErrorCode.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static ua.kpi.mobiledev.exception.ErrorCode.ORDER_NOT_FOUND_WITH_ID;
+import static ua.kpi.mobiledev.exception.ErrorCode.REGISTRATION_GENERAL_SYSTEM_EXCEPTION;
+import static ua.kpi.mobiledev.exception.ErrorCode.TEST_CODE;
+import static ua.kpi.mobiledev.exception.ErrorCode.USER_ALREADY_EXISTS;
+import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -87,14 +97,14 @@ public class ExceptionHandlingAdviceTest {
         BindingResult bindingResult = mock(BindingResult.class);
         List<FieldError> fieldErrors = asList(
                 createFieldError("distance.invalidValue", "distance.invalidValue"),
-                createFieldError("NotNull.carDto.carType", "NotNull.carDto.carType"));
+                createFieldError("NotNull.car.carType", "NotNull.car.carType"));
         when(bindingResult.getFieldErrors()).thenReturn(fieldErrors);
 
         MethodArgumentNotValidException thrown = new MethodArgumentNotValidException(null, bindingResult);
 
         List<CustomFieldError> fieldErrorList = asList(
                 new CustomFieldError("fieldName", "distance.invalidValue", "Distance can't be 0 or negative"),
-                new CustomFieldError("fieldName", "NotNull.carDto.carType", "Сar type should exist")
+                new CustomFieldError("fieldName", "NotNull.car.carType", "Specify car type")
         );
         ResponseEntity<List<CustomFieldError>> expectedResponse = new ResponseEntity<>(fieldErrorList, BAD_REQUEST);
         assertEquals(expectedResponse, exceptionHandlingAdvice.handleRequestValidationException(thrown));

@@ -11,7 +11,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ua.kpi.mobiledev.exception.*;
+import ua.kpi.mobiledev.exception.AbstractLocalizedException;
+import ua.kpi.mobiledev.exception.ForbiddenOperationException;
+import ua.kpi.mobiledev.exception.RequestException;
+import ua.kpi.mobiledev.exception.ResourceNotFoundException;
+import ua.kpi.mobiledev.exception.SystemException;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -19,14 +23,19 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static ua.kpi.mobiledev.exception.ErrorCode.DEFAULT_EXCEPTION_MESSAGE;
+import static ua.kpi.mobiledev.exception.ErrorCode.DEFAULT_VALIDATION_EXCEPTION_MESSAGE;
 
 @ControllerAdvice
 public class ExceptionHandlingAdvice {
 
     private static final Locale DEFAULT_LOCALE = new Locale("en", "EN");
     private static final String DEFAULT_EXCEPTION_CODE = DEFAULT_EXCEPTION_MESSAGE.name();
+    private static final String DEFAULT_VALIDATION_MESSAGE = DEFAULT_VALIDATION_EXCEPTION_MESSAGE.name();
 
     @Resource(name = "messageSource")
     private ReloadableResourceBundleMessageSource messageSource;
@@ -49,9 +58,15 @@ public class ExceptionHandlingAdvice {
     }
 
     private CustomFieldError toCustomFieldError(FieldError fieldError) {
-        return new CustomFieldError(fieldError.getField(), fieldError.getDefaultMessage(),
-                messageSource.getMessage(new DefaultMessageSourceResolvable(fieldError.getCodes(),
-                        fieldError.getArguments()), getRequestLocale()));
+        String exceptionMessage;
+        try {
+            exceptionMessage = messageSource.getMessage(new DefaultMessageSourceResolvable(fieldError.getCodes(),
+                    fieldError.getArguments()), getRequestLocale());
+        } catch (NoSuchMessageException e) {
+            exceptionMessage = messageSource.getMessage(createMessageResolvable(DEFAULT_VALIDATION_MESSAGE,
+                    new String[]{fieldError.getField()}), getRequestLocale());
+        }
+        return new CustomFieldError(fieldError.getField(), fieldError.getDefaultMessage(), exceptionMessage);
     }
 
     protected Locale getRequestLocale() {
@@ -91,10 +106,10 @@ public class ExceptionHandlingAdvice {
         String resultMessage;
         try {
             resultMessage = exceptionMessageSource
-                    .getMessage(createMessageResolvable(errorCode, ex.getParams()),  getRequestLocale());
+                    .getMessage(createMessageResolvable(errorCode, ex.getParams()), getRequestLocale());
         } catch (NoSuchMessageException e) {
             resultMessage = exceptionMessageSource
-                    .getMessage(createMessageResolvable(DEFAULT_EXCEPTION_CODE, new String[]{errorCode}),  getRequestLocale());
+                    .getMessage(createMessageResolvable(DEFAULT_EXCEPTION_CODE, new String[]{errorCode}), getRequestLocale());
         }
         return new ErrorMessage(resultMessage);
     }

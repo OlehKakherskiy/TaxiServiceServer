@@ -3,6 +3,7 @@ package ua.kpi.mobiledev.web.controller;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,7 @@ public class UserController {
 
     @RequestMapping(path = "/user/register", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void registerUser(@RequestBody /*@Valid*/ UserDto userDto) {
+    public void registerUser(@RequestBody @Validated({UserDto.AddUserCheck.class}) UserDto userDto) {
         User user = isCustomer(userDto.getUserType()) ? new User() : new TaxiDriver();
         userConverter.reverseConvert(userDto, user);
 
@@ -51,10 +52,10 @@ public class UserController {
 
     @RequestMapping(path = "/user", method = RequestMethod.PATCH, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void updateUserProfile(/*@Valid*/ @RequestBody UserDto userDto, Authentication authentication) {
+    public void updateUserProfile(@RequestBody @Validated({UserDto.UpdateUserCheck.class}) UserDto userDto, Authentication authentication) {
         UserContext userContext = (UserContext) authentication.getDetails();
         Integer userId = userContext.getId();
-        User user = (userContext.getUserType() == User.UserType.TAXI_DRIVER) ? new TaxiDriver() : new User();
+        User user = isCustomer(userContext.getUserType()) ? new User() : new TaxiDriver();
         user.setId(userId);
         userDto.setUserType(userContext.getUserType());
         userConverter.reverseConvert(userDto, user);

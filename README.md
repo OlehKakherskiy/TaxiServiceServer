@@ -2,6 +2,14 @@
 server RESTful app developed using Spring framework
 
 ##Public API
+
+**GENERAL NOTES** 
+* Date and DateTime should be in format ISO 8601.
+* OrderStatus enumeration contains values : NEW/ACCEPTED/CANCELLED/DONE/WAITING/PROCESSING
+* UserType enumeration contains values : CUSTOMER/TAXI_DRIVER
+* CarType enumeration contains values : TRUCK/PASSENGER_CAR/MINIBUS
+ 
+ 
 ###User API
 
 **_1. Register_**
@@ -19,13 +27,13 @@ Request body:
   "mobileNumbers" :[
   	  {"mobileNumber":"String"}
   ],
-  "userType" : "CUSTOMER/TAXI_DRIVER",
+  "userType" : "UserType",
   "car" : {
     "manufacturer" : "String",
     "model" : "String",
     "plateNumber" : "String",
     "seatsNumber" : "Integer",
-    "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+    "carType" : "CarType"
   },
   "driverLicense":{
     "code":"String",
@@ -67,17 +75,15 @@ Response:
      "idMobileNumber":"Integer",
      "mobileNumber": "String"
   }],
-  "userType" : "CUSTOMER/TAXI_DRIVER",
+  "userType" : "UserType",
   "car" : {
-    "carId":"Integer",
     "manufacturer" : "String",
     "model" : "String",
     "plateNumber" : "String",
     "seatsNumber" : "Integer",
-    "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+    "carType" : "CarType"
   },
   "driverLicense":{
-    "driverLicenseId":"Integer",
     "driverLicense":"String",
     "expirationTime":"Date"
   }
@@ -104,7 +110,7 @@ Request body:
     "model" : "String",
     "plateNumber" : "String",
     "seatsNumber" : "Integer",
-    "carType" : "TRUCK, PASSENGER_CAR, MINIBUS"
+    "carType" : "CarType"
   },
   "driverLicense":{
     "driverLicense":"String",
@@ -150,7 +156,7 @@ Response body:
 ```
 /order?orderStatus='actualOrderStatus'
 ```
-**orderStatus** = NEW/ACCEPTED/CANCELLED/DONE/ALL
+**orderStatus** = "OrderStatus" + ALL
 
 Request type: GET
 
@@ -163,7 +169,7 @@ Response:
     "startPoint" : "String",
     "endPoint" : "String",
     "price" : "Double",
-    "status":"NEW/ACCEPTED/CANCELLED/DONE/WAITING/PROCESSING"
+    "status":"OrderStatus"
 }]
 ```
 **NOTES:**
@@ -189,7 +195,7 @@ Response:
         "houseNumber":"String",
         "city":"String"
      }],
-    "status" : "NEW/ACCEPTED/CANCELLED/DONE/WAITING/PROCESSING",
+    "status" : "OrderStatus",
     "customerId": "Integer",
     "driverId" : "Integer",
     "distance": "Double",
@@ -249,7 +255,7 @@ Request body:
 ```json
 {
   "userId" : "Long",
-  "orderStatus" : "NEW/ACCEPTED/WAITING/PROCESSING/CANCELLED/DONE"
+  "orderStatus" : "OrderStatus"
 }
 ```
 **NOTES:**

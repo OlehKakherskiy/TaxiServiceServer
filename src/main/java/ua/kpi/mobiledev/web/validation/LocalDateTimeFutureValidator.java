@@ -1,7 +1,8 @@
-package ua.kpi.mobiledev.web.validators;
+package ua.kpi.mobiledev.web.validation;
 
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+import ua.kpi.mobiledev.domain.dto.DriverLicenseDto;
 import ua.kpi.mobiledev.domain.dto.OrderDto;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ public class LocalDateTimeFutureValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return OrderDto.class == clazz;
+        return OrderDto.class == clazz || DriverLicenseDto.class == clazz;
     }
 
     @Override

@@ -13,7 +13,7 @@ import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.web.security.model.Role;
 import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +39,7 @@ public class DBMock {
 
         List<MobileNumber> driverMobileNumbers = new ArrayList<>(asList(new MobileNumber(1, "+380987654321")));
         Car car = new Car(1, "DBR", "Aston Martin", "AA-0000-BB", 3, PASSENGER_CAR);
-        DriverLicense driverLicense = new DriverLicense(1, "BXX 990664", LocalDateTime.now().plusYears(3), new byte[0], new byte[0]);
+        DriverLicense driverLicense = new DriverLicense(1, "BXX 990664", LocalDate.now().plusYears(3), new byte[0], new byte[0]);
         taxiDriver = new TaxiDriver(2, "James Bond", "driver@gmail.com", driverMobileNumbers, car, driverLicense);
     }
 

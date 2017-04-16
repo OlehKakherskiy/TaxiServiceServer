@@ -11,7 +11,6 @@ public class CarConverter implements CustomConverter<Car, CarDto> {
 
     @Override
     public void convert(Car source, CarDto target) {
-        target.setCarId(source.getCarId());
         target.setCarType(source.getCarType());
         target.setManufacturer(source.getManufacturer());
         target.setModel(source.getModel());

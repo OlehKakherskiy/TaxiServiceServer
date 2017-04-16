@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.web.validators;
+package ua.kpi.mobiledev.web.validation;
 
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -12,7 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 import static javax.persistence.FetchType.LAZY;
@@ -35,7 +35,7 @@ public class DriverLicense {
     private String driverLicense;
 
     @Column(name = "expiration_time")
-    private LocalDateTime expirationTime;
+    private LocalDate expirationTime;
 
     @Lob
     @Column(name = "front_side_scan")

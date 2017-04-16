@@ -24,10 +24,10 @@ import ua.kpi.mobiledev.web.security.model.Role;
 import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
-import static java.time.LocalDateTime.now;
+import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.core.Is.is;
@@ -240,7 +240,7 @@ public class TransactionalUserServiceTest {
         TaxiDriver userBeforeUpdate = (TaxiDriver) getUserMock(TAXI_DRIVER_ID, User.UserType.TAXI_DRIVER);
         userBeforeUpdate.setDriverLicense(driverLicenseBeforeUpdate);
 
-        LocalDateTime newDate = now().plusYears(1L);
+        LocalDate newDate = now().plusYears(1L);
         DriverLicense driverLicenseAfterUpdate = new DriverLicense(1, "afterUpdate", newDate, null, null);
         TaxiDriver userAfterUpdate = (TaxiDriver) getUserMock(TAXI_DRIVER_ID, User.UserType.TAXI_DRIVER);
         userAfterUpdate.setCar(carBeforeUpdate);
