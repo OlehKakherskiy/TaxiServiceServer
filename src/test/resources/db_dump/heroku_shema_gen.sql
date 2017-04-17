@@ -4,13 +4,13 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 DROP SCHEMA IF EXISTS `heroku_c6f857e7f6daba9` ;
 CREATE SCHEMA IF NOT EXISTS `heroku_c6f857e7f6daba9` DEFAULT CHARACTER SET utf8 ;
-SHOW WARNINGS;
+
 USE `heroku_c6f857e7f6daba9` ;
 
 -- -----------------------------------------------------
 -- Table `user_credential`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `user_credential` (
   `username` VARCHAR(40) NOT NULL,
   `password` VARCHAR(360) NOT NULL,
@@ -20,12 +20,10 @@ CREATE TABLE IF NOT EXISTS `user_credential` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `authority`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `authority` (
   `authority` VARCHAR(25) NOT NULL,
   `username` VARCHAR(40) NOT NULL,
@@ -39,12 +37,10 @@ CREATE TABLE IF NOT EXISTS `authority` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `car_type`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `car_type` (
   `car_type_id` INT(11) NOT NULL,
   `type` CHAR(30) NOT NULL,
@@ -52,12 +48,10 @@ CREATE TABLE IF NOT EXISTS `car_type` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `car`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `car` (
   `car_id` INT(11) NOT NULL AUTO_INCREMENT,
   `model` VARCHAR(20) NOT NULL,
@@ -73,15 +67,12 @@ CREATE TABLE IF NOT EXISTS `car` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
   ENGINE = InnoDB
-  AUTO_INCREMENT = 2
-  DEFAULT CHARACTER SET = utf8;
-
-SHOW WARNINGS;
+   DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `driver_license`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `driver_license` (
   `driver_license_id` INT(11) NOT NULL,
   `driver_license` CHAR(20) NOT NULL,
@@ -92,26 +83,21 @@ CREATE TABLE IF NOT EXISTS `driver_license` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `user_type`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `user_type` (
   `user_type_id` INT(11) NOT NULL AUTO_INCREMENT,
   `user_type` ENUM('CUSTOMER', 'TAXI_DRIVER') NOT NULL DEFAULT 'CUSTOMER',
   PRIMARY KEY (`user_type_id`))
   ENGINE = InnoDB
-  AUTO_INCREMENT = 2
-  DEFAULT CHARACTER SET = utf8;
-
-SHOW WARNINGS;
+   DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `user`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `user` (
   `user_id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
@@ -139,15 +125,12 @@ CREATE TABLE IF NOT EXISTS `user` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
   ENGINE = InnoDB
-  AUTO_INCREMENT = 47
-  DEFAULT CHARACTER SET = utf8;
-
-SHOW WARNINGS;
+   DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `mobile_number`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `mobile_number` (
   `mobile_number_id` INT(11) NOT NULL AUTO_INCREMENT,
   `mobile_number` CHAR(13) NOT NULL,
@@ -160,15 +143,12 @@ CREATE TABLE IF NOT EXISTS `mobile_number` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
   ENGINE = InnoDB
-  AUTO_INCREMENT = 99
-  DEFAULT CHARACTER SET = utf8;
-
-SHOW WARNINGS;
+   DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `payment_method`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `payment_method` (
   `payment_method_id` INT(11) NOT NULL,
   `payment_method` VARCHAR(45) NOT NULL,
@@ -176,12 +156,10 @@ CREATE TABLE IF NOT EXISTS `payment_method` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `order_status`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `order_status` (
   `order_status_id` INT(11) NOT NULL,
   `order_status` CHAR(30) NOT NULL,
@@ -189,12 +167,10 @@ CREATE TABLE IF NOT EXISTS `order_status` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `taxi_order`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `taxi_order` (
   `taxi_order_id` INT(11) NOT NULL AUTO_INCREMENT,
   `start_time` DATETIME NOT NULL,
@@ -244,15 +220,12 @@ CREATE TABLE IF NOT EXISTS `taxi_order` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
   ENGINE = InnoDB
-  AUTO_INCREMENT = 3
-  DEFAULT CHARACTER SET = utf8;
-
-SHOW WARNINGS;
+   DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `administration_area`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `administration_area` (
   `admin_area_id` INT(11) NOT NULL AUTO_INCREMENT,
   `admin_area_name` VARCHAR(45) NOT NULL,
@@ -260,12 +233,10 @@ CREATE TABLE IF NOT EXISTS `administration_area` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `city`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `city` (
   `city_id` INT(11) NOT NULL AUTO_INCREMENT,
   `city_name` VARCHAR(45) NOT NULL,
@@ -280,12 +251,10 @@ CREATE TABLE IF NOT EXISTS `city` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `district`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `district` (
   `district_id` INT(11) NOT NULL AUTO_INCREMENT,
   `district_name` VARCHAR(45) NOT NULL,
@@ -300,12 +269,10 @@ CREATE TABLE IF NOT EXISTS `district` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `street`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `street` (
   `street_id` INT(11) NOT NULL AUTO_INCREMENT,
   `street_name` VARCHAR(45) NOT NULL,
@@ -320,12 +287,10 @@ CREATE TABLE IF NOT EXISTS `street` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `address`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `address` (
   `address_id` INT(11) NOT NULL AUTO_INCREMENT,
   `house_number` VARCHAR(10) NOT NULL,
@@ -340,12 +305,10 @@ CREATE TABLE IF NOT EXISTS `address` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
-
 -- -----------------------------------------------------
 -- Table `taxi_order_has_address`
 -- -----------------------------------------------------
-SHOW WARNINGS;
+
 CREATE TABLE IF NOT EXISTS `taxi_order_has_address` (
   `taxi_order_id` INT(11) NOT NULL,
   `address_id` INT(11) NOT NULL,
@@ -368,10 +331,11 @@ CREATE TABLE IF NOT EXISTS `taxi_order_has_address` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
-SHOW WARNINGS;
+ALTER TABLE `user_type` AUTO_INCREMENT=0;
+ALTER TABLE `car_type` AUTO_INCREMENT=0;
+ALTER TABLE `payment_method` AUTO_INCREMENT=0;
+ALTER TABLE `order_status` AUTO_INCREMENT=0;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-

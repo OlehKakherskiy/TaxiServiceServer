@@ -7,6 +7,9 @@ INSERT INTO payment_method (payment_method_id, payment_method) VALUES (1, 'CREDI
 
 INSERT INTO user_type (user_type_id, user_type) VALUES (1, 'CUSTOMER');
 INSERT INTO user_type (user_type_id, user_type) VALUES (2, 'TAXI_DRIVER');
+UPDATE user_type SET user_type_id = 0 where user_type_id = 1;
+UPDATE user_type SET user_type_id = 1 where user_type_id = 2;
+
 
 INSERT INTO order_status (order_status_id, order_status) VALUES (0, 'NEW');
 INSERT INTO order_status (order_status_id, order_status) VALUES (1, 'ACCEPTED');
@@ -24,11 +27,11 @@ INSERT INTO driver_license (driver_license_id, driver_license, expiration_time, 
 INSERT INTO driver_license (driver_license_id, driver_license, expiration_time, front_side_scan, back_side_scan) VALUES (3, 'ПОП 990642', '2023-05-03 03:22:28', NULL, NULL);
 
 
-INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (1, 'Daniel Morales', 'daniel@gmail.com', 1, 2, 1);
-INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (2, 'Jason Statham', 'jason@gmail.com', 2, 2, 2);
-INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (3, 'Лёлик', 'lelik@gmail.com', 3, 2, 3);
-INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (4, 'Emilien Kerbalec', 'emilien@gmail.com', NULL, 1, NULL);
-INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (5, 'Семён Горбунков', 'gorbunkov@gmail.com', NULL, 1, NULL);
+INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (1, 'Daniel Morales', 'daniel@gmail.com', 1, 1, 1);
+INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (2, 'Jason Statham', 'jason@gmail.com', 2, 1, 2);
+INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (3, 'Лёлик', 'lelik@gmail.com', 3, 1, 3);
+INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (4, 'Emilien Kerbalec', 'emilien@gmail.com', NULL, 0, NULL);
+INSERT INTO user (user_id, name, email, car_id, user_type, driver_license_id) VALUES (5, 'Семён Горбунков', 'gorbunkov@gmail.com', NULL, 0, NULL);
 
 INSERT INTO mobile_number (mobile_number_id, mobile_number, user_id) VALUES (112, 0958428809, 1);
 INSERT INTO mobile_number (mobile_number_id, mobile_number, user_id) VALUES (122, 0976651562, 1);
