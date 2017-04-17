@@ -28,7 +28,7 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
     @Override
     public void convert(OrderDto source, Order target) {
         target.setStartTime(source.getStartTime());
-        target.setRoutePoints(convertRoutePoints(source.getRoutePoint()));
+        target.setRoutePoints(convertRoutePoints(source.getRoutePoints()));
         target.setComment(source.getComment());
         additionalRequirementsConverter.convert(source.getAdditionalRequirements(), target);
     }
@@ -64,7 +64,7 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
                 .sorted(Comparator.comparing(RoutePoint::getRoutePointPosition))
                 .map(this::convertRoutePoint)
                 .collect(Collectors.toList());
-        target.setRoutePoint(routePointDtos);
+        target.setRoutePoints(routePointDtos);
     }
 
     private RoutePointDto convertRoutePoint(RoutePoint routePoint) {

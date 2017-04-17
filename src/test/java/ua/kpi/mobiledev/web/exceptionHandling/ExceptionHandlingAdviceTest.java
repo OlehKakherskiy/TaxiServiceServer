@@ -96,15 +96,16 @@ public class ExceptionHandlingAdviceTest {
     public void shouldReturnResponseWithInvalidFieldList() {
         BindingResult bindingResult = mock(BindingResult.class);
         List<FieldError> fieldErrors = asList(
-                createFieldError("distance.invalidValue", "distance.invalidValue"),
-                createFieldError("NotNull.car.carType", "NotNull.car.carType"));
+                createFieldError("Email.userDto.email", "Email.userDto.email"),
+                createFieldError("additionalRequirement.idValue.carType", "additionalRequirement.idValue.carType"));
         when(bindingResult.getFieldErrors()).thenReturn(fieldErrors);
 
         MethodArgumentNotValidException thrown = new MethodArgumentNotValidException(null, bindingResult);
 
         List<CustomFieldError> fieldErrorList = asList(
-                new CustomFieldError("fieldName", "distance.invalidValue", "Distance can't be 0 or negative"),
-                new CustomFieldError("fieldName", "NotNull.car.carType", "Specify car type")
+                new CustomFieldError("fieldName", "Email.userDto.email", "Email has incorrect format"),
+                new CustomFieldError("fieldName", "additionalRequirement.idValue.carType", "Wrong id value of 'car type' requirement. " +
+                        "Valid values : 0 - truck, 1 - passenger car, 2 - minibus")
         );
         ResponseEntity<List<CustomFieldError>> expectedResponse = new ResponseEntity<>(fieldErrorList, BAD_REQUEST);
         assertEquals(expectedResponse, exceptionHandlingAdvice.handleRequestValidationException(thrown));

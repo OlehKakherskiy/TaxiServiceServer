@@ -1,12 +1,7 @@
 package ua.kpi.mobiledev.web.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Validator;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +21,6 @@ import ua.kpi.mobiledev.web.converter.CustomConverter;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -42,7 +36,7 @@ import static ua.kpi.mobiledev.exception.ErrorCode.INVALID_ORDER_STATUS;
 @RestController
 public class OrderController {
 
-    private static String VALID_ORDER_STATUSES = "NEW/ACCEPTED/DONE/CANCELLED/ALL";
+    private static String VALID_ORDER_STATUSES;
 
     static {
         VALID_ORDER_STATUSES = stream(OrderStatus.values())
@@ -59,40 +53,12 @@ public class OrderController {
     @Resource(name = "simpleOrderDtoConverter")
     private CustomConverter<Order, OrderSimpleDto> orderToSimpleOrderDtoConverter;
 
-    @Resource(name = "orderPricePopulator")
-    private CustomConverter<OrderPriceDto, Order> orderPriceConverter;
-
     @Resource(name = "orderService")
     private OrderService orderService;
 
-    private Validator orderPriceDtoValidatorForAdd;
-
-    private Validator orderPriceDtoValidatorForCalculatePrice;
-
-    private Validator futureTimeValidator;
-
-    @Autowired
-    public OrderController(Validator orderPriceDtoValidatorForAddOrder, Validator orderPriceDtoValidatorForCalculateOrderPrice, Validator futureTimeValidator) {
-        this.orderPriceDtoValidatorForAdd = orderPriceDtoValidatorForAddOrder;
-        this.orderPriceDtoValidatorForCalculatePrice = orderPriceDtoValidatorForCalculateOrderPrice;
-        this.futureTimeValidator = futureTimeValidator;
-    }
-
-    @InitBinder("orderPriceDto")
-    private void initOrderPriceBinder(WebDataBinder webDataBinder) {
-        webDataBinder.addValidators(orderPriceDtoValidatorForCalculatePrice);
-    }
-
-    @InitBinder("orderDto")
-    private void initStartTimeBinder(WebDataBinder webDataBinder) {
-        webDataBinder.addValidators(futureTimeValidator);
-    }
-
     @RequestMapping(value = "/order", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(OK)
-    public void addOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
-        checkIfValid(bindingResult);
-//        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
+    public void addOrder(@RequestBody @Validated(OrderDto.AddOrderGroup.class) OrderDto orderDto, Authentication authentication) {
         UserContext userContext = (UserContext) authentication.getDetails();
         Order order = new Order();
         order.fillDefaultAdditionalParameters();
@@ -101,20 +67,9 @@ public class OrderController {
         orderService.addOrder(order, userContext.getId());
     }
 
-    private void validate(Validator validator, Object object, BindingResult bindingResult) throws MethodArgumentNotValidException {
-        validator.validate(object, bindingResult);
-        checkIfValid(bindingResult);
-    }
-
-    private void checkIfValid(BindingResult bindingResult) throws MethodArgumentNotValidException {
-        if (bindingResult.hasErrors()) {
-            throw new MethodArgumentNotValidException(null, bindingResult);
-        }
-    }
-
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
     @ResponseStatus(OK)
-    public OrderPriceDto calculatePrice(@Valid @RequestBody OrderPriceDto orderPriceDto) {
+    public OrderPriceDto calculatePrice(@RequestBody @Validated(OrderPriceDto.PriceInfoCheck.class) OrderPriceDto orderPriceDto) {
         Order orderWithPriceData = new Order();
         orderPricePopulator.convert(orderPriceDto, orderWithPriceData);
         Double price = orderService.calculatePrice(orderWithPriceData);
@@ -124,7 +79,7 @@ public class OrderController {
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PATCH)
     @ResponseStatus(OK)
-    public void changeOrderStatus(@Valid @RequestBody OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
+    public void changeOrderStatus(@RequestBody @Validated OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
         orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
     }
 
@@ -171,11 +126,8 @@ public class OrderController {
 
     @RequestMapping(value = "/order/{orderId}", method = RequestMethod.PATCH)
     @ResponseStatus(OK)
-//    @Secured("CUSTOMER")
     public void updateOrder(@NotNull @Min(0) @PathVariable("orderId") Long orderId,
-                            @RequestBody /*@Valid*/ OrderDto orderDto, BindingResult bindingResult, Authentication authentication) throws MethodArgumentNotValidException {
-//        checkIfValid(bindingResult);
-//        validate(orderPriceDtoValidatorForAdd, orderDto.getOrderPrice(), bindingResult);
+                            @RequestBody @Validated(OrderDto.UpdateOrderGroup.class) OrderDto orderDto, Authentication authentication) {
         Order orderToUpdate = new Order();
         orderToUpdate.setOrderId(orderId);
         orderConverter.convert(orderDto, orderToUpdate);

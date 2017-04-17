@@ -224,7 +224,7 @@ Request body:
 {
   "startTime" : "DateTime",
   "comment" : "String",
-  "routePoint":[{
+  "routePoints":[{
     "latitude":"String",
     "longtitude":"String",
     //TODO: will be removed

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ua.kpi.mobiledev.domain.Order;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
@@ -12,10 +11,9 @@ import javax.validation.constraints.NotNull;
 public class OrderStatusDto {
 
     @NotNull(message = "userId.required")
-    @Min(value = 0, message = "userId.negative")
     private Integer userId;
 
-    @NotNull(message = "orderStatus.nullOrInvalid")
+    @NotNull(message = "orderStatus.required")
     private Order.OrderStatus orderStatus;
 
 }

@@ -8,10 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.group.GroupSequenceProvider;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeDeserializer;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeSerializer;
+import ua.kpi.mobiledev.web.validation.FutureTime;
+import ua.kpi.mobiledev.web.validation.groupprovider.OrderDtoGroupProvider;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,22 +27,45 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@GroupSequenceProvider(OrderDtoGroupProvider.class)
 public class OrderDto {
+
+    public interface AddOrderGroup extends RoutePointDto.FullRoutePointCheck,
+            AddReqSimpleDto.AdditionalRequirementCheck{
+    }
+
+    public interface UpdateOrderGroup extends OptionalComment, OptionalStartTime,
+            RoutePointDto.OptionalLatitude, RoutePointDto.OptionalLongtitude, AddReqSimpleDto.AdditionalRequirementCheck {
+    }
+
+    public interface OptionalComment {
+    }
+
+    public interface OptionalStartTime {
+    }
 
     private Long orderId;
     private Integer customerId;
     private Integer driverId;
     private Order.OrderStatus status;
+
+    @Valid
     private List<AddReqSimpleDto> additionalRequirements;
-    private List<RoutePointDto> routePoint;
+
+    @NotNull(message = "routePoints.required", groups = AddOrderGroup.class)
+    @Size(min = 2, message = "routePoints.invalidCount", groups = AddOrderGroup.class)
+    @Valid
+    private List<RoutePointDto> routePoints;
+
+    @Size(max = 300, message = "orderComment.maxLength", groups = OptionalComment.class)
     private String comment;
+
     private Double distance;
     private Double price;
     private Double extraPrice;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-//    @NotNull(message = "startTime.required") //TODO: uncomment and add custom validation tag
-//    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @FutureTime(message = "startTime.notFuture", groups = OptionalStartTime.class)
     private LocalDateTime startTime;
 }

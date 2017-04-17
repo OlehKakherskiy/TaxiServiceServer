@@ -60,13 +60,18 @@ public class ExceptionHandlingAdvice {
     private CustomFieldError toCustomFieldError(FieldError fieldError) {
         String exceptionMessage;
         try {
+            //TODO: remove this when l10n keys will be reformatted to default message parameters of validation annotations (like in OrderDto)
             exceptionMessage = messageSource.getMessage(new DefaultMessageSourceResolvable(fieldError.getCodes(),
                     fieldError.getArguments()), getRequestLocale());
         } catch (NoSuchMessageException e) {
-            exceptionMessage = messageSource.getMessage(createMessageResolvable(DEFAULT_VALIDATION_MESSAGE,
-                    new String[]{fieldError.getField()}), getRequestLocale());
+            try {
+                exceptionMessage = messageSource.getMessage(new DefaultMessageSourceResolvable(fieldError.getDefaultMessage()), getRequestLocale());
+            }catch (NoSuchMessageException e1){
+                exceptionMessage = messageSource.getMessage(createMessageResolvable(DEFAULT_VALIDATION_MESSAGE,
+                        new String[]{fieldError.getField()}), getRequestLocale());
+            }
         }
-        return new CustomFieldError(fieldError.getField(), fieldError.getDefaultMessage(), exceptionMessage);
+        return new CustomFieldError(fieldError.getField().trim(), fieldError.getDefaultMessage().trim(), exceptionMessage.trim());
     }
 
     protected Locale getRequestLocale() {
@@ -111,7 +116,7 @@ public class ExceptionHandlingAdvice {
             resultMessage = exceptionMessageSource
                     .getMessage(createMessageResolvable(DEFAULT_EXCEPTION_CODE, new String[]{errorCode}), getRequestLocale());
         }
-        return new ErrorMessage(resultMessage);
+        return new ErrorMessage(resultMessage.trim());
     }
 
     private DefaultMessageSourceResolvable createMessageResolvable(String errorCode, Object[] errorParams) {
