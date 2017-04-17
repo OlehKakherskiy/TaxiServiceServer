@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.Order.OrderStatus;
-import ua.kpi.mobiledev.domain.dto.OrderDto;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
-import ua.kpi.mobiledev.domain.dto.OrderSimpleDto;
-import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
 import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.service.OrderService;
 import ua.kpi.mobiledev.web.converter.CustomConverter;
+import ua.kpi.mobiledev.web.dto.OrderDto;
+import ua.kpi.mobiledev.web.dto.OrderPriceDto;
+import ua.kpi.mobiledev.web.dto.OrderSimpleDto;
+import ua.kpi.mobiledev.web.dto.OrderStatusDto;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.annotation.Resource;

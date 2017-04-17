@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.domain.dto;
+package ua.kpi.mobiledev.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

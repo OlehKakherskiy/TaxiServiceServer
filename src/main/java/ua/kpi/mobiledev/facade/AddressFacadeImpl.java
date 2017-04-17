@@ -3,9 +3,9 @@ package ua.kpi.mobiledev.facade;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.Street;
-import ua.kpi.mobiledev.domain.dto.RoutePointDto;
 import ua.kpi.mobiledev.service.AddressService;
 import ua.kpi.mobiledev.service.StreetService;
+import ua.kpi.mobiledev.web.dto.RoutePointDto;
 
 import javax.annotation.Resource;
 

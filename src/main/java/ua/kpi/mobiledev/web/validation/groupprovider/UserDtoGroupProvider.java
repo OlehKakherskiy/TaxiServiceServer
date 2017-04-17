@@ -2,7 +2,7 @@ package ua.kpi.mobiledev.web.validation.groupprovider;
 
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import ua.kpi.mobiledev.domain.User;
-import ua.kpi.mobiledev.domain.dto.UserDto;
+import ua.kpi.mobiledev.web.dto.UserDto;
 
 import java.util.ArrayList;
 import java.util.List;

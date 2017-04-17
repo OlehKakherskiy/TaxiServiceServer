@@ -7,8 +7,8 @@ import ua.kpi.mobiledev.domain.AdministrationArea;
 import ua.kpi.mobiledev.domain.City;
 import ua.kpi.mobiledev.domain.RoutePoint;
 import ua.kpi.mobiledev.domain.Street;
-import ua.kpi.mobiledev.domain.dto.RoutePointDto;
 import ua.kpi.mobiledev.facade.AddressFacade;
+import ua.kpi.mobiledev.web.dto.RoutePointDto;
 
 import javax.annotation.Resource;
 

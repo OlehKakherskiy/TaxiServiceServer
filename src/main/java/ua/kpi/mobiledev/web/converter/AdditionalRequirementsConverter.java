@@ -3,7 +3,7 @@ package ua.kpi.mobiledev.web.converter;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Car;
 import ua.kpi.mobiledev.domain.Order;
-import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
+import ua.kpi.mobiledev.web.dto.AddReqSimpleDto;
 
 import java.util.List;
 

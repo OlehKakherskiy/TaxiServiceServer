@@ -18,8 +18,8 @@ import org.springframework.web.context.WebApplicationContext;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
-import ua.kpi.mobiledev.domain.dto.OrderStatusDto;
 import ua.kpi.mobiledev.service.OrderService;
+import ua.kpi.mobiledev.web.dto.OrderStatusDto;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

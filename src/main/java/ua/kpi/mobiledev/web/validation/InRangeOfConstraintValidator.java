@@ -1,6 +1,6 @@
 package ua.kpi.mobiledev.web.validation;
 
-import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
+import ua.kpi.mobiledev.web.dto.AddReqSimpleDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

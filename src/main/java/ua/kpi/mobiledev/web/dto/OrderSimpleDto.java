@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.domain.dto;
+package ua.kpi.mobiledev.web.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

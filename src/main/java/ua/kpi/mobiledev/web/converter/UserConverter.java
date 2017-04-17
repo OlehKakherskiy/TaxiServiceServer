@@ -6,10 +6,10 @@ import ua.kpi.mobiledev.domain.DriverLicense;
 import ua.kpi.mobiledev.domain.MobileNumber;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
-import ua.kpi.mobiledev.domain.dto.CarDto;
-import ua.kpi.mobiledev.domain.dto.DriverLicenseDto;
-import ua.kpi.mobiledev.domain.dto.MobileNumberDto;
-import ua.kpi.mobiledev.domain.dto.UserDto;
+import ua.kpi.mobiledev.web.dto.CarDto;
+import ua.kpi.mobiledev.web.dto.DriverLicenseDto;
+import ua.kpi.mobiledev.web.dto.MobileNumberDto;
+import ua.kpi.mobiledev.web.dto.UserDto;
 
 import javax.annotation.Resource;
 import java.util.List;

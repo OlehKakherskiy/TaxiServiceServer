@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.RoutePoint;
 import ua.kpi.mobiledev.domain.TaxiDriver;
-import ua.kpi.mobiledev.domain.dto.AddReqSimpleDto;
-import ua.kpi.mobiledev.domain.dto.OrderDto;
-import ua.kpi.mobiledev.domain.dto.RoutePointDto;
+import ua.kpi.mobiledev.web.dto.AddReqSimpleDto;
+import ua.kpi.mobiledev.web.dto.OrderDto;
+import ua.kpi.mobiledev.web.dto.RoutePointDto;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;

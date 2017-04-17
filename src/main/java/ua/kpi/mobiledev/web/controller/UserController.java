@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
-import ua.kpi.mobiledev.domain.dto.UserDto;
 import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.converter.CustomConverter;
+import ua.kpi.mobiledev.web.dto.UserDto;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.annotation.Resource;

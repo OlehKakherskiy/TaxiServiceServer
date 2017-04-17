@@ -2,7 +2,7 @@ package ua.kpi.mobiledev.web.converter;
 
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Car;
-import ua.kpi.mobiledev.domain.dto.CarDto;
+import ua.kpi.mobiledev.web.dto.CarDto;
 
 import static java.util.Objects.isNull;
 

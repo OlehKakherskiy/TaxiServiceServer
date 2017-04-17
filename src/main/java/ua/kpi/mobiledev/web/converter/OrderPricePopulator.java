@@ -4,8 +4,8 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.RoutePoint;
-import ua.kpi.mobiledev.domain.dto.OrderPriceDto;
-import ua.kpi.mobiledev.domain.dto.RoutePointDto;
+import ua.kpi.mobiledev.web.dto.OrderPriceDto;
+import ua.kpi.mobiledev.web.dto.RoutePointDto;
 
 import javax.annotation.Resource;
 

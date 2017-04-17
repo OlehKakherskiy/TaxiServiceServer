@@ -2,7 +2,7 @@ package ua.kpi.mobiledev.web.converter;
 
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.DriverLicense;
-import ua.kpi.mobiledev.domain.dto.DriverLicenseDto;
+import ua.kpi.mobiledev.web.dto.DriverLicenseDto;
 
 import static java.util.Objects.isNull;
 

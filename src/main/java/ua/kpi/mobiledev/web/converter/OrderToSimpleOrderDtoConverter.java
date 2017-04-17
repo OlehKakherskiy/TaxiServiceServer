@@ -3,7 +3,7 @@ package ua.kpi.mobiledev.web.converter;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.Order;
-import ua.kpi.mobiledev.domain.dto.OrderSimpleDto;
+import ua.kpi.mobiledev.web.dto.OrderSimpleDto;
 
 @Component("simpleOrderDtoConverter")
 public class OrderToSimpleOrderDtoConverter implements CustomConverter<Order, OrderSimpleDto> {
