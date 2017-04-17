@@ -2,7 +2,6 @@ package ua.kpi.mobiledev.web.exceptionHandling;
 
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,18 +57,12 @@ public class ExceptionHandlingAdvice {
     }
 
     private CustomFieldError toCustomFieldError(FieldError fieldError) {
+        Locale locale = getRequestLocale();
         String exceptionMessage;
         try {
-            //TODO: remove this when l10n keys will be reformatted to default message parameters of validation annotations (like in OrderDto)
-            exceptionMessage = messageSource.getMessage(new DefaultMessageSourceResolvable(fieldError.getCodes(),
-                    fieldError.getArguments()), getRequestLocale());
+            exceptionMessage = messageSource.getMessage(fieldError.getDefaultMessage(), fieldError.getArguments(), locale);
         } catch (NoSuchMessageException e) {
-            try {
-                exceptionMessage = messageSource.getMessage(new DefaultMessageSourceResolvable(fieldError.getDefaultMessage()), getRequestLocale());
-            }catch (NoSuchMessageException e1){
-                exceptionMessage = messageSource.getMessage(createMessageResolvable(DEFAULT_VALIDATION_MESSAGE,
-                        new String[]{fieldError.getField()}), getRequestLocale());
-            }
+            exceptionMessage = messageSource.getMessage(DEFAULT_VALIDATION_MESSAGE, new String[]{fieldError.getField()}, locale);
         }
         return new CustomFieldError(fieldError.getField().trim(), fieldError.getDefaultMessage().trim(), exceptionMessage.trim());
     }
@@ -107,19 +100,14 @@ public class ExceptionHandlingAdvice {
     }
 
     private ErrorMessage createErrorMessage(AbstractLocalizedException ex) {
+        Locale locale = getRequestLocale();
         String errorCode = ex.getErrorCode().name();
         String resultMessage;
         try {
-            resultMessage = exceptionMessageSource
-                    .getMessage(createMessageResolvable(errorCode, ex.getParams()), getRequestLocale());
+            resultMessage = exceptionMessageSource.getMessage(errorCode, ex.getParams(), locale);
         } catch (NoSuchMessageException e) {
-            resultMessage = exceptionMessageSource
-                    .getMessage(createMessageResolvable(DEFAULT_EXCEPTION_CODE, new String[]{errorCode}), getRequestLocale());
+            resultMessage = exceptionMessageSource.getMessage(DEFAULT_EXCEPTION_CODE, new String[]{errorCode}, locale);
         }
         return new ErrorMessage(resultMessage.trim());
-    }
-
-    private DefaultMessageSourceResolvable createMessageResolvable(String errorCode, Object[] errorParams) {
-        return new DefaultMessageSourceResolvable(new String[]{errorCode}, errorParams);
     }
 }
