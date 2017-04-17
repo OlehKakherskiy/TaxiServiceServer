@@ -35,32 +35,32 @@ public class UserDto {
     public interface DriverAddMandatoryParams {
     }
 
-    @NotNull(message = "name.required", groups = {AddUserCheck.class, NameCheck.class})
-    @Size(min = 1, max = 45, message = "name.invalidSize", groups = {AddUserCheck.class, NameCheck.class})
+    @NotNull(message = "user.name.required", groups = {AddUserCheck.class, NameCheck.class})
+    @Size(min = 1, max = 45, message = "user.name.invalidSize", groups = {AddUserCheck.class, NameCheck.class})
     private String name;
 
-    @NotNull(message = "email.required", groups = {AddUserCheck.class})
-    @Size(min = 1, max = 100, message = "email.invalidSize", groups = {AddUserCheck.class})
-    @Email(message = "email.invalidFormat", groups = {AddUserCheck.class}, regexp = MAIL_REGEX)
+    @NotNull(message = "user.email.required", groups = {AddUserCheck.class})
+    @Size(min = 1, max = 100, message = "user.email.invalidSize", groups = {AddUserCheck.class})
+    @Email(message = "user.email.invalidFormat", groups = {AddUserCheck.class}, regexp = MAIL_REGEX)
     private String email;
 
-    @NotNull(message = "password.required", groups = {AddUserCheck.class})
-    @Size(min = 1, max = 100, groups = {AddUserCheck.class})
+    @NotNull(message = "user.password.required", groups = {AddUserCheck.class})
+    @Size(min = 1, max = 100, message = "user.password.invalidSize", groups = {AddUserCheck.class})
     private String password;
 
-    @NotNull(message = "mobileNumbers.required", groups = {AddUserCheck.class})
-    @Size(min = 1, message = "mobileNumbers.atLeastOne", groups = {AddUserCheck.class})
+    @NotNull(message = "user.mobileNumbers.required", groups = {AddUserCheck.class})
+    @Size(min = 1, message = "user.mobileNumbers.atLeastOne", groups = {AddUserCheck.class})
     @Valid
     private List<MobileNumberDto> mobileNumbers;
 
-    @NotNull(message = "userType.required")
+    @NotNull(message = "user.userType.required")
     private User.UserType userType;
 
     @Valid
-    @NotNull(message = "car.required", groups = DriverAddMandatoryParams.class)
+    @NotNull(message = "user.car.required", groups = DriverAddMandatoryParams.class)
     private CarDto car;
 
     @Valid
-    @NotNull(message = "driverLicense.required", groups = DriverAddMandatoryParams.class)
+    @NotNull(message = "user.driverLicense.required", groups = DriverAddMandatoryParams.class)
     private DriverLicenseDto driverLicense;
 }

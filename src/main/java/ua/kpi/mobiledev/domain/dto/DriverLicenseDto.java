@@ -39,7 +39,8 @@ public class DriverLicenseDto {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @NotNull(groups = UserDto.AddUserCheck.class, message = "driverLicense.expirationTime.required")
-    @FutureTime(groups = {UserDto.AddUserCheck.class, DriverLicenseDto.DriverLicenseExpirationTimeCheck.class}, message = "driverLicense.expirationTime.notFuture")
+    @FutureTime(groups = {UserDto.AddUserCheck.class, DriverLicenseDto.DriverLicenseExpirationTimeCheck.class},
+            message = "driverLicense.expirationTime.notFuture")
     private LocalDate expirationTime;
 
     private MultipartFile frontSideScan;

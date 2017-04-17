@@ -96,14 +96,14 @@ public class ExceptionHandlingAdviceTest {
     public void shouldReturnResponseWithInvalidFieldList() {
         BindingResult bindingResult = mock(BindingResult.class);
         List<FieldError> fieldErrors = asList(
-                createFieldError("Email.userDto.email", "Email.userDto.email"),
+                createFieldError("user.email.invalidFormat", "user.email.invalidFormat"),
                 createFieldError("additionalRequirement.idValue.carType", "additionalRequirement.idValue.carType"));
         when(bindingResult.getFieldErrors()).thenReturn(fieldErrors);
 
         MethodArgumentNotValidException thrown = new MethodArgumentNotValidException(null, bindingResult);
 
         List<CustomFieldError> fieldErrorList = asList(
-                new CustomFieldError("fieldName", "Email.userDto.email", "Email has incorrect format"),
+                new CustomFieldError("fieldName", "user.email.invalidFormat", "Email has incorrect format"),
                 new CustomFieldError("fieldName", "additionalRequirement.idValue.carType", "Wrong id value of 'car type' requirement. " +
                         "Valid values : 0 - truck, 1 - passenger car, 2 - minibus")
         );

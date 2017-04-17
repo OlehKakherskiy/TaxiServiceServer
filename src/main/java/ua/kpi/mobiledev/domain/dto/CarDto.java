@@ -36,23 +36,23 @@ public class CarDto {
     public interface CarTypeCheck {
     }
 
-    @NotNull(message = "model.required", groups = UserDto.AddUserCheck.class)
-    @Size(min = 1, max = 20, message = "model.invalidNameSize", groups = {UserDto.AddUserCheck.class, CarModelCheck.class})
+    @NotNull(message = "car.model.required", groups = UserDto.AddUserCheck.class)
+    @Size(min = 1, max = 20, message = "car.model.invalidSize", groups = {UserDto.AddUserCheck.class, CarModelCheck.class})
     private String model;
 
-    @NotNull(message = "manufacturer.required", groups = UserDto.AddUserCheck.class)
-    @Size(min = 1, max = 20, message = "manufacturer.invalidNameSize", groups = {UserDto.AddUserCheck.class, CarManufacturerCheck.class})
+    @NotNull(message = "car.manufacturer.required", groups = UserDto.AddUserCheck.class)
+    @Size(min = 1, max = 20, message = "car.manufacturer.invalidSize", groups = {UserDto.AddUserCheck.class, CarManufacturerCheck.class})
     private String manufacturer;
 
-    @Size(min = 1, max = 20, message = "plateNumber.invalidNameSize", groups = {UserDto.AddUserCheck.class, PlateNumberCheck.class})
+    @Size(min = 1, max = 20, message = "car.plateNumber.invalidNameSize", groups = {UserDto.AddUserCheck.class, PlateNumberCheck.class})
     @Pattern(regexp = "^([\u0410-\u042f]{2} \\d{4} [\u0410-\u042f]{2})|(\\d{3}-\\d{2} [\u0410-\u042f]{2})$"
-            , message = "plateNumber.invalidFormat", groups = {UserDto.AddUserCheck.class, PlateNumberCheck.class})
+            , message = "car.plateNumber.invalidFormat", groups = {UserDto.AddUserCheck.class, PlateNumberCheck.class})
     private String plateNumber;
 
-    @NotNull(message = "seatsNumber.required", groups = UserDto.AddUserCheck.class)
-    @Min(value = 1, message = "seatsNumber.negativeValue", groups = {UserDto.AddUserCheck.class, SeatsNumberCheck.class})
+    @NotNull(message = "car.seatsNumber.required", groups = UserDto.AddUserCheck.class)
+    @Min(value = 1, message = "car.seatsNumber.wrongValue", groups = {UserDto.AddUserCheck.class, SeatsNumberCheck.class})
     private Integer seatsNumber;
 
-    @NotNull(message = "carType.required", groups = {UserDto.AddUserCheck.class, CarTypeCheck.class})
+    @NotNull(message = "car.carType.required", groups = {UserDto.AddUserCheck.class, CarTypeCheck.class})
     private Car.CarType carType;
 }
