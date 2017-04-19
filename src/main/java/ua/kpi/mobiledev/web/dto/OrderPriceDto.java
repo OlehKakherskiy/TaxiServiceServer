@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -18,10 +19,8 @@ import static java.util.Collections.emptyList;
 @NoArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@GroupSequence({RoutePointDto.FullRoutePointCheck.class, AddReqSimpleDto.AdditionalRequirementCheck.class, OrderPriceDto.class})
 public class OrderPriceDto {
-
-    public interface PriceInfoCheck extends RoutePointDto.FullRoutePointCheck, AddReqSimpleDto.AdditionalRequirementCheck {
-    }
 
     @Valid
     private List<RoutePointDto> routePoints = emptyList();

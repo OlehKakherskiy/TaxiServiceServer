@@ -13,6 +13,7 @@ import ua.kpi.mobiledev.web.dto.RoutePointDto;
 import javax.annotation.Resource;
 
 import static java.lang.Double.parseDouble;
+import static java.util.Objects.isNull;
 
 @Component("routePointConverter")
 @Setter
@@ -25,9 +26,12 @@ public class RoutePointConverter implements CustomConverter<RoutePointDto, Route
     public void convert(RoutePointDto routePointDto, RoutePoint routePoint) {
         routePoint.setRoutePointId(routePointDto.getRoutePointId());
         routePoint.setRoutePointPosition(routePointDto.getRoutePointIndex());
-        routePoint.setAddress(addressFacade.createAndGet(routePointDto));
         routePoint.setLatitude(routePointDto.getLatitude() == null ? null : parseDouble(routePointDto.getLatitude()));
         routePoint.setLongtitude(routePointDto.getLongtitude() == null ? null : parseDouble(routePointDto.getLongtitude()));
+        if(isNull(routePoint.getLatitude()) || isNull(routePoint.getLongtitude())){
+            return;
+        }
+        routePoint.setAddress(addressFacade.createAndGet(routePointDto));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Email;
@@ -10,11 +11,13 @@ import ua.kpi.mobiledev.web.validation.groupprovider.UserDtoGroupProvider;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @GroupSequenceProvider(UserDtoGroupProvider.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
     private static final String MAIL_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"" +
@@ -29,7 +32,7 @@ public class UserDto {
     public interface NameCheck {
     }
 
-    public interface AddUserCheck extends DriverAddMandatoryParams {
+    public interface AddUserCheck extends Default {
     }
 
     public interface DriverAddMandatoryParams {

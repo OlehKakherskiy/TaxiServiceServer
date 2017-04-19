@@ -15,6 +15,7 @@ public class MobileNumberConverter implements CustomConverter<MobileNumber, Mobi
 
     @Override
     public void reverseConvert(MobileNumberDto source, MobileNumber target) {
+        target.setIdMobileNumber(source.getIdMobileNumber());
         target.setMobileNumber(source.getMobileNumber());
     }
 }

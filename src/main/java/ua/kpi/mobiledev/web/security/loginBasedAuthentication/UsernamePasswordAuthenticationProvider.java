@@ -19,6 +19,7 @@ import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 import java.util.Collection;
 import java.util.Objects;
 
+import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Component(value = "userCredentialsProvider")
@@ -41,7 +42,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
         final UserDetails userDetails = getByUserName(userName);
         final String password = (String) authentication.getCredentials();
 
-        if (invalidPassword(password, userDetails.getPassword())) {
+        if (isNull(userDetails) || invalidPassword(password, userDetails.getPassword())) {
             throw new HttpClientErrorException(BAD_REQUEST, "Authentication Failed. Username or Password not valid.");
         }
         User user = getFullInfoByUserName(userName);

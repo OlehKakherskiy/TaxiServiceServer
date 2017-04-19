@@ -69,7 +69,7 @@ public class OrderController {
 
     @RequestMapping(value = "/order/price", method = RequestMethod.POST)
     @ResponseStatus(OK)
-    public OrderPriceDto calculatePrice(@RequestBody @Validated(OrderPriceDto.PriceInfoCheck.class) OrderPriceDto orderPriceDto) {
+    public OrderPriceDto calculatePrice(@RequestBody @Validated OrderPriceDto orderPriceDto) {
         Order orderWithPriceData = new Order();
         orderPricePopulator.convert(orderPriceDto, orderWithPriceData);
         Double price = orderService.calculatePrice(orderWithPriceData);
