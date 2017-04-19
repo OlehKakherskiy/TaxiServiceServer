@@ -21,7 +21,8 @@ public class GoogleMapsDistanceDeserializer extends JsonDeserializer<GoogleMapsD
     public GoogleMapsDistanceResponse deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         TreeNode rowsElement = jsonParser.getCodec().readTree(jsonParser).get(ROWS);
         ArrayNode elementsNode = (ArrayNode) rowsElement.get(FIRST_NODE).get(ELEMENTS);
-        ObjectNode distanceNode = (ObjectNode) elementsNode.get(FIRST_NODE).get(DISTANCE);
+        int lastNodeIndex = elementsNode.size() - 1;
+        ObjectNode distanceNode = (ObjectNode) elementsNode.get(lastNodeIndex).get(DISTANCE);
         return new GoogleMapsDistanceResponse(distanceNode.get(VALUE_FIELD).asDouble());
     }
 }

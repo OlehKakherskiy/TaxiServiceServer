@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class GoogleMapsClientServiceImplTest {
+public class GoogleMapsClientServiceTest {
 
     private static final String CALCULATE_DISTANCE_URL = "https://maps.googleapis.com/maps/api/distancematrix/" +
             "json?units=metric&origins={origins}&destinations={destinations}";
