@@ -226,13 +226,7 @@ Request body:
   "comment" : "String",
   "routePoints":[{
     "latitude":"String",
-    "longtitude":"String",
-    //TODO: will be removed
-    "adminArea":"String",
-    "street":"String",
-    "houseNumber":"String",
-    "city":"String"
-    //TODO: end of will be removed
+    "longtitude":"String"
   }],
   "additionalRequirements" : [{
     "reqId" : "Integer",

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="userRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.UserRepository"/>
+    </bean>
+
+    <bean id="orderRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.OrderRepository"/>
+    </bean>
+
+    <bean id="districtRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.DistrictRepository"/>
+    </bean>
+
+    <bean id="cityRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.CityRepository"/>
+    </bean>
+
+    <bean id="adminAreaRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.AdminAreaRepository"/>
+    </bean>
+
+    <bean id="addressRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.AddressRepository"/>
+    </bean>
+
+    <bean id="streetRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.StreetRepository"/>
+    </bean>
+
+    <bean id="securityDetailsRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.web.security.service.CustomUserDetailsService"/>
+    </bean>
+
+    <bean id="hibernateLazyInitializationUtil" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.util.LazyInitializationUtil"/>
+    </bean>
+
+</beans>
