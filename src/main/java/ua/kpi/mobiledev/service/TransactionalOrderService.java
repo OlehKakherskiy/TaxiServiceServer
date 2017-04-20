@@ -38,7 +38,7 @@ import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
 public class TransactionalOrderService implements OrderService {
 
     @Resource(name = "orderRepository")
-    private OrderRepository<Order, Long> orderRepository;
+    private OrderRepository orderRepository;
 
     @Resource(name = "userService")
     private UserService userService;

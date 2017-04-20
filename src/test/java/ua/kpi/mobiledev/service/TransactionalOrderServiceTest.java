@@ -61,7 +61,7 @@ public class TransactionalOrderServiceTest {
     private static final long ORDER_ID = 1L;
 
     @Mock
-    private OrderRepository<Order, Long> orderRepository;
+    private OrderRepository orderRepository;
     @Mock
     private UserService userService;
     @Mock

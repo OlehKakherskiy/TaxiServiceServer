@@ -2,6 +2,8 @@ package ua.kpi.mobiledev.service;
 
 import ua.kpi.mobiledev.domain.Street;
 
+import java.util.Optional;
+
 public interface StreetService {
-    Street getStreet(String streetName, String cityName);
+    Optional<Street> getStreet(String streetName, String cityName);
 }

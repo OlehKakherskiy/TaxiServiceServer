@@ -11,7 +11,6 @@ import ua.kpi.mobiledev.repository.AddressRepository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -29,11 +28,11 @@ public class AddressServiceTest {
     @Mock
     private AddressRepository addressRepository;
 
-    private AddressServiceImpl addressService;
+    private TransactionalAddressService addressService;
 
     @Before
     public void setUp() throws Exception {
-        addressService = new AddressServiceImpl();
+        addressService = new TransactionalAddressService();
         addressService.setAddressRepository(addressRepository);
     }
 
@@ -41,7 +40,7 @@ public class AddressServiceTest {
     public void shouldGetExistedAddress() {
         when(addressRepository.customGet(STREET_NAME, HOUSE_NUM)).thenReturn(ADDRESS);
 
-        assertThat(addressService.getAddress(STREET_NAME, HOUSE_NUM), is(ADDRESS));
+        assertThat(addressService.getAddress(STREET_NAME, HOUSE_NUM).get(), is(ADDRESS));
         verify(addressRepository).customGet(STREET_NAME, HOUSE_NUM);
         verifyNoMoreInteractions(addressRepository);
     }
@@ -50,7 +49,7 @@ public class AddressServiceTest {
     public void shouldReturnNullIfNoAddressExists() {
         when(addressRepository.customGet(STREET_NAME, HOUSE_NUM)).thenReturn(null);
 
-        assertThat(addressService.getAddress(STREET_NAME, HOUSE_NUM), is(nullValue()));
+        assertThat(addressService.getAddress(STREET_NAME, HOUSE_NUM).isPresent(), is(false));
         verify(addressRepository).customGet(STREET_NAME, HOUSE_NUM);
         verifyNoMoreInteractions(addressRepository);
     }
@@ -59,7 +58,7 @@ public class AddressServiceTest {
     public void shouldAddAddress() {
         when(addressRepository.save(NOT_PERSISTED_ADDRESS)).thenReturn(ADDRESS);
 
-        assertThat(addressService.addAddress(STREET_MOCK, HOUSE_NUM), is(ADDRESS));
+        assertThat(addressService.addAddress(NOT_PERSISTED_ADDRESS), is(ADDRESS));
         verify(addressRepository).save(NOT_PERSISTED_ADDRESS);
         verifyNoMoreInteractions(addressRepository);
     }

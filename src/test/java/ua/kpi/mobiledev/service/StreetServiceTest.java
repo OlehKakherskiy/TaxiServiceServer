@@ -35,6 +35,6 @@ public class StreetServiceTest {
     public void shouldReturnStreet() {
         when(streetRepository.customGet(STREET, CITY)).thenReturn(STREET_MOCK);
 
-        assertThat(streetService.getStreet(STREET, CITY), is(STREET_MOCK));
+        assertThat(streetService.getStreet(STREET, CITY).get(), is(STREET_MOCK));
     }
 }

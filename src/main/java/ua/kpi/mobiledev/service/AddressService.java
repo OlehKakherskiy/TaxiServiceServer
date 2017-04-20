@@ -1,9 +1,10 @@
 package ua.kpi.mobiledev.service;
 
 import ua.kpi.mobiledev.domain.Address;
-import ua.kpi.mobiledev.domain.Street;
+
+import java.util.Optional;
 
 public interface AddressService {
-    Address getAddress(String streetName, String houseNumber);
-    Address addAddress(Street street, String houseNumber);
+    Optional<Address> getAddress(String streetName, String houseNumber);
+    Address addAddress(Address address);
 }

@@ -57,7 +57,7 @@ public class TransactionalUserServiceTest {
     private static final int CAR_ID = 1;
 
     @Mock
-    private UserRepository<User, Integer> userRepositoryMock;
+    private UserRepository userRepositoryMock;
     @Mock
     private LazyInitializationUtil lazyInitializationUtilMock;
     @Mock

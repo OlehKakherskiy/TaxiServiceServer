@@ -43,12 +43,12 @@ import static ua.kpi.mobiledev.exception.ErrorCode.USER_NOT_FOUND_WITH_ID;
 public class TransactionalUserService implements UserService {
 
     private static final Predicate<MobileNumber> IS_NEW_NUMBER = mobileNumber -> isNull(mobileNumber.getIdMobileNumber());
-    private UserRepository<User, Integer> userRepository;
+    private UserRepository userRepository;
     private CustomUserDetailsService securityDetailsRepository;
     private LazyInitializationUtil lazyInitializationUtil;
 
     @Autowired
-    public TransactionalUserService(UserRepository<User, Integer> userRepository, CustomUserDetailsService securityDetailsRepository,
+    public TransactionalUserService(UserRepository userRepository, CustomUserDetailsService securityDetailsRepository,
                                     LazyInitializationUtil lazyInitializationUtil) {
         this.userRepository = userRepository;
         this.securityDetailsRepository = securityDetailsRepository;

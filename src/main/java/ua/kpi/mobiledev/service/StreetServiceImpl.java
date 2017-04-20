@@ -6,6 +6,7 @@ import ua.kpi.mobiledev.domain.Street;
 import ua.kpi.mobiledev.repository.StreetRepository;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 @Service("streetService")
 @Setter
@@ -15,7 +16,7 @@ public class StreetServiceImpl implements StreetService {
     private StreetRepository streetRepository;
 
     @Override
-    public Street getStreet(String streetName, String cityName) {
-        return streetRepository.customGet(streetName, cityName);
+    public Optional<Street> getStreet(String streetName, String cityName) {
+        return Optional.ofNullable(streetRepository.customGet(streetName, cityName));
     }
 }
