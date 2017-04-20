@@ -1,12 +1,13 @@
-package ua.kpi.mobiledev.repository;
+package ua.kpi.mobiledev.repository.inmem;
 
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Address;
+import ua.kpi.mobiledev.repository.AddressRepository;
 
 import javax.annotation.Resource;
 
 @Component("addressRepository")
-public class InMemAddressRepository implements AddressRepository<Address, Long> {
+public class InMemAddressRepository implements AddressRepository {
 
     @Resource(name = "dbMock")
     private DBMock dbMock;

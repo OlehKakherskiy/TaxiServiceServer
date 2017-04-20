@@ -1,15 +1,16 @@
-package ua.kpi.mobiledev.repository;
+package ua.kpi.mobiledev.repository.inmem;
 
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.repository.UserRepository;
 
 import javax.annotation.Resource;
 
 import static java.util.Objects.isNull;
 
 @Repository("userRepository")
-public class InMemUserRepository implements UserRepository<User, Integer> {
+public class InMemUserRepository implements UserRepository {
 
     @Resource
     private DBMock dbMock;

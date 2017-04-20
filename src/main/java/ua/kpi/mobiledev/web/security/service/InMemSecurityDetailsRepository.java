@@ -4,7 +4,7 @@ import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import ua.kpi.mobiledev.repository.DBMock;
+import ua.kpi.mobiledev.repository.inmem.DBMock;
 import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 
 import javax.annotation.Resource;

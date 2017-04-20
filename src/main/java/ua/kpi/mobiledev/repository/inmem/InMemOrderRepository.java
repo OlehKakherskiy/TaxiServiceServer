@@ -1,8 +1,9 @@
-package ua.kpi.mobiledev.repository;
+package ua.kpi.mobiledev.repository.inmem;
 
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.repository.OrderRepository;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -12,7 +13,7 @@ import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
 @Repository("orderRepository")
-public class InMemOrderRepository implements OrderRepository<Order, Long> {
+public class InMemOrderRepository implements OrderRepository {
 
     @Resource
     private DBMock dbMock;

@@ -8,7 +8,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <!--TODO: uncomment repoContext if wanna integrate with ORM layer-->
-        <param-value><!--classpath:/repoContext.xml--> classpath:/appContext.xml classpath:/RESTContext.xml
+        <param-value>classpath:/repoContext.xml classpath:/appContext.xml classpath:/RESTContext.xml
             classpath:/security.xml
         </param-value>
     </context-param>

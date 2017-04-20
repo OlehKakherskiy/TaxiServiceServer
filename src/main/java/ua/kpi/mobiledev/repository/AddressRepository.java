@@ -1,7 +1,12 @@
 package ua.kpi.mobiledev.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import ua.kpi.mobiledev.domain.Address;
 
-public interface AddressRepository<Address, T extends Long> extends CrudRepository<Address, Long> {
-    Address customGet(String streetName, String houseNumber);
+public interface AddressRepository extends CrudRepository<Address, Long> {
+
+    @Query("Select addr from Address addr where addr.houseNumber = :houseNumber and addr.street.streetName = :streetName")
+    Address customGet(@Param("streetName") String streetName, @Param("houseNumber") String houseNumber);
 }

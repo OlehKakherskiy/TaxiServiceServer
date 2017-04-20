@@ -7,43 +7,44 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!--TODO: uncomment if wanna to integrate with DB layer-->
-    <!--<import resource="repoContext.xml"/>-->
-    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+    <beans xmlns:tx="http://www.springframework.org/schema/tx" xsi:schemaLocation="http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd" profile="prod;local">
+        <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <!--<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">-->
-        <!--<property name="entityManagerFactory" ref="entityManagerFactory"/>-->
-    <!--</bean>-->
-    <context:component-scan base-package="ua.kpi.mobiledev.repository"/>
-    <!--TODO: end of uncomment if wanna to integrate with DB layer-->
+        <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+            <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        </bean>
+    </beans>
 
-    <context:component-scan base-package="ua.kpi.mobiledev.service"/>
-    <context:component-scan base-package="ua.kpi.mobiledev.domain"/>
-    <context:component-scan base-package="ua.kpi.mobiledev.util"/>
-    <context:component-scan base-package="ua.kpi.mobiledev.facade"/>
-    <context:property-placeholder system-properties-mode="OVERRIDE"
-                                  location="classpath:app.properties"
-                                  ignore-unresolvable="true"/>
+    <beans>
+        <context:component-scan base-package="ua.kpi.mobiledev.service"/>
+        <context:component-scan base-package="ua.kpi.mobiledev.domain"/>
+        <context:component-scan base-package="ua.kpi.mobiledev.util"/>
+        <context:component-scan base-package="ua.kpi.mobiledev.facade"/>
+        <context:property-placeholder system-properties-mode="OVERRIDE"
+                                      location="classpath:app.properties"
+                                      ignore-unresolvable="true"/>
 
-    <bean id="priceCalculationManager"
-          class="ua.kpi.mobiledev.domain.priceCalculationManagement.StrategicalPriceCalculationManager">
-        <constructor-arg name="calculationStrategies">
-            <util:list list-class="java.util.ArrayList"
-                       value-type="ua.kpi.mobiledev.domain.priceCalculationManagement.CalculationStrategy">
-                <ref bean="carTypePriceCalculationStrategy"/>
-            </util:list>
-        </constructor-arg>
-        <constructor-arg name="kmPrice" value="${kmPrice}"/>
-    </bean>
+        <bean id="priceCalculationManager"
+              class="ua.kpi.mobiledev.domain.priceCalculationManagement.StrategicalPriceCalculationManager">
+            <constructor-arg name="calculationStrategies">
+                <util:list list-class="java.util.ArrayList"
+                           value-type="ua.kpi.mobiledev.domain.priceCalculationManagement.CalculationStrategy">
+                    <ref bean="carTypePriceCalculationStrategy"/>
+                </util:list>
+            </constructor-arg>
+            <constructor-arg name="kmPrice" value="${kmPrice}"/>
+        </bean>
 
-    <bean id="carTypePriceCalculationStrategy"
-          class="ua.kpi.mobiledev.domain.priceCalculationManagement.calculationStrategy.CarTypePriceCalculationStrategy">
-        <constructor-arg name="multiplyCoefficients">
-            <util:map key-type="ua.kpi.mobiledev.domain.Car.CarType" value-type="java.lang.Double">
-                <entry key="TRUCK" value="${addRequirement.carType.truckPriceMultiplication}"/>
-                <entry key="PASSENGER_CAR" value="${addRequirement.carType.passengerCarMultiplication}"/>
-                <entry key="MINIBUS" value="${addRequirement.carType.minibusMultiplication}"/>
-            </util:map>
-        </constructor-arg>
-    </bean>
+        <bean id="carTypePriceCalculationStrategy"
+              class="ua.kpi.mobiledev.domain.priceCalculationManagement.calculationStrategy.CarTypePriceCalculationStrategy">
+            <constructor-arg name="multiplyCoefficients">
+                <util:map key-type="ua.kpi.mobiledev.domain.Car.CarType" value-type="java.lang.Double">
+                    <entry key="TRUCK" value="${addRequirement.carType.truckPriceMultiplication}"/>
+                    <entry key="PASSENGER_CAR" value="${addRequirement.carType.passengerCarMultiplication}"/>
+                    <entry key="MINIBUS" value="${addRequirement.carType.minibusMultiplication}"/>
+                </util:map>
+            </constructor-arg>
+        </bean>
+    </beans>
 </beans>

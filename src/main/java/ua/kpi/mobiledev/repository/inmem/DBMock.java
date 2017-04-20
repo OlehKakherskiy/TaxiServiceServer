@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.repository;
+package ua.kpi.mobiledev.repository.inmem;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
