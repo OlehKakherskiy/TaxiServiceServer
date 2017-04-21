@@ -13,6 +13,7 @@ import ua.kpi.mobiledev.web.dto.RoutePointDto;
 import javax.annotation.Resource;
 
 import static java.lang.Double.parseDouble;
+import static java.util.Objects.isNull;
 
 @Component("routePointConverter")
 @Setter
