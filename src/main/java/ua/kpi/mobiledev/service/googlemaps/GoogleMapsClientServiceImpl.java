@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
 import static ua.kpi.mobiledev.exception.ErrorCode.INVALID_ROUTE_POINT_COUNT;
 
 @Service("googleMapsService")
@@ -23,7 +22,6 @@ public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
     private static final String ORIGINS = "origins";
     private static final String DESTINATIONS = "destinations";
     private static final String GEOGRAPHICAL_POINT_TEMPLATE = "%s,%s";
-    private static final String DELIMITER = "|";
     private static final String CALCULATE_DISTANCE_URL = format("https://maps.googleapis.com/maps/api/distancematrix/" +
             "json?units=metric&origins={%s}&destinations={%s}", ORIGINS, DESTINATIONS);
 
@@ -34,7 +32,6 @@ public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
 
     private static final int FIRST = 0;
     private static final int MINIMAL_COUNT = 2;
-    private static final int TO_KILOMETERS = 1000;
 
     @Resource(name = "googleMapsRequestHelper")
     private GoogleMapsRequestHelper googleMapsRequestHelper;
@@ -42,13 +39,23 @@ public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
     @Resource(name = "addressInfoToDtoConverter")
     private CustomConverter<AddressInfo, AddressDto> addressInfoToDtoConverter;
 
-    public double calculateDistance(List<GeographicalPoint> geographicalPoints) {
+    public GoogleMapsRouteResponse calculateDistance(List<GeographicalPoint> geographicalPoints) {
         checkPointList(geographicalPoints);
-
-        GoogleMapsDistanceResponse response = googleMapsRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL,
-                GoogleMapsDistanceResponse.class, prepareUrlParams(geographicalPoints));
-
-        return response.getDistance() / TO_KILOMETERS;
+        List<GoogleMapsRouteResponse> routeParts = new ArrayList<>();
+        for (int i = 0; i < geographicalPoints.size() - 1; i++) {
+            GeographicalPoint currentPoint = geographicalPoints.get(i);
+            GeographicalPoint nextPoint = geographicalPoints.get(i + 1);
+            GoogleMapsRouteResponse routePartResponse = googleMapsRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL,
+                    GoogleMapsRouteResponse.class, prepareUrlParams(currentPoint, nextPoint));
+            routeParts.add(routePartResponse);
+        }
+        int sumDistance = 0;
+        int sumDuration = 0;
+        for (GoogleMapsRouteResponse routeResponse : routeParts) {
+            sumDistance += routeResponse.getDistance();
+            sumDuration += routeResponse.getDuration();
+        }
+        return new GoogleMapsRouteResponse(sumDistance, sumDuration);
     }
 
     private void checkPointList(List<GeographicalPoint> geographicalPoints) {
@@ -57,21 +64,11 @@ public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
         }
     }
 
-    private Map<String, ?> prepareUrlParams(List<GeographicalPoint> geographicalPoints) {
+    private Map<String, ?> prepareUrlParams(GeographicalPoint... geographicalPoints) {
         Map<String, String> urlParams = new HashMap<>();
-        String origin = convertPoint(geographicalPoints.get(FIRST));
-        String destinations = removeFirstPoint(geographicalPoints).stream()
-                .map(this::convertPoint)
-                .collect(joining(DELIMITER));
-        urlParams.put(ORIGINS, origin);
-        urlParams.put(DESTINATIONS, destinations);
+        urlParams.put(ORIGINS, convertPoint(geographicalPoints[0]));
+        urlParams.put(DESTINATIONS, convertPoint(geographicalPoints[1]));
         return urlParams;
-    }
-
-    private List<GeographicalPoint> removeFirstPoint(List<GeographicalPoint> geographicalPoints) {
-        List<GeographicalPoint> points = new ArrayList<>(geographicalPoints);
-        points.remove(FIRST);
-        return points;
     }
 
     private String convertPoint(GeographicalPoint point) {

@@ -9,20 +9,28 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 
-public class GoogleMapsDistanceDeserializer extends JsonDeserializer<GoogleMapsDistanceResponse> {
+public class GoogleMapsRouteDeserializer extends JsonDeserializer<GoogleMapsRouteResponse> {
 
     private static final String ROWS = "rows";
     private static final String ELEMENTS = "elements";
     private static final String DISTANCE = "distance";
+    private static final String DURATION = "duration";
     private static final int FIRST_NODE = 0;
     private static final String VALUE_FIELD = "value";
 
     @Override
-    public GoogleMapsDistanceResponse deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+    public GoogleMapsRouteResponse deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         TreeNode rowsElement = jsonParser.getCodec().readTree(jsonParser).get(ROWS);
         ArrayNode elementsNode = (ArrayNode) rowsElement.get(FIRST_NODE).get(ELEMENTS);
-        int lastNodeIndex = elementsNode.size() - 1;
-        ObjectNode distanceNode = (ObjectNode) elementsNode.get(lastNodeIndex).get(DISTANCE);
-        return new GoogleMapsDistanceResponse(distanceNode.get(VALUE_FIELD).asDouble());
+        ObjectNode elementNode = (ObjectNode) elementsNode.get(FIRST_NODE);
+        return new GoogleMapsRouteResponse(getDistance(elementNode), getDuration(elementNode));
+    }
+
+    private int getDistance(ObjectNode elementNode) {
+        return elementNode.get(DISTANCE).get(VALUE_FIELD).asInt();
+    }
+
+    private int getDuration(ObjectNode elementNode) {
+        return elementNode.get(DURATION).get(VALUE_FIELD).asInt();
     }
 }

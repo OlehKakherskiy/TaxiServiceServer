@@ -89,7 +89,7 @@ public class TransactionalOrderServiceTest {
     @Before
     public void initOrderService() {
         when(userService.getById(CUSTOMER_ID)).thenReturn(customer);
-        when(googleMapsClientService.calculateDistance(anyList())).thenReturn(100.0);
+        when(googleMapsClientService.calculateDistance(anyList())).thenReturn(null);
         orderService = new TransactionalOrderService();
         orderService.setOrderRepository(orderRepository);
         orderService.setOrderStatusManager(transitionManager);
@@ -309,8 +309,7 @@ public class TransactionalOrderServiceTest {
     }
 
     @Test
-    @Ignore
-    public void shouldReturnZeroWhenCalculatePriceOfNull() {
+    public void shouldDefaultValuesWhenCalculatePriceOfNull() {
         assertThat(orderService.calculatePrice(null), is(0.0));
     }
 
