@@ -55,6 +55,7 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
         target.setPrice(source.getPrice());
         target.setDistance(source.getDistance());
         target.setExtraPrice(source.getExtraPrice());
+        target.setDuration(source.getDuration());
         convertRoutePoints(source, target);
         convertAdditionalRequirements(source, target);
     }

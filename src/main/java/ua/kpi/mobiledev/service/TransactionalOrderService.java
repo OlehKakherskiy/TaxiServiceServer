@@ -14,9 +14,13 @@ import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
 import ua.kpi.mobiledev.service.googlemaps.GeographicalPoint;
 import ua.kpi.mobiledev.service.googlemaps.GoogleMapsClientService;
+import ua.kpi.mobiledev.service.googlemaps.GoogleMapsRouteResponse;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -37,6 +41,8 @@ import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
 @Service("orderService")
 public class TransactionalOrderService implements OrderService {
 
+    private static final double TO_KILOMETERS = 1000.0;
+
     @Resource(name = "orderRepository")
     private OrderRepository orderRepository;
 
@@ -56,18 +62,11 @@ public class TransactionalOrderService implements OrderService {
     @Transactional
     public Order addOrder(Order order, Integer userId) {
         order.setCustomer(checkIfCustomer(findUser(userId)));
-        order.setDistance(calculateDistance(order));
+        getOrderRouteParams(order);
         for (int i = 0; i < order.getRoutePoints().size(); i++) {
             order.getRoutePoints().get(i).setRoutePointPosition(i);
         }
-        return orderRepository.save(priceCalculationManager.calculateOrderPrice(order));
-    }
-
-    private Double calculateDistance(Order order) {
-        List<GeographicalPoint> geographicalPoints = order.getRoutePoints().stream()
-                .map(routePoint -> new GeographicalPoint(routePoint.getLatitude(), routePoint.getLongtitude()))
-                .collect(toList());
-        return googleMapsService.calculateDistance(geographicalPoints);
+        return orderRepository.save(order);
     }
 
     private User checkIfCustomer(User user) {
@@ -82,11 +81,33 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
-    public Double calculatePrice(Order notCompletedOrder) {
-        notCompletedOrder.setDistance(calculateDistance(notCompletedOrder));
-        return isNull(notCompletedOrder)
-                ? 0.0
-                : priceCalculationManager.calculateOrderPrice(notCompletedOrder).getPrice();
+    public Order getOrderRouteParams(Order notCompletedOrder) {
+        if (isNull(notCompletedOrder)) {
+            return new Order();
+        }
+
+        GoogleMapsRouteResponse routeParams = getDistanceAndDuration(notCompletedOrder);
+        notCompletedOrder.setDistance(convertDistanceToKilometers(routeParams.getDistance()));
+        notCompletedOrder.setDuration(LocalTime.ofSecondOfDay(routeParams.getDuration()));
+        notCompletedOrder.setPrice(calculateOrderPrice(notCompletedOrder));
+
+        return notCompletedOrder;
+    }
+
+    private GoogleMapsRouteResponse getDistanceAndDuration(Order order) {
+        List<GeographicalPoint> geographicalPoints = order.getRoutePoints().stream()
+                .map(routePoint -> new GeographicalPoint(routePoint.getLatitude(), routePoint.getLongtitude()))
+                .collect(toList());
+        return googleMapsService.calculateDistance(geographicalPoints);
+    }
+
+    private double convertDistanceToKilometers(Integer distanceInMeters) {
+        return distanceInMeters / TO_KILOMETERS;
+    }
+
+    private double calculateOrderPrice(Order order) {
+        Double orderPrice = priceCalculationManager.calculateOrderPrice(order).getPrice();
+        return new BigDecimal(orderPrice).setScale(2, RoundingMode.UP).doubleValue();
     }
 
     @Override
@@ -149,12 +170,15 @@ public class TransactionalOrderService implements OrderService {
         updateParameterIfPresent(orderPrototype.getComment(), originalOrder::setComment);
         updateParameterIfPresent(orderPrototype.getPaymentMethod(), originalOrder::setPaymentMethod);
         updateParameterIfPresent(orderPrototype.getCarType(), originalOrder::setCarType);
+
         boolean routeWasUpdated = updateRoutePoints(orderPrototype.getRoutePoints(), originalOrder);
         if (routeWasUpdated) {
-            originalOrder.setDistance(calculateDistance(originalOrder));
+            GoogleMapsRouteResponse routeInfo = getDistanceAndDuration(originalOrder);
+            originalOrder.setDuration(LocalTime.ofSecondOfDay(routeInfo.getDuration()));
+            originalOrder.setDistance(convertDistanceToKilometers(routeInfo.getDistance()));
         }
 
-        priceCalculationManager.calculateOrderPrice(originalOrder);
+        originalOrder.setPrice(calculateOrderPrice(originalOrder));
 
         return orderRepository.save(originalOrder);
     }

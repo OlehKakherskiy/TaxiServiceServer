@@ -21,9 +21,11 @@ import ua.kpi.mobiledev.exception.ForbiddenOperationException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
 import ua.kpi.mobiledev.service.googlemaps.GoogleMapsClientService;
+import ua.kpi.mobiledev.service.googlemaps.GoogleMapsRouteResponse;
 import ua.kpi.mobiledev.testCategories.UnitTest;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +33,12 @@ import static java.time.LocalDateTime.MIN;
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
@@ -89,7 +93,7 @@ public class TransactionalOrderServiceTest {
     @Before
     public void initOrderService() {
         when(userService.getById(CUSTOMER_ID)).thenReturn(customer);
-        when(googleMapsClientService.calculateDistance(anyList())).thenReturn(null);
+        when(googleMapsClientService.calculateDistance(anyList())).thenReturn(new GoogleMapsRouteResponse(100000, 3600));
         orderService = new TransactionalOrderService();
         orderService.setOrderRepository(orderRepository);
         orderService.setOrderStatusManager(transitionManager);
@@ -138,19 +142,6 @@ public class TransactionalOrderServiceTest {
 //        orderService.addOrder(orderDto);
 //
 //        //then ForbiddenOperationException is thrown
-    }
-
-    @Ignore
-    @Test(expected = NullPointerException.class)
-    public void addOrderWithoutPriceInfo() throws Exception {
-        //given
-//        OrderDto orderDto = new OrderDto(1, NOW, "start", "end",
-//                null, 0.0);
-//
-//        //when
-//        orderService.addOrder(orderDto);
-
-        //then NPE is thrown
     }
 
     @Test
@@ -309,19 +300,22 @@ public class TransactionalOrderServiceTest {
     }
 
     @Test
-    public void shouldDefaultValuesWhenCalculatePriceOfNull() {
-        assertThat(orderService.calculatePrice(null), is(0.0));
+    public void shouldDefaultValuesWhenCalculateOrderRouteInfoOfNull() {
+        assertTrue(nonNull(orderService.getOrderRouteParams(null)));
     }
 
     @Test
-    @Ignore
-    public void shouldCalculateOrderPrice() {
-        Order order = mock(Order.class);
-        when(priceCalculationManager.calculateOrderPrice(any(Order.class))).thenReturn(order);
-        when(order.getPrice()).thenReturn(100.0);
+    public void shouldCalculateRouteInfo() {
+        Order orderWithRouteInfo = new Order();
+        orderWithRouteInfo.setRoutePoints(emptyList());
+        Order withPriceSet = new Order();
+        withPriceSet.setPrice(100.556);
+        when(priceCalculationManager.calculateOrderPrice(any())).thenReturn(withPriceSet);
 
-        assertThat(orderService.calculatePrice(order), is(100.0));
-        verify(priceCalculationManager).calculateOrderPrice(order);
+        Order actual = orderService.getOrderRouteParams(orderWithRouteInfo);
+        assertThat(actual.getDistance(), is(100.0));
+        assertThat(actual.getDuration(), is(LocalTime.ofSecondOfDay(3600)));
+        assertThat(actual.getPrice(), is(100.56));
     }
 
     @Test
@@ -569,16 +563,18 @@ public class TransactionalOrderServiceTest {
         Order expected = createExpectedOrder();
         expected.getRoutePoints().set(routePoint.getRoutePointPosition(), routePoint);
         expected.setDistance(100.0);
+        expected.setDuration(LocalTime.ofSecondOfDay(3600));
 
         checkOrderUnderTest(originalOrder, createOrderWithUpdatedRoutePoint(routePoint), expected);
     }
 
     @Test
-    public void shouldRecalculateDistanceWhenRoutePointsWereChanged() {
+    public void shouldRecalculateDistaneAndDurationWhenRoutePointsWereChanged() {
         RoutePoint routePoint = new RoutePoint(null, addressMock, null, 0.0, 0.0);
         Order expected = createExpectedOrder();
         expected.getRoutePoints().add(routePoint);
         expected.setDistance(100.0);
+        expected.setDuration(LocalTime.ofSecondOfDay(3600));
 
         checkOrderUnderTest(originalOrder, createOrderWithUpdatedRoutePoint(routePoint), expected);
         verify(googleMapsClientService).calculateDistance(anyList());
@@ -592,7 +588,8 @@ public class TransactionalOrderServiceTest {
         order.setOrderStatus(NEW);
         order.setPrice(20.0);
         order.fillDefaultAdditionalParameters();
-        order.setDistance(25.0);
+        order.setDistance(100.0);
+        order.setDuration(LocalTime.ofSecondOfDay(3600));
         order.setComment("");
 
         order.setRoutePoints(new ArrayList<>(asList(startPoint, middlePoint, endPoint)));
@@ -621,6 +618,7 @@ public class TransactionalOrderServiceTest {
 
     private void checkOrderUnderTest(Order original, Order toUpdate, Order expected) {
         when(orderRepository.findOne(ORDER_ID)).thenReturn(original);
+        when(priceCalculationManager.calculateOrderPrice(any())).thenReturn(original);
         when(userService.getById(CUSTOMER_ID)).thenReturn(customer);
         when(orderRepository.save(expected)).thenReturn(expected);
         assertThat(orderService.updateOrder(toUpdate, CUSTOMER_ID), is(expected));

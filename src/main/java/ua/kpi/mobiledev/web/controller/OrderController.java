@@ -23,8 +23,6 @@ import ua.kpi.mobiledev.web.security.model.UserContext;
 import javax.annotation.Resource;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 import static java.util.Arrays.stream;
@@ -67,14 +65,16 @@ public class OrderController {
         orderService.addOrder(order, userContext.getId());
     }
 
-    @RequestMapping(value = "/order/price", method = RequestMethod.POST)
+    @RequestMapping(value = "/order/routeinfo", method = RequestMethod.POST)
     @ResponseStatus(OK)
     public OrderPriceDto calculatePrice(@RequestBody @Validated OrderPriceDto orderPriceDto) {
         Order orderWithPriceData = new Order();
         orderPricePopulator.convert(orderPriceDto, orderWithPriceData);
-        Double price = orderService.calculatePrice(orderWithPriceData);
-        Double roundedPrice = new BigDecimal(price).setScale(2, RoundingMode.UP).doubleValue();
-        return new OrderPriceDto(roundedPrice);
+
+        OrderPriceDto result = new OrderPriceDto();
+        orderPricePopulator.reverseConvert(orderService.getOrderRouteParams(orderWithPriceData), result);
+
+        return result;
     }
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PATCH)

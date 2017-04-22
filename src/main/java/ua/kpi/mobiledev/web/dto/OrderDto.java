@@ -12,6 +12,7 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeDeserializer;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeSerializer;
+import ua.kpi.mobiledev.web.localDateTimeMapper.LocalTimeSerializer;
 import ua.kpi.mobiledev.web.validation.FutureTime;
 import ua.kpi.mobiledev.web.validation.groupprovider.OrderDtoGroupProvider;
 
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Setter
@@ -63,6 +65,8 @@ public class OrderDto {
     private Double distance;
     private Double price;
     private Double extraPrice;
+    @JsonSerialize(using = LocalTimeSerializer.class)
+    private LocalTime duration;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

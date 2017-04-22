@@ -19,8 +19,8 @@ import static org.hamcrest.core.Is.is;
 @DirtiesContext
 public class GoogleMapsClientServiceIntegrationTest {
 
-    private static final GeographicalPoint YANHELYA_STREET = new GeographicalPoint(50.4475705, 30.4527254);
-    private static final GeographicalPoint SPARTAKIVSKA_STREET = new GeographicalPoint(49.95175, 33.62531674);
+    private static final GeographicalPoint YANHELYA_STREET = new GeographicalPoint(50.4475113,30.4527215);
+    private static final GeographicalPoint SPARTAKIVSKA_STREET = new GeographicalPoint(49.9527218,33.623382);
 
     @Resource(name = "googleMapsService")
     private GoogleMapsClientServiceImpl googleMapsClientService;
@@ -28,13 +28,11 @@ public class GoogleMapsClientServiceIntegrationTest {
     @Test
     public void shouldCalculateDistanceBetweenGeoPoints() {
         List<GeographicalPoint> points = asList(
-                new GeographicalPoint(50.37626, 30.7007608),
-                YANHELYA_STREET,
-                SPARTAKIVSKA_STREET
+                SPARTAKIVSKA_STREET,
+                YANHELYA_STREET
         );
 
-        double distanceInKilometers = 241.308;
-        assertThat(googleMapsClientService.calculateDistance(points), is(distanceInKilometers));
+        assertThat(googleMapsClientService.calculateDistance(points).getDistance(), is(257429));
     }
 
     @Test
@@ -52,7 +50,7 @@ public class GoogleMapsClientServiceIntegrationTest {
     @Test
     public void shouldSetDefaultDistrictValueIfItWasNotReturned() {
         AddressDto expected = new AddressDto();
-        expected.setHouseNumber("17");
+        expected.setHouseNumber("15");
         expected.setStreetName("Spartakivs'ka Street");
         expected.setDistrictName("NO_DISTRICT_INFO");
         expected.setCityName("Myrhorod");

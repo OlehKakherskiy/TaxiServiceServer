@@ -35,5 +35,8 @@ public class OrderPricePopulator implements CustomConverter<OrderPriceDto, Order
 
     @Override
     public void reverseConvert(Order source, OrderPriceDto target) {
+        target.setDistance(source.getDistance());
+        target.setDuration(source.getDuration());
+        target.setPrice(source.getPrice());
     }
 }

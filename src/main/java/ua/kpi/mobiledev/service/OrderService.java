@@ -8,7 +8,7 @@ public interface OrderService {
 
     Order addOrder(Order order, Integer userId);
 
-    Double calculatePrice(Order notCompletedOrder);
+    Order getOrderRouteParams(Order notCompletedOrder);
 
     Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus);
 

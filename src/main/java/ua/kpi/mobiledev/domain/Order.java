@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -50,6 +51,8 @@ public class Order {
 
     @Column(name = "price")
     private Double price;
+
+    private LocalTime duration;
 
     @Column(name = "extra_price")
     private Double extraPrice;
@@ -98,7 +101,7 @@ public class Order {
         CREDIT_CARD
     }
 
-    public void fillDefaultAdditionalParameters(){
+    public void fillDefaultAdditionalParameters() {
         carType = Car.CarType.PASSENGER_CAR;
         paymentMethod = Order.PaymentMethod.CASH;
         withPet = false;
@@ -131,6 +134,7 @@ public class Order {
         if (orderStatus != order.orderStatus) return false;
         if (paymentMethod != order.paymentMethod) return false;
         if (carType != order.carType) return false;
+        if (!duration.equals(order.duration)) return false;
         return routePoints.equals(order.routePoints);
     }
 
@@ -153,6 +157,7 @@ public class Order {
         result = 31 * result + paymentMethod.hashCode();
         result = 31 * result + carType.hashCode();
         result = 31 * result + routePoints.hashCode();
+        result = 31 * result + duration.hashCode();
         return result;
     }
 }

@@ -199,6 +199,7 @@ Response:
     "customerId": "Integer",
     "driverId" : "Integer",
     "distance": "Double",
+    "duration":"Time",
     "price" : "Double",
     "extraPrice":"Double",
     "comment":"String",
@@ -306,9 +307,9 @@ Request body:
 * price recalculation will perform automatically.
 * all another params will be ignored.
 
-**_7. Calculate order price_**
+**_7. Get order route info_**
 ```
-/order/price
+/order/routeinfo
 ```
 Request type: **POST**
 
@@ -325,8 +326,20 @@ Request body:
   }]
 }
 ```
+
+Response body:
+```json
+{
+  "price":"Double",
+  "distance":"Double",
+  "duration":"Time"
+}
+```
+
 **NOTES**
 * Can be performed only by customer.
+* Duration value format - ISO-8601
+
 
 
 **EXCEPTION RESPONSE TEMPLATES**
