@@ -44,9 +44,6 @@ public class AddressFacadeImpl implements AddressFacade {
     @Resource(name = "googleMapsService")
     private GoogleMapsClientService googleMapsClientService;
 
-    @Resource(name = "addressBuilder")
-    private AddressBuilder addressBuilder;
-
     @Override
     public Address createAndGet(Double latitude, Double longtitude) {
         if (isNull(latitude) || isNull(longtitude)) {
@@ -58,6 +55,8 @@ public class AddressFacadeImpl implements AddressFacade {
         if (address.isPresent()) {
             return address.get();
         }
+
+        AddressBuilder addressBuilder = new AddressBuilder();
         addressBuilder.start().withHouseNumber(addressPrototype.getHouseNumber());
 
         Optional<Street> street = streetService.getStreet(addressPrototype.getStreetName(), addressPrototype.getCityName());

@@ -1,8 +1,5 @@
 package ua.kpi.mobiledev.service.googlemaps;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.AdministrationArea;
 import ua.kpi.mobiledev.domain.City;
@@ -11,8 +8,6 @@ import ua.kpi.mobiledev.domain.Street;
 
 import static java.util.Objects.isNull;
 
-@Component("addressBuilder")
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AddressBuilder {
 
     private Address address;
