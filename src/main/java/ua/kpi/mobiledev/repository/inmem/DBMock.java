@@ -16,6 +16,7 @@ import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -81,8 +82,9 @@ public class DBMock {
     }
 
     private void updateRoutePointIndexes(Order order){
-        order.getRoutePoints().forEach(this::setRoutePointId);
+        order.getRoutePoints().stream().filter(routePoint -> Objects.isNull(routePoint.getRoutePointId())).forEach(this::setRoutePointId);
     }
+
     private void setRoutePointId(RoutePoint routePoint) {
         routePoint.setRoutePointId(routePointIndex.getAndIncrement());
     }
