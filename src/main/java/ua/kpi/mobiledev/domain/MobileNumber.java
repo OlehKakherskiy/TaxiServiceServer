@@ -2,7 +2,6 @@ package ua.kpi.mobiledev.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -27,7 +26,6 @@ public class MobileNumber {
     private Integer idMobileNumber;
 
     @Column(name = "mobile_number")
-    @NonNull
     private String mobileNumber;
 
     public MobileNumber(Integer idMobileNumber, String mobileNumber) {

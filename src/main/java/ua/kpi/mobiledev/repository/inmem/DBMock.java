@@ -16,12 +16,12 @@ import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.isNull;
 import static ua.kpi.mobiledev.domain.Car.CarType.PASSENGER_CAR;
 import static ua.kpi.mobiledev.domain.User.UserType.CUSTOMER;
 
@@ -53,6 +53,7 @@ public class DBMock {
 
     private AtomicLong orderIndex;
     private AtomicLong routePointIndex;
+    private AtomicLong mobileNumberIndex;
 
     private AtomicInteger userIndex;
 
@@ -60,18 +61,19 @@ public class DBMock {
         orderIndex = new AtomicLong(0);
         userIndex = new AtomicInteger(2);
         routePointIndex = new AtomicLong(0);
+        mobileNumberIndex = new AtomicLong(0);
         users = new ConcurrentHashMap<>();
         orders = new ConcurrentHashMap<>();
         userDetails = new ConcurrentHashMap<>();
-        users.put(1,customer);
-        users.put(2,taxiDriver);
-        addUserDetails(prepareSecurityDetails(customer,"$argon2i$v=19$m=65536,t=2,p=1$a+mi/WKP7JyM73psXOaiuA$tqt2EhzNbSaWpN7vsXSKa6VG7CG7qPTmk0h41aEmtzU"));
-        addUserDetails(prepareSecurityDetails(taxiDriver,"$argon2i$v=19$m=65536,t=2,p=1$a+mi/WKP7JyM73psXOaiuA$tqt2EhzNbSaWpN7vsXSKa6VG7CG7qPTmk0h41aEmtzU"));
+        users.put(1, customer);
+        users.put(2, taxiDriver);
+        addUserDetails(prepareSecurityDetails(customer, "$argon2i$v=19$m=65536,t=2,p=1$a+mi/WKP7JyM73psXOaiuA$tqt2EhzNbSaWpN7vsXSKa6VG7CG7qPTmk0h41aEmtzU"));
+        addUserDetails(prepareSecurityDetails(taxiDriver, "$argon2i$v=19$m=65536,t=2,p=1$a+mi/WKP7JyM73psXOaiuA$tqt2EhzNbSaWpN7vsXSKa6VG7CG7qPTmk0h41aEmtzU"));
     }
 
     private SecurityDetails prepareSecurityDetails(User user, String password) {
         return new SecurityDetails(user.getEmail(), password, "", true,
-                asList(new Role(new SimpleGrantedAuthority("ROLE_"+user.getUserType().name()))));
+                asList(new Role(new SimpleGrantedAuthority("ROLE_" + user.getUserType().name()))));
     }
 
     public void addOrder(Order order) {
@@ -81,8 +83,8 @@ public class DBMock {
         order.setOrderId(index);
     }
 
-    private void updateRoutePointIndexes(Order order){
-        order.getRoutePoints().stream().filter(routePoint -> Objects.isNull(routePoint.getRoutePointId())).forEach(this::setRoutePointId);
+    private void updateRoutePointIndexes(Order order) {
+        order.getRoutePoints().stream().filter(routePoint -> isNull(routePoint.getRoutePointId())).forEach(this::setRoutePointId);
     }
 
     private void setRoutePointId(RoutePoint routePoint) {
@@ -93,6 +95,13 @@ public class DBMock {
         Integer index = userIndex.incrementAndGet();
         users.put(index, user);
         user.setId(index);
+        updateMobileNumberIds(user.getMobileNumbers());
+    }
+
+    private void updateMobileNumberIds(List<MobileNumber> mobileNumbers) {
+        mobileNumbers.stream()
+                .filter(mobileNumber -> isNull(mobileNumber.getIdMobileNumber()))
+                .forEach(mobileNumber -> mobileNumber.setIdMobileNumber((int) mobileNumberIndex.getAndIncrement()));
     }
 
     public User getUser(Integer userIndex) {
@@ -109,6 +118,7 @@ public class DBMock {
 
     public void replace(User user) {
         users.put(user.getId(), user);
+        updateMobileNumberIds(user.getMobileNumbers());
     }
 
     public void replace(Order order) {
