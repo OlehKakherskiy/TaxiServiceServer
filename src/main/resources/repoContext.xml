@@ -17,7 +17,7 @@
         </jpa:repositories>
 
         <context:component-scan base-package="ua.kpi.mobiledev.repository">
-            <context:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>
+            <!--<context:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>-->
         </context:component-scan>
 
         <bean id="securityDetailsRepository" class="ua.kpi.mobiledev.web.security.service.SecurityDetailsRepository"/>
@@ -52,7 +52,7 @@
                                       ignore-unresolvable="true"/>
         <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
             <property name="driverClass" value="${driver}"/>
-            <property name="jdbcUrl" value="${url}"/>
+            <property name="jdbcUrl" value="jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_c6f857e7f6daba9?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
             <property name="user" value="${user}"/>
             <property name="password" value="${password}"/>
             <property name="initialPoolSize" value="${initialPoolSize}"/>
@@ -64,7 +64,7 @@
     <beans profile="local">
         <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
             <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-            <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/taxiService"/>
+            <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/taxiservice?connectTimeout=10000&amp;cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
             <property name="user" value="root"/>
             <property name="password" value="root"/>
             <property name="initialPoolSize" value="1"/>
