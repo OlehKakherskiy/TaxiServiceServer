@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `taxi_order` (
 -- Table `route_point`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `route_point` (
-  `taxi_order_id` INT(11) UNSIGNED NOT NULL,
+  `taxi_order_id` INT(11) UNSIGNED,
   `address_id` INT(11) UNSIGNED NOT NULL,
   `point_index` INT(11) NOT NULL,
   `longtitude` DOUBLE NOT NULL,
