@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @GroupSequenceProvider(DriverLicenseDtoGroupProvider.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DriverLicenseDto {
 
     public interface DriverLicenseCheck extends DriverLicenseCodeCheck, DriverLicenseExpirationTimeCheck {

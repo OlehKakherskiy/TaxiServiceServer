@@ -8,4 +8,6 @@ public interface LazyInitializationUtil {
     void initMobileNumbers(User user);
 
     void initCar(TaxiDriver taxiDriver);
+
+    void initDriverLicense(TaxiDriver taxiDriver);
 }

@@ -109,6 +109,7 @@ public class TransactionalUserServiceTest {
         verify(userRepositoryMock).findOne(TAXI_DRIVER_ID);
         verify(lazyInitializationUtilMock).initMobileNumbers(any());
         verify(lazyInitializationUtilMock).initCar(any());
+        verify(lazyInitializationUtilMock).initDriverLicense(any());
         verifyNoMoreInteractions(userRepositoryMock, lazyInitializationUtilMock, customUserDetailsServiceMock);
     }
 

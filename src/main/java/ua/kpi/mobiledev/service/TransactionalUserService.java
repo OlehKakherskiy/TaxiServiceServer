@@ -64,6 +64,7 @@ public class TransactionalUserService implements UserService {
         lazyInitializationUtil.initMobileNumbers(user);
         if (isTaxiDriver(user)) {
             lazyInitializationUtil.initCar((TaxiDriver) user);
+            lazyInitializationUtil.initDriverLicense((TaxiDriver) user);
         }
         return user;
     }
@@ -146,7 +147,7 @@ public class TransactionalUserService implements UserService {
                 .collect(toList());
         numbersToUpdate.removeIf(IS_NEW_NUMBER);
 
-        for (MobileNumber mobileNumber : userPrototype.getMobileNumbers()) {
+        for (MobileNumber mobileNumber : numbersToUpdate) {
             MobileNumber targetNumber = ofNullable(mPhones.get(mobileNumber.getIdMobileNumber()))
                     .orElseThrow(() -> new RequestException(INVALID_MOBILE_NUMBER_ID, mobileNumber.getIdMobileNumber()));
 

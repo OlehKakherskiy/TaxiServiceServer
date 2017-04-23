@@ -17,4 +17,9 @@ public class HibernateLazyInitializationUtil implements LazyInitializationUtil {
     public void initCar(TaxiDriver taxiDriver) {
         Hibernate.initialize(taxiDriver.getCar());
     }
+
+    @Override
+    public void initDriverLicense(TaxiDriver taxiDriver) {
+        Hibernate.initialize(taxiDriver.getDriverLicense());
+    }
 }
