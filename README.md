@@ -249,7 +249,6 @@ Request body:
 
 ```json
 {
-  "userId" : "Long",
   "orderStatus" : "OrderStatus"
 }
 ```

@@ -9,11 +9,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Data
 public class OrderStatusDto {
-
-    @NotNull(message = "userId.required")
-    private Integer userId;
-
     @NotNull(message = "orderStatus.required")
     private Order.OrderStatus orderStatus;
-
 }

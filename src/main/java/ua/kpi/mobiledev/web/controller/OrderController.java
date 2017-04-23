@@ -79,8 +79,8 @@ public class OrderController {
 
     @RequestMapping(value = "/order/{orderId}/status", method = RequestMethod.PATCH)
     @ResponseStatus(OK)
-    public void changeOrderStatus(@RequestBody @Validated OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId) {
-        orderService.changeOrderStatus(orderId, orderStatusDto.getUserId(), orderStatusDto.getOrderStatus());
+    public void changeOrderStatus(@RequestBody @Validated OrderStatusDto orderStatusDto, @PathVariable("orderId") Long orderId, Authentication authentication) {
+        orderService.changeOrderStatus(orderId, getUserId(authentication), orderStatusDto.getOrderStatus());
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
