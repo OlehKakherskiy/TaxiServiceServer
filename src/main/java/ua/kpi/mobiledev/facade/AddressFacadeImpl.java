@@ -2,6 +2,7 @@ package ua.kpi.mobiledev.facade;
 
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.AdministrationArea;
 import ua.kpi.mobiledev.domain.City;
@@ -44,6 +45,7 @@ public class AddressFacadeImpl implements AddressFacade {
     @Resource(name = "googleMapsService")
     private GoogleMapsClientService googleMapsClientService;
 
+    @Transactional
     @Override
     public Address createAndGet(Double latitude, Double longtitude) {
         if (isNull(latitude) || isNull(longtitude)) {

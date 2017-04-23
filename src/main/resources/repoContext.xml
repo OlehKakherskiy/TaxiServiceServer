@@ -2,6 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:repository="http://www.springframework.org/schema/data/repository"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context.xsd
@@ -14,11 +15,11 @@
     <beans profile="prod;local">
         <jpa:repositories base-package="ua.kpi.mobiledev.repository" entity-manager-factory-ref="entityManagerFactory"
                           enable-default-transactions="false">
+            <repository:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>
         </jpa:repositories>
+        <jpa:repositories base-package="ua.kpi.mobiledev.repository" repository-impl-postfix="Impl"/>
 
-        <context:component-scan base-package="ua.kpi.mobiledev.repository">
-            <!--<context:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>-->
-        </context:component-scan>
+        <context:component-scan base-package="ua.kpi.mobiledev.repository"/>
 
         <bean id="securityDetailsRepository" class="ua.kpi.mobiledev.web.security.service.SecurityDetailsRepository"/>
 

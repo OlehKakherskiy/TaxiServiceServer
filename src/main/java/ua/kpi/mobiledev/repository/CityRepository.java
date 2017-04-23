@@ -5,6 +5,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import ua.kpi.mobiledev.domain.City;
 
+@org.springframework.stereotype.Repository
 public interface CityRepository extends Repository<City, Integer> {
 
     @Query("Select city from City city where city.name =:cityName And city.administrationArea.name = :areaName")

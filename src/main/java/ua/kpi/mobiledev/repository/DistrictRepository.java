@@ -5,6 +5,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import ua.kpi.mobiledev.domain.District;
 
+@org.springframework.stereotype.Repository
 public interface DistrictRepository extends Repository<District, Integer> {
 
     @Query("Select d from District d where d.districtName=:districtName and d.city.name=:cityName")
