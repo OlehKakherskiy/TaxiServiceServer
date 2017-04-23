@@ -5,23 +5,43 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.GenerationType.IDENTITY;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = "route_point")
 public class RoutePoint {
 
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "route_point_id")
     private Long routePointId;
-    private Address address;
-    private Integer routePointPosition;
-    private Double longtitude;
-    private Double latitude;
 
-    public RoutePoint(Address address, Double longtitude, Double latitude) {
-        this.address = address;
-        this.longtitude = longtitude;
-        this.latitude = latitude;
-    }
+    @OneToOne(cascade = {PERSIST, MERGE})
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @Column(name = "point_index")
+    private Integer routePointPosition;
+
+    @Column(name = "longtitude")
+    private Double longtitude;
+
+    @Column(name = "latitude")
+    private Double latitude;
 
 
     @Override

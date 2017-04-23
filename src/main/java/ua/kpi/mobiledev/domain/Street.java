@@ -11,10 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.Set;
 
 @Entity
 @Table(name = "street")
@@ -32,11 +31,12 @@ public class Street {
     @Column(name = "street_name")
     private String streetName;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "district_id")
     private District district;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<Address> addresses;
+//    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    private Set<Address> addresses;
 
     @Override
     public boolean equals(Object o) {

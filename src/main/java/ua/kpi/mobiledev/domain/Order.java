@@ -15,10 +15,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.REMOVE;
 
 @Getter
 @Setter
@@ -29,7 +35,7 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "taxi_order_id")
+    @Column(name = "taxi_order_id", nullable = false, insertable = false)
     private Long orderId;
 
     @ManyToOne(optional = false)
@@ -84,6 +90,9 @@ public class Order {
     @Enumerated(EnumType.ORDINAL)
     private CarType carType;
 
+    @OneToMany(cascade = {PERSIST, MERGE, REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OrderBy("routePointPosition ASC")
+    @JoinColumn(name = "taxi_order_id", referencedColumnName = "taxi_order_id")
     private List<RoutePoint> routePoints;
 
     public enum OrderStatus {
