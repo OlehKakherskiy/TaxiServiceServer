@@ -66,6 +66,7 @@ public class TransactionalOrderService implements OrderService {
         for (int i = 0; i < order.getRoutePoints().size(); i++) {
             order.getRoutePoints().get(i).setRoutePointPosition(i);
         }
+        order.setAddTime(LocalDateTime.now());
         return orderRepository.save(order);
     }
 
