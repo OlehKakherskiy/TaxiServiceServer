@@ -24,6 +24,7 @@ import ua.kpi.mobiledev.service.googlemaps.GoogleMapsClientService;
 import ua.kpi.mobiledev.service.googlemaps.GoogleMapsRouteResponse;
 import ua.kpi.mobiledev.testCategories.UnitTest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -357,7 +358,7 @@ public class TransactionalOrderServiceTest {
     public void shouldResetStartTimeWhenOrderMarkedAsQuick() {
         Order toUpdate = createOrderWithTimeUnderTest(MIN);
         Order afterUpdate = createOriginalOrder();
-        afterUpdate.setStartTime(null);
+        afterUpdate.setStartTime(LocalDate.now().atStartOfDay());
 
         checkOrderUnderTest(originalOrder, toUpdate, afterUpdate);
     }

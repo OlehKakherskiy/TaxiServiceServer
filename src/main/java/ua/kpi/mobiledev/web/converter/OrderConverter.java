@@ -12,8 +12,10 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 
 @Component("orderConverter")
@@ -30,11 +32,11 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
         target.setStartTime(source.getStartTime());
         target.setRoutePoints(convertRoutePoints(source.getRoutePoints()));
         target.setComment(source.getComment());
-        additionalRequirementsConverter.convert(source.getAdditionalRequirements(), target);
+        additionalRequirementsConverter.convert(Optional.ofNullable(source.getAdditionalRequirements()).orElse(emptyList()), target);
     }
 
     private List<RoutePoint> convertRoutePoints(List<RoutePointDto> routePointDtoList) {
-        return routePointDtoList.stream().map(this::convertRoutePoint).collect(Collectors.toList());
+        return Optional.ofNullable(routePointDtoList).orElse(emptyList()).stream().map(this::convertRoutePoint).collect(Collectors.toList());
     }
 
     private RoutePoint convertRoutePoint(RoutePointDto routePointDto) {
@@ -51,6 +53,7 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
         target.setDriverId(isNull(driver) ? null : driver.getId());
         target.setStatus(source.getOrderStatus());
         target.setStartTime(source.getStartTime());
+        target.setQuickRequest(null);
         target.setComment(source.getComment());
         target.setPrice(source.getPrice());
         target.setDistance(source.getDistance());

@@ -188,7 +188,7 @@ public class TransactionalOrderService implements OrderService {
 
     private void updateStartTime(LocalDateTime startTime, Order originalOrder) {
         if (MIN == startTime) {
-            originalOrder.setStartTime(null);
+            originalOrder.setStartTime(LocalDate.now().atStartOfDay());
         } else if (nonNull(startTime)) {
             originalOrder.setStartTime(startTime);
         }
