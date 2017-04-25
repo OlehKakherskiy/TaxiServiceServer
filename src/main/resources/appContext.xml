@@ -32,6 +32,7 @@
                 <util:list list-class="java.util.ArrayList"
                            value-type="ua.kpi.mobiledev.domain.priceCalculationManagement.CalculationStrategy">
                     <ref bean="carTypePriceCalculationStrategy"/>
+                    <ref bean="startPriceCalculationStrategy"/>
                 </util:list>
             </constructor-arg>
             <constructor-arg name="kmPrice" value="${kmPrice}"/>
@@ -46,6 +47,10 @@
                     <entry key="MINIBUS" value="${addRequirement.carType.minibusMultiplication}"/>
                 </util:map>
             </constructor-arg>
+        </bean>
+
+        <bean id="startPriceCalculationStrategy" class="ua.kpi.mobiledev.domain.priceCalculationManagement.calculationStrategy.StartPriceCalculationStrategy">
+            <property name="startPrice" value="${startPrice}"/>
         </bean>
     </beans>
 </beans>
