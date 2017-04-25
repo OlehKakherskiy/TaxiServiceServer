@@ -16,7 +16,7 @@ public class CityServiceImpl implements CityService {
     private CityRepository cityRepository;
 
     @Override
-    public Optional<City> getCity(String cityName, String adminAreaName) {
-        return ofNullable(cityRepository.getCityByNameAndArea(cityName, adminAreaName));
+    public Optional<City> getCity(String cityName, String adminAreaName, String countryName) {
+        return ofNullable(cityRepository.getCityByNameAndArea(cityName, adminAreaName, countryName));
     }
 }

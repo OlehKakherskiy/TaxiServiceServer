@@ -5,16 +5,14 @@ import ua.kpi.mobiledev.web.converter.CustomConverter;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 
 @Component("addressInfoToDtoConverter")
 public class AddressInfoToDtoConverter implements CustomConverter<AddressInfo, AddressDto> {
 
-    private static final String NO_DISTRICT_INFO = "NO_DISTRICT_INFO";
     private List<String> infoTypes = Arrays.asList("street_number", "route", "locality", "sublocality",
-            "administrative_area_level_1", "administrative_area_level_2");
+            "administrative_area_level_1", "administrative_area_level_2", "country");
 
     @Override
     public void convert(AddressInfo source, AddressDto target) {
@@ -59,10 +57,10 @@ public class AddressInfoToDtoConverter implements CustomConverter<AddressInfo, A
                     addressDto.setAdminAreaName(addressComponentValue);
                     break;
                 }
+                case "country": {
+                    addressDto.setCountryName(addressComponentValue);
+                }
             }
-        }
-        if (Objects.isNull(addressDto.getDistrictName())) {
-            addressDto.setDistrictName(NO_DISTRICT_INFO);
         }
     }
 

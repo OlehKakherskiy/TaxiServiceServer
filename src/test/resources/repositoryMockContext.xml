@@ -39,4 +39,8 @@
         <constructor-arg value="ua.kpi.mobiledev.util.LazyInitializationUtil"/>
     </bean>
 
+    <bean id="countryRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.CountryRepository"/>
+    </bean>
+
 </beans>

@@ -3,6 +3,7 @@ package ua.kpi.mobiledev.service.googlemaps;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.AdministrationArea;
 import ua.kpi.mobiledev.domain.City;
+import ua.kpi.mobiledev.domain.Country;
 import ua.kpi.mobiledev.domain.District;
 import ua.kpi.mobiledev.domain.Street;
 
@@ -15,6 +16,7 @@ public class AddressBuilder {
     private District district;
     private City city;
     private AdministrationArea administrationArea;
+    private Country country;
 
     public AddressBuilder start() {
         address = new Address();
@@ -70,6 +72,17 @@ public class AddressBuilder {
         return this;
     }
 
+    public AddressBuilder withCountry(Country country) {
+        this.country = country;
+        return this;
+    }
+
+    public AddressBuilder withCountryName(String countryName) {
+        country = isNull(country) ? new Country() : country;
+        country.setCountryName(countryName);
+        return this;
+    }
+
     public Address build() {
         if(isNull(address)) {
             return null;
@@ -90,6 +103,10 @@ public class AddressBuilder {
             return address;
         }
         city.setAdministrationArea(administrationArea);
+        if(isNull(country)){
+            return address;
+        }
+        administrationArea.setCountry(country);
         return address;
     }
 }

@@ -43,6 +43,7 @@ public class GoogleMapsClientServiceIntegrationTest {
         expected.setDistrictName("Solom'yans'kyi district");
         expected.setCityName("Kyiv");
         expected.setAdminAreaName("Kyiv city");
+        expected.setCountryName("Ukraine");
 
         assertThat(googleMapsClientService.getAddressDto(YANHELYA_STREET), equalTo(expected));
     }
@@ -52,9 +53,10 @@ public class GoogleMapsClientServiceIntegrationTest {
         AddressDto expected = new AddressDto();
         expected.setHouseNumber("15");
         expected.setStreetName("Spartakivs'ka Street");
-        expected.setDistrictName("NO_DISTRICT_INFO");
+        expected.setDistrictName(null);
         expected.setCityName("Myrhorod");
         expected.setAdminAreaName("Poltavs'ka oblast");
+        expected.setCountryName("Ukraine");
 
         assertThat(googleMapsClientService.getAddressDto(SPARTAKIVSKA_STREET), equalTo(expected));
     }

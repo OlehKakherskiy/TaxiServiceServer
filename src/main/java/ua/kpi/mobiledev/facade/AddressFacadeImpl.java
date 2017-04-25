@@ -6,11 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.AdministrationArea;
 import ua.kpi.mobiledev.domain.City;
+import ua.kpi.mobiledev.domain.Country;
 import ua.kpi.mobiledev.domain.District;
 import ua.kpi.mobiledev.domain.Street;
 import ua.kpi.mobiledev.service.AddressService;
 import ua.kpi.mobiledev.service.AdministrationAreaService;
 import ua.kpi.mobiledev.service.CityService;
+import ua.kpi.mobiledev.service.CountryService;
 import ua.kpi.mobiledev.service.DistrictService;
 import ua.kpi.mobiledev.service.StreetService;
 import ua.kpi.mobiledev.service.googlemaps.AddressBuilder;
@@ -41,6 +43,9 @@ public class AddressFacadeImpl implements AddressFacade {
 
     @Resource(name = "adminAreaService")
     private AdministrationAreaService administrationAreaService;
+
+    @Resource(name = "countryService")
+    private CountryService countryService;
 
     @Resource(name = "googleMapsService")
     private GoogleMapsClientService googleMapsClientService;
@@ -73,7 +78,7 @@ public class AddressFacadeImpl implements AddressFacade {
         }
         addressBuilder.withDistrictName(addressPrototype.getDistrictName());
 
-        Optional<City> city = cityService.getCity(addressPrototype.getCityName(), addressPrototype.getAdminAreaName());
+        Optional<City> city = cityService.getCity(addressPrototype.getCityName(), addressPrototype.getAdminAreaName(), addressPrototype.getCountryName());
         if (city.isPresent()) {
             return addressService.addAddress(addressBuilder.withCity(city.get()).build());
         }
@@ -83,6 +88,12 @@ public class AddressFacadeImpl implements AddressFacade {
         if (administrationArea.isPresent()) {
             return addressService.addAddress(addressBuilder.withAdminArea(administrationArea.get()).build());
         }
-        return addressService.addAddress(addressBuilder.withAdminAreaName(addressPrototype.getAdminAreaName()).build());
+        addressBuilder.withAdminAreaName(addressPrototype.getAdminAreaName());
+
+        Optional<Country> country = countryService.getCountry(addressPrototype.getCountryName());
+        if (country.isPresent()) {
+            return addressService.addAddress(addressBuilder.withCountry(country.get()).build());
+        }
+        return addressService.addAddress(addressBuilder.withCountryName(addressPrototype.getCountryName()).build());
     }
 }

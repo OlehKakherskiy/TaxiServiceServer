@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -28,8 +31,9 @@ public class AdministrationArea {
     @Column(name = "admin_area_name")
     private String name;
 
-//    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-//    private Set<City> cities;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "country_id")
+    private Country country;
 
     @Override
     public boolean equals(Object o) {
@@ -39,13 +43,15 @@ public class AdministrationArea {
         AdministrationArea that = (AdministrationArea) o;
 
         if (adminAreaId != null ? !adminAreaId.equals(that.adminAreaId) : that.adminAreaId != null) return false;
-        return name.equals(that.name);
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return country.equals(that.country);
     }
 
     @Override
     public int hashCode() {
         int result = adminAreaId != null ? adminAreaId.hashCode() : 0;
-        result = 31 * result + name.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + country.hashCode();
         return result;
     }
 }

@@ -13,11 +13,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.domain.AdministrationArea;
 import ua.kpi.mobiledev.domain.City;
+import ua.kpi.mobiledev.domain.Country;
 import ua.kpi.mobiledev.domain.District;
 import ua.kpi.mobiledev.domain.Street;
 import ua.kpi.mobiledev.repository.AddressRepository;
 import ua.kpi.mobiledev.repository.AdminAreaRepository;
 import ua.kpi.mobiledev.repository.CityRepository;
+import ua.kpi.mobiledev.repository.CountryRepository;
 import ua.kpi.mobiledev.repository.DistrictRepository;
 import ua.kpi.mobiledev.repository.StreetRepository;
 import ua.kpi.mobiledev.service.googlemaps.AddressBuilder;
@@ -47,6 +49,7 @@ public class AddressFacadeImplTest {
     private static final String DISTRICT_NAME = "districtName";
     private static final String CITY_NAME = "cityName";
     private static final String ADMIN_AREA_NAME = "adminAreaName";
+    private static final String COUNTRY_NAME = "countryName";
 
     @Resource(name = "addressRepository")
     private AddressRepository addressRepository;
@@ -62,6 +65,9 @@ public class AddressFacadeImplTest {
 
     @Resource(name = "adminAreaRepository")
     private AdminAreaRepository adminAreaRepository;
+
+    @Resource(name = "countryRepository")
+    private CountryRepository countryRepository;
 
     @Resource(name = "googleMapsService")
     private GoogleMapsClientService googleMapsClientService;
@@ -79,6 +85,7 @@ public class AddressFacadeImplTest {
     private static final District DISTRICT = new District();
     private static final City CITY = new City();
     private static final AdministrationArea ADMINISTRATION_AREA = new AdministrationArea();
+    private static final Country COUNTRY = new Country();
 
     @BeforeClass
     public static void beforeClass() {
@@ -87,9 +94,14 @@ public class AddressFacadeImplTest {
         ADDRESS_DTO.setDistrictName(DISTRICT_NAME);
         ADDRESS_DTO.setCityName(CITY_NAME);
         ADDRESS_DTO.setAdminAreaName(ADMIN_AREA_NAME);
+        ADDRESS_DTO.setCountryName(COUNTRY_NAME);
+
+        COUNTRY.setCountryName(COUNTRY_NAME);
+        COUNTRY.setCountryId(1);
 
         ADMINISTRATION_AREA.setAdminAreaId(1);
         ADMINISTRATION_AREA.setName(ADMIN_AREA_NAME);
+        ADMINISTRATION_AREA.setCountry(COUNTRY);
 
         CITY.setCityId(1);
         CITY.setAdministrationArea(ADMINISTRATION_AREA);
@@ -120,7 +132,7 @@ public class AddressFacadeImplTest {
         when(addressRepository.customGet(STREET_NAME, HOUSE_NUMBER)).thenReturn(null);
         when(streetRepository.customGet(STREET_NAME, CITY_NAME)).thenReturn(null);
         when(districtRepository.getByNameAndCityName(DISTRICT_NAME, CITY_NAME)).thenReturn(null);
-        when(cityRepository.getCityByNameAndArea(CITY_NAME, ADMIN_AREA_NAME)).thenReturn(null);
+        when(cityRepository.getCityByNameAndArea(CITY_NAME, ADMIN_AREA_NAME, COUNTRY_NAME)).thenReturn(null);
     }
 
     @Test
@@ -168,7 +180,7 @@ public class AddressFacadeImplTest {
     @Test
     public void shouldConstructAndSaveAddressWhenOnlySityAndAdminAreaExists() {
         reset(cityRepository);
-        when(cityRepository.getCityByNameAndArea(CITY_NAME, ADMIN_AREA_NAME)).thenReturn(CITY);
+        when(cityRepository.getCityByNameAndArea(CITY_NAME, ADMIN_AREA_NAME, COUNTRY_NAME)).thenReturn(CITY); //TODO: remove null
 
         Address toPersist = new AddressBuilder().start()
                 .withHouseNumber(HOUSE_NUMBER)
@@ -197,6 +209,23 @@ public class AddressFacadeImplTest {
     }
 
     @Test
+    public void shouldConstructAndSaveAddressWhenOnlyCountryExistsInDb() {
+        reset(countryRepository);
+        when(countryRepository.findByName(COUNTRY_NAME)).thenReturn(COUNTRY);
+
+        Address toPersist = new AddressBuilder().start()
+                .withHouseNumber(HOUSE_NUMBER)
+                .withStreetName(STREET_NAME)
+                .withDistrictName(DISTRICT_NAME)
+                .withCityName(CITY_NAME)
+                .withAdminAreaName(ADMIN_AREA_NAME)
+                .withCountry(COUNTRY)
+                .build();
+
+        doAssert(toPersist);
+    }
+
+    @Test
     public void shouldConstructAndPersistAddressWhenNoItPartsExist() {
         Address toPersist = new AddressBuilder().start()
                 .withHouseNumber(HOUSE_NUMBER)
@@ -204,6 +233,7 @@ public class AddressFacadeImplTest {
                 .withDistrictName(DISTRICT_NAME)
                 .withCityName(CITY_NAME)
                 .withAdminAreaName(ADMIN_AREA_NAME)
+                .withCountryName(COUNTRY_NAME)
                 .build();
 
         doAssert(toPersist);

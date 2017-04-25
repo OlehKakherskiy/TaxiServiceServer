@@ -1,4 +1,5 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @@auto_increment_increment=1;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
@@ -6,14 +7,32 @@ DROP SCHEMA IF EXISTS `taxiservice`;
 CREATE SCHEMA IF NOT EXISTS `taxiservice` DEFAULT CHARACTER SET utf8 ;
 USE `taxiservice`;
 
+
 -- -----------------------------------------------------
--- Table `administration_area`
+-- Table `taxiservice`.`country`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `country` (
+  `country_id` INT NOT NULL AUTO_INCREMENT,
+  `country_name` VARCHAR(45) NULL,
+  PRIMARY KEY (`country_id`))
+  ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `taxiservice`.`administration_area`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `administration_area` (
   `admin_area_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `admin_area_name` VARCHAR(45) NOT NULL,
+  `admin_area_name` VARCHAR(45) NULL,
+  `country_id` INT NOT NULL,
   PRIMARY KEY (`admin_area_id`),
-  INDEX `admin_area_name_idx` (`admin_area_name` ASC))
+  INDEX `admin_area_name_idx` (`admin_area_name` ASC),
+  INDEX `fk_administration_area_country1_idx` (`country_id` ASC),
+  CONSTRAINT `fk_administration_area_country1`
+  FOREIGN KEY (`country_id`)
+  REFERENCES `country` (`country_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8;
 
@@ -42,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `city` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `district` (
   `district_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `district_name` VARCHAR(45) NOT NULL,
+  `district_name` VARCHAR(45),
   `city_id` INT(11) UNSIGNED NOT NULL,
   PRIMARY KEY (`district_id`),
   INDEX `fk_district_city1_idx` (`city_id` ASC),
@@ -61,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `district` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `street` (
   `street_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `street_name` VARCHAR(45) NOT NULL,
+  `street_name` VARCHAR(45),
   `district_id` INT(11) UNSIGNED NOT NULL,
   PRIMARY KEY (`street_id`),
   INDEX `fk_street_district1_idx` (`district_id` ASC),
@@ -80,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `street` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `address` (
   `address_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `house_number` VARCHAR(10) NOT NULL,
+  `house_number` VARCHAR(10),
   `street_id` INT(11) UNSIGNED NOT NULL,
   PRIMARY KEY (`address_id`),
   INDEX `fk_address_street_idx` (`street_id` ASC),

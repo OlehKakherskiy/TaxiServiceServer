@@ -8,7 +8,7 @@ import ua.kpi.mobiledev.repository.CityRepository;
 public class InMemCityRepository implements CityRepository {
 
     @Override
-    public City getCityByNameAndArea(String cityName, String areaName) {
+    public City getCityByNameAndArea(String cityName, String areaName, String countryName) {
         return null;
     }
 }
