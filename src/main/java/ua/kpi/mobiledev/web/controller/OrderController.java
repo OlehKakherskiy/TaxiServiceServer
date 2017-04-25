@@ -23,6 +23,7 @@ import ua.kpi.mobiledev.web.security.model.UserContext;
 import javax.annotation.Resource;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Arrays.stream;
@@ -131,6 +132,9 @@ public class OrderController {
         Order orderToUpdate = new Order();
         orderToUpdate.setOrderId(orderId);
         orderConverter.convert(orderDto, orderToUpdate);
+        if(orderDto.getQuickRequest()){
+            orderToUpdate.setStartTime(LocalDateTime.MIN);
+        }
         orderService.updateOrder(orderToUpdate, getUserId(authentication));
     }
 

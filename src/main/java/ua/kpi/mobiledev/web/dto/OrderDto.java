@@ -72,4 +72,6 @@ public class OrderDto {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @FutureTime(message = "startTime.notFuture", groups = OptionalStartTime.class)
     private LocalDateTime startTime;
+
+    private Boolean quickRequest = false;
 }

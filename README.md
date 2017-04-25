@@ -237,7 +237,7 @@ Request body:
 ```
 **NOTES:**
 * Only customer can perform operation
-* if "startTime" is null - quick request
+* if "startTime" is null - quick request. The date of request will be saved and returned by next get request
 
 **_4. Change order status _**
 ```

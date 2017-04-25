@@ -19,6 +19,7 @@ import ua.kpi.mobiledev.service.googlemaps.GoogleMapsRouteResponse;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ public class TransactionalOrderService implements OrderService {
         for (int i = 0; i < order.getRoutePoints().size(); i++) {
             order.getRoutePoints().get(i).setRoutePointPosition(i);
         }
+        order.setStartTime(ofNullable(order.getStartTime()).orElse(LocalDate.now().atStartOfDay()));
         order.setAddTime(LocalDateTime.now());
         return orderRepository.save(order);
     }
