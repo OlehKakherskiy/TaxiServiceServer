@@ -37,4 +37,8 @@
         </property>
     </bean>
 
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver">
+        <property name="defaultLocale" value="en_EN"/>
+    </bean>
+
 </beans>
