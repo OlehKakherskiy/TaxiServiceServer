@@ -32,7 +32,7 @@
     </bean>
 
     <bean id="securityDetailsRepository" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="ua.kpi.mobiledev.web.security.service.CustomUserDetailsService"/>
+        <constructor-arg value="ua.kpi.mobiledev.web.security.service.CustomerUserDetailsCrudService"/>
     </bean>
 
     <bean id="hibernateLazyInitializationUtil" class="org.mockito.Mockito" factory-method="mock">
@@ -41,6 +41,10 @@
 
     <bean id="countryRepository" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="ua.kpi.mobiledev.repository.CountryRepository"/>
+    </bean>
+
+    <bean id="resetPasswordRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.ResetPasswordRepository"/>
     </bean>
 
 </beans>

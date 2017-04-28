@@ -340,6 +340,28 @@ Response body:
 * Duration value format - ISO-8601
 
 
+##Restore password
+
+**Step-by-step:**
+1. /user/password
+* Type: **POST**
+* Request body:
+```json
+{"email":"String"}
+```
+* Response body: id of password restore request - _restore_id_request_
+* Result: returned id request that will be used at next request and email message with _secret_code_
+
+2. /user/password/_restore_id_request_
+* Type: **POST**
+* Request body:
+```json
+{
+  "password":"String",
+  "code":"String"
+}
+```
+
 
 **EXCEPTION RESPONSE TEMPLATES**
 

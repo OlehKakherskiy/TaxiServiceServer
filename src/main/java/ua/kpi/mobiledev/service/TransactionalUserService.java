@@ -5,11 +5,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.kpi.mobiledev.domain.Car;
-import ua.kpi.mobiledev.domain.DriverLicense;
-import ua.kpi.mobiledev.domain.MobileNumber;
-import ua.kpi.mobiledev.domain.TaxiDriver;
-import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.exception.SystemException;
@@ -30,12 +26,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static ua.kpi.mobiledev.exception.ErrorCode.CANNOT_UPDATE_EMAIL;
-import static ua.kpi.mobiledev.exception.ErrorCode.CANNOT_UPDATE_USER_TYPE;
-import static ua.kpi.mobiledev.exception.ErrorCode.INVALID_MOBILE_NUMBER_ID;
-import static ua.kpi.mobiledev.exception.ErrorCode.REGISTRATION_GENERAL_SYSTEM_EXCEPTION;
-import static ua.kpi.mobiledev.exception.ErrorCode.USER_ALREADY_EXISTS;
-import static ua.kpi.mobiledev.exception.ErrorCode.USER_NOT_FOUND_WITH_ID;
+import static ua.kpi.mobiledev.exception.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -71,7 +62,7 @@ public class TransactionalUserService implements UserService {
 
     @Override
     public User getByUsername(String username) {
-        return userRepository.findByEmail(username);
+        return userRepository.findByEmail(username); //TODO: throw exception instead of return null
     }
 
     @Override

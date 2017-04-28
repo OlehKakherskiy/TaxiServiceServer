@@ -25,6 +25,7 @@
     </http>
 
     <http pattern="/user/register" security="none"/>
+    <http pattern="/user/password/**" security="none"/>
 
     <http pattern="/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless" use-expressions="true"
           auto-config="false">

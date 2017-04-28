@@ -4,16 +4,14 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.service.ResetPasswordService;
 import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.converter.CustomConverter;
+import ua.kpi.mobiledev.web.dto.EmailDto;
+import ua.kpi.mobiledev.web.dto.ResetPasswordDto;
 import ua.kpi.mobiledev.web.dto.UserDto;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 
@@ -28,6 +26,9 @@ public class UserController {
 
     @Resource(name = "userConverter")
     private CustomConverter<User, UserDto> userConverter;
+
+    @Resource(name = "resetPasswordService")
+    private ResetPasswordService resetPasswordService;
 
     @RequestMapping(path = "/user/register", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
@@ -61,6 +62,16 @@ public class UserController {
         userConverter.reverseConvert(userDto, user);
         user.setUserType(null); //to not update user type
         userService.update(user);
+    }
+
+    @RequestMapping(path = "/user/password", method = RequestMethod.POST, consumes = "application/json")
+    public String resetPasswordRequest(@RequestBody @Validated EmailDto emailDto) {
+        return resetPasswordService.resetPassword(emailDto.getEmail());
+    }
+
+    @RequestMapping(path = "/user/password/{passwordToken}", method = RequestMethod.POST, consumes = "application/json")
+    public void resetPasswordAction(@RequestBody @Validated ResetPasswordDto resetPasswordDto, @PathVariable String passwordToken) {
+        resetPasswordService.resetPassword(resetPasswordDto, passwordToken);
     }
 
 }
