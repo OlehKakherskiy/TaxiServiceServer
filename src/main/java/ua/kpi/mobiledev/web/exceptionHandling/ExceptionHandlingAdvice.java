@@ -10,29 +10,20 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ua.kpi.mobiledev.exception.AbstractLocalizedException;
-import ua.kpi.mobiledev.exception.ForbiddenOperationException;
-import ua.kpi.mobiledev.exception.RequestException;
-import ua.kpi.mobiledev.exception.ResourceNotFoundException;
-import ua.kpi.mobiledev.exception.SystemException;
+import ua.kpi.mobiledev.exception.*;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 import static ua.kpi.mobiledev.exception.ErrorCode.DEFAULT_EXCEPTION_MESSAGE;
 import static ua.kpi.mobiledev.exception.ErrorCode.DEFAULT_VALIDATION_EXCEPTION_MESSAGE;
 
 @ControllerAdvice
 public class ExceptionHandlingAdvice {
 
-    private static final Locale DEFAULT_LOCALE = new Locale("en", "EN");
     private static final String DEFAULT_EXCEPTION_CODE = DEFAULT_EXCEPTION_MESSAGE.name();
     private static final String DEFAULT_VALIDATION_MESSAGE = DEFAULT_VALIDATION_EXCEPTION_MESSAGE.name();
 
@@ -67,8 +58,8 @@ public class ExceptionHandlingAdvice {
         return new CustomFieldError(fieldError.getField().trim(), fieldError.getDefaultMessage().trim(), exceptionMessage.trim());
     }
 
-    protected Locale getRequestLocale() {
-        return ofNullable(LocaleContextHolder.getLocale()).orElse(DEFAULT_LOCALE);
+    private Locale getRequestLocale() {
+        return LocaleContextHolder.getLocale();
     }
 
     @RequestMapping(produces = "application/json")

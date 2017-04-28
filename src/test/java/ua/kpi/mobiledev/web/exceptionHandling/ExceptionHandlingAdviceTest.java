@@ -1,8 +1,9 @@
 package ua.kpi.mobiledev.web.exceptionHandling;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -21,19 +22,10 @@ import java.util.Locale;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static ua.kpi.mobiledev.exception.ErrorCode.ORDER_NOT_FOUND_WITH_ID;
-import static ua.kpi.mobiledev.exception.ErrorCode.REGISTRATION_GENERAL_SYSTEM_EXCEPTION;
-import static ua.kpi.mobiledev.exception.ErrorCode.TEST_CODE;
-import static ua.kpi.mobiledev.exception.ErrorCode.USER_ALREADY_EXISTS;
-import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
+import static org.springframework.http.HttpStatus.*;
+import static ua.kpi.mobiledev.exception.ErrorCode.*;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -46,32 +38,30 @@ public class ExceptionHandlingAdviceTest {
     private static final String RESOURCE_NOT_FOUND = "Order with id=1 doesn't exist";
     private static final String DEFAULT_MESSAGE = "No message was defined for error code 'TEST_CODE'";
 
+    private static final Locale DEFAULT_LOCALE = new Locale("en", "EN");
+    private static final Locale RUSSIAN_LOCALE = new Locale("ru", "RU");
+    private static final Locale UKRAINIAN_LOCALE = new Locale("uk", "UA");
+
     @Resource(name = "exceptionHandlingAdvice")
     private ExceptionHandlingAdvice exceptionHandlingAdvice;
-    private ExceptionHandlingAdvice spiedExceptionHandlerAdvice;
-
-    @Before
-    public void setUp() {
-        spiedExceptionHandlerAdvice = spy(exceptionHandlingAdvice);
-    }
 
     @Test
     public void shouldReturnResponseWithServerErrorCodeAndMessageInDefaultLocale() {
-        doReturn(null).when(spiedExceptionHandlerAdvice).getRequestLocale();
+        setLocale(DEFAULT_LOCALE);
         SystemException thrown = new SystemException(REGISTRATION_GENERAL_SYSTEM_EXCEPTION);
         ResponseEntity<ErrorMessage> expected =
                 new ResponseEntity<>(createMessage(SYSTEM_EXCEPTION), INTERNAL_SERVER_ERROR);
 
-        assertEquals(expected, spiedExceptionHandlerAdvice.handleSystemException(thrown));
+        assertEquals(expected, exceptionHandlingAdvice.handleSystemException(thrown));
     }
 
     @Test
     public void shouldReturnResponseWithErrorCodeAndMessage() {
         RequestException thrown = new RequestException(USER_ALREADY_EXISTS, "testEmail@gmail.com");
         ResponseEntity<ErrorMessage> expected = new ResponseEntity<>(createMessage(REQUEST_EXCEPTION), BAD_REQUEST);
-        doReturn(new Locale("ru", "RU")).when(spiedExceptionHandlerAdvice).getRequestLocale();
+        setLocale(RUSSIAN_LOCALE);
 
-        assertEquals(expected, spiedExceptionHandlerAdvice.handleRequestException(thrown));
+        assertEquals(expected, exceptionHandlingAdvice.handleRequestException(thrown));
     }
 
     @Test
@@ -79,13 +69,14 @@ public class ExceptionHandlingAdviceTest {
         ForbiddenOperationException thrown = new ForbiddenOperationException(USER_IS_NOT_ORDER_OWNER, 1, 2);
         ResponseEntity<ErrorMessage> expected
                 = new ResponseEntity<>(createMessage(FORBIDDEN_OPERATION), FORBIDDEN);
-        doReturn(new Locale("uk", "UA")).when(spiedExceptionHandlerAdvice).getRequestLocale();
+        setLocale(UKRAINIAN_LOCALE);
 
-        assertEquals(expected, spiedExceptionHandlerAdvice.handleForbiddenOperationException(thrown));
+        assertEquals(expected, exceptionHandlingAdvice.handleForbiddenOperationException(thrown));
     }
 
     @Test
     public void shouldReturnResponseWithFormattedMessageWhenMoreMessageParamsAdded() {
+        setLocale(DEFAULT_LOCALE);
         ResourceNotFoundException thrown = new ResourceNotFoundException(ORDER_NOT_FOUND_WITH_ID, 1, 2, 3);
         ResponseEntity<ErrorMessage> expected = new ResponseEntity<>(createMessage(RESOURCE_NOT_FOUND), NOT_FOUND);
 
@@ -94,6 +85,7 @@ public class ExceptionHandlingAdviceTest {
 
     @Test
     public void shouldReturnResponseWithInvalidFieldList() {
+        setLocale(DEFAULT_LOCALE);
         BindingResult bindingResult = mock(BindingResult.class);
         List<FieldError> fieldErrors = asList(
                 createFieldError("user.email.invalidFormat", "user.email.invalidFormat"),
@@ -118,11 +110,14 @@ public class ExceptionHandlingAdviceTest {
 
     @Test
     public void shouldReturnDefaultMessageWhenNoMessageIsDefinedForErrorCode() {
+        setLocale(DEFAULT_LOCALE);
         ResponseEntity<ErrorMessage> expected = new ResponseEntity<>(createMessage(DEFAULT_MESSAGE), BAD_REQUEST);
-
         assertEquals(expected, exceptionHandlingAdvice.handleRequestException(new RequestException(TEST_CODE)));
     }
 
+    private void setLocale(Locale locale){
+        LocaleContextHolder.setLocaleContext(new SimpleLocaleContext(locale));
+    }
     private ErrorMessage createMessage(String message) {
         return new ErrorMessage(message);
     }
