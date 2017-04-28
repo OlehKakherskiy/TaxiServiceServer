@@ -10,6 +10,10 @@
 
     <beans profile="inMem">
         <context:component-scan base-package="ua.kpi.mobiledev.repository.inmem"/>
+        <bean id="resetPasswordRepository" class="ua.kpi.mobiledev.repository.ResetPasswordRepositoryImpl">
+            <property name="redisTemplate" ref="redisTemplate"/>
+            <property name="expireDurationInMs" value="${security.resetPasswordCodeAlive}"/>
+        </bean>
     </beans>
 
     <beans profile="prod;local">
@@ -21,7 +25,7 @@
 
         <context:component-scan base-package="ua.kpi.mobiledev.repository"/>
 
-        <bean id="securityDetailsRepository" class="ua.kpi.mobiledev.web.security.service.SecurityDetailsRepository"/>
+        <bean id="securityDetailsRepository" class="ua.kpi.mobiledev.web.security.service.SecurityDetailsRepositoryImpl"/>
 
         <bean name="entityManagerFactory"
               class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">

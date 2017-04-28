@@ -10,7 +10,7 @@ import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import javax.annotation.Resource;
 
 @Component("securityDetailsRepository")
-public class InMemSecurityDetailsRepository implements CustomUserDetailsService{
+public class InMemSecurityDetailsRepository implements CustomerUserDetailsCrudService {
 
     @Resource
     private DBMock dbMock;
@@ -30,5 +30,17 @@ public class InMemSecurityDetailsRepository implements CustomUserDetailsService{
         securityDetails.setPassword(encodedPassword);
 
         dbMock.addUserDetails(securityDetails);
+    }
+
+    @Override
+    public void updatePassword(String email, String password) {
+        SecurityDetails securityDetails = (SecurityDetails) fullLoadWithAuthorities(email);
+        securityDetails.setPassword(hashPassword(password));
+        dbMock.addUserDetails(securityDetails);
+    }
+
+    private String hashPassword(String password) {
+        Argon2 argon2 = Argon2Factory.create();
+        return argon2.hash(2, 65536, 1, password);
     }
 }
