@@ -290,7 +290,7 @@ CREATE TABLE IF NOT EXISTS `taxi_order` (
   `car_type_id` INT(11) NOT NULL,
   `add_time` DATETIME NOT NULL,
   `distance` DOUBLE NOT NULL,
-  `new_column` INT(11) NULL DEFAULT NULL,
+  `removed` TINYINT(1) NOT NULL DEFAULT 0,
   `duration` TIME NOT NULL,
   `update_time` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`taxi_order_id`),
