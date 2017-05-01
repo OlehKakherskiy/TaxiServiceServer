@@ -1,14 +1,17 @@
 package ua.kpi.mobiledev.repository;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.User;
 
 import java.util.List;
 
-public interface OrderRepository extends CrudRepository<Order, Long> {
+public interface OrderRepository{
 
-    @Query("Select o from Order o where o.orderStatus=:orderStatus")
-    List<ua.kpi.mobiledev.domain.Order> getAllByOrderStatus(@Param("orderStatus") ua.kpi.mobiledev.domain.Order.OrderStatus orderStatus);
+    Order findOne(Long id);
+
+    Order save(Order entity);
+
+    void delete(Order entity);
+
+    List<Order> getAllByOrderStatus(Order.OrderStatus orderStatus, User user);
 }

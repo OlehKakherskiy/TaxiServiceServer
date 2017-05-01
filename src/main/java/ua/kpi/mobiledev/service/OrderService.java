@@ -12,7 +12,7 @@ public interface OrderService {
 
     Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus);
 
-    List<Order> getOrderList(Order.OrderStatus orderStatus);
+    List<Order> getOrderList(Order.OrderStatus orderStatus, Integer userId);
 
     Order getOrder(Long orderId);
 

@@ -7,14 +7,8 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import ua.kpi.mobiledev.domain.Address;
-import ua.kpi.mobiledev.domain.Car;
-import ua.kpi.mobiledev.domain.DriverLicense;
-import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.domain.Order.OrderStatus;
-import ua.kpi.mobiledev.domain.RoutePoint;
-import ua.kpi.mobiledev.domain.TaxiDriver;
-import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusTransitionManager;
 import ua.kpi.mobiledev.domain.priceCalculationManagement.PriceCalculationManager;
 import ua.kpi.mobiledev.exception.ForbiddenOperationException;
@@ -37,19 +31,9 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static ua.kpi.mobiledev.domain.Car.CarType.PASSENGER_CAR;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.ACCEPTED;
 import static ua.kpi.mobiledev.domain.Order.OrderStatus.NEW;
@@ -200,27 +184,13 @@ public class TransactionalOrderServiceTest {
         OrderStatus targetStatus = NEW;
 
         //when
-        when(orderRepository.getAllByOrderStatus(targetStatus)).thenReturn(asList(mock(Order.class), mock(Order.class)));
-        List<Order> resultList = orderService.getOrderList(targetStatus);
+        when(orderRepository.getAllByOrderStatus(targetStatus, customer)).thenReturn(asList(mock(Order.class), mock(Order.class)));
+        when(userService.getById(CUSTOMER_ID)).thenReturn(customer);
+        List<Order> resultList = orderService.getOrderList(targetStatus, CUSTOMER_ID);
 
         //then
         assertEquals(2, resultList.size());
-        verify(orderRepository).getAllByOrderStatus(targetStatus);
-        verifyNoMoreInteractions(orderRepository);
-    }
-
-    @Test
-    public void shouldReturnOrdersOfAllStatusesWhenTargetStatusIsNull() {
-        //given
-        OrderStatus targetStatus = null; //ALL orders should be returned
-
-        //when
-        when(orderRepository.findAll()).thenReturn(asList(mock(Order.class), mock(Order.class)));
-        List<Order> resultList = orderService.getOrderList(targetStatus);
-
-        //then
-        assertEquals(2, resultList.size());
-        verify(orderRepository).findAll();
+        verify(orderRepository).getAllByOrderStatus(targetStatus, customer);
         verifyNoMoreInteractions(orderRepository);
     }
 
@@ -592,6 +562,7 @@ public class TransactionalOrderServiceTest {
         order.setDistance(100.0);
         order.setDuration(LocalTime.ofSecondOfDay(3600));
         order.setComment("");
+        order.setRemoved(false);
 
         order.setRoutePoints(new ArrayList<>(asList(startPoint, middlePoint, endPoint)));
         return order;

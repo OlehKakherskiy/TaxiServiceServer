@@ -22,7 +22,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -32,10 +31,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
-import static ua.kpi.mobiledev.exception.ErrorCode.DRIVER_CANNOT_PERFORM_OPERATION;
-import static ua.kpi.mobiledev.exception.ErrorCode.NO_ROUTE_POINT_WITH_ID;
-import static ua.kpi.mobiledev.exception.ErrorCode.ORDER_NOT_FOUND_WITH_ID;
-import static ua.kpi.mobiledev.exception.ErrorCode.USER_IS_NOT_ORDER_OWNER;
+import static ua.kpi.mobiledev.exception.ErrorCode.*;
 
 @Transactional(readOnly = true)
 @Setter
@@ -69,6 +65,7 @@ public class TransactionalOrderService implements OrderService {
         }
         order.setStartTime(ofNullable(order.getStartTime()).orElse(LocalDate.now().atStartOfDay()));
         order.setAddTime(LocalDateTime.now());
+        order.setRemoved(false);
         return orderRepository.save(order);
     }
 
@@ -120,14 +117,8 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
-    public List<Order> getOrderList(Order.OrderStatus orderStatus) {
-        return isNull(orderStatus) ? mapToList(orderRepository.findAll()) : orderRepository.getAllByOrderStatus(orderStatus);
-    }
-
-    private List<Order> mapToList(Iterable<Order> all) {
-        List<Order> orders = new ArrayList<>();
-        all.forEach(orders::add);
-        return orders;
+    public List<Order> getOrderList(Order.OrderStatus orderStatus, Integer userId) {
+        return orderRepository.getAllByOrderStatus(orderStatus, userService.getById(userId));
     }
 
     @Override

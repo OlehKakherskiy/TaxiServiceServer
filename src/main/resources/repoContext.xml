@@ -14,6 +14,9 @@
             <property name="redisTemplate" ref="redisTemplate"/>
             <property name="expireDurationInMs" value="${security.resetPasswordCodeAlive}"/>
         </bean>
+        <bean id="orderRepository" class="ua.kpi.mobiledev.repository.inmem.InMemOrderRepository">
+            <property name="dbMock" ref="dbMock"/>
+        </bean>
     </beans>
 
     <beans profile="prod;local">
@@ -21,9 +24,10 @@
                           enable-default-transactions="false">
             <repository:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>
         </jpa:repositories>
-        <jpa:repositories base-package="ua.kpi.mobiledev.repository" repository-impl-postfix="Impl"/>
 
-        <context:component-scan base-package="ua.kpi.mobiledev.repository"/>
+        <context:component-scan base-package="ua.kpi.mobiledev.repository">
+            <context:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>
+        </context:component-scan>
 
         <bean id="securityDetailsRepository" class="ua.kpi.mobiledev.web.security.service.SecurityDetailsRepositoryImpl"/>
 

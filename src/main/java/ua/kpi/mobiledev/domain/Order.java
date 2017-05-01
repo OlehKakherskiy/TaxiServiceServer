@@ -5,26 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ua.kpi.mobiledev.domain.Car.CarType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.CascadeType.PERSIST;
-import static javax.persistence.CascadeType.REMOVE;
+import static javax.persistence.CascadeType.*;
 
 @Getter
 @Setter
@@ -94,6 +80,9 @@ public class Order {
     @OrderBy("routePointPosition ASC")
     @JoinColumn(name = "taxi_order_id", referencedColumnName = "taxi_order_id")
     private List<RoutePoint> routePoints;
+
+    @Column(name = "removed")
+    private Boolean removed;
 
     public enum OrderStatus {
         NEW,

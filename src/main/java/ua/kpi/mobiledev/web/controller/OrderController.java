@@ -2,13 +2,7 @@ package ua.kpi.mobiledev.web.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.Order.OrderStatus;
 import ua.kpi.mobiledev.exception.RequestException;
@@ -27,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Arrays.stream;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.OK;
@@ -86,10 +81,10 @@ public class OrderController {
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     @ResponseStatus(OK)
-    public List<OrderSimpleDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus) {
+    public List<OrderSimpleDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus, Authentication authentication) {
         String uppercaseOrderStatus = orderStatus.toUpperCase();
         OrderStatus status = uppercaseOrderStatus.equals("ALL") ? null : getFromName(uppercaseOrderStatus);
-        return mapToDto(orderService.getOrderList(status));
+        return mapToDto(orderService.getOrderList(status, getUserId(authentication)));
     }
 
     private List<OrderSimpleDto> mapToDto(List<Order> orderList) {
@@ -132,7 +127,8 @@ public class OrderController {
         Order orderToUpdate = new Order();
         orderToUpdate.setOrderId(orderId);
         orderConverter.convert(orderDto, orderToUpdate);
-        if(orderDto.getQuickRequest()){
+        Boolean quickRequest = orderDto.getQuickRequest();
+        if(nonNull(quickRequest) && quickRequest){
             orderToUpdate.setStartTime(LocalDateTime.MIN);
         }
         orderService.updateOrder(orderToUpdate, getUserId(authentication));

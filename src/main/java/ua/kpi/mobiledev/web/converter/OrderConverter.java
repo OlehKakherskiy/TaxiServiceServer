@@ -30,7 +30,7 @@ public class OrderConverter implements CustomConverter<OrderDto, Order> {
     @Override
     public void convert(OrderDto source, Order target) {
         target.setStartTime(source.getStartTime());
-        target.setRoutePoints(convertRoutePoints(source.getRoutePoints()));
+        target.setRoutePoints(convertRoutePoints(source.getRoutePoints())); //TODO: when update order there's no need to convert route points in some cases (when change position or delete this route point)
         target.setComment(source.getComment());
         additionalRequirementsConverter.convert(Optional.ofNullable(source.getAdditionalRequirements()).orElse(emptyList()), target);
     }
