@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ua.kpi.mobiledev.exception.RequestException;
+import ua.kpi.mobiledev.service.integration.HttpRequestHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,11 +49,11 @@ public class GoogleMapsClientServiceTest {
     @Before
     public void setUp() throws Exception {
         googleMapsClientService = new GoogleMapsClientServiceImpl();
-        GoogleMapsRequestHelper googleMapsRequestHelper = mock(GoogleMapsRequestHelper.class);
-        googleMapsClientService.setGoogleMapsRequestHelper(googleMapsRequestHelper);
-        when(googleMapsRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL, GoogleMapsRouteResponse.class, FIRST_ROUTE_PART))
+        HttpRequestHelper httpRequestHelper = mock(HttpRequestHelper.class);
+        googleMapsClientService.setHttpRequestHelper(httpRequestHelper);
+        when(httpRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL, GoogleMapsRouteResponse.class, FIRST_ROUTE_PART))
                 .thenReturn(new GoogleMapsRouteResponse(FIRST_DISTANCE_IN_METRES, FIRST_DURATION_IN_SECONDS));
-        when(googleMapsRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL, GoogleMapsRouteResponse.class, SECOND_ROUTE_PART))
+        when(httpRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL, GoogleMapsRouteResponse.class, SECOND_ROUTE_PART))
                 .thenReturn(new GoogleMapsRouteResponse(SECOND_DISTANCE_IN_METRES, SECOND_DURATION_IN_SECONDS));
     }
 

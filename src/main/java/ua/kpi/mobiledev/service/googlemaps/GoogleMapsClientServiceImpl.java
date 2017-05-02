@@ -3,14 +3,11 @@ package ua.kpi.mobiledev.service.googlemaps;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 import ua.kpi.mobiledev.exception.RequestException;
+import ua.kpi.mobiledev.service.integration.HttpRequestHelper;
 import ua.kpi.mobiledev.web.converter.CustomConverter;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static java.lang.String.format;
 import static ua.kpi.mobiledev.exception.ErrorCode.INVALID_ROUTE_POINT_COUNT;
@@ -33,8 +30,8 @@ public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
     private static final int FIRST = 0;
     private static final int MINIMAL_COUNT = 2;
 
-    @Resource(name = "googleMapsRequestHelper")
-    private GoogleMapsRequestHelper googleMapsRequestHelper;
+    @Resource(name = "httpRequestHelper")
+    private HttpRequestHelper httpRequestHelper;
 
     @Resource(name = "addressInfoToDtoConverter")
     private CustomConverter<AddressInfo, AddressDto> addressInfoToDtoConverter;
@@ -45,7 +42,7 @@ public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
         for (int i = 0; i < geographicalPoints.size() - 1; i++) {
             GeographicalPoint currentPoint = geographicalPoints.get(i);
             GeographicalPoint nextPoint = geographicalPoints.get(i + 1);
-            GoogleMapsRouteResponse routePartResponse = googleMapsRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL,
+            GoogleMapsRouteResponse routePartResponse = httpRequestHelper.processGetRequest(CALCULATE_DISTANCE_URL,
                     GoogleMapsRouteResponse.class, prepareUrlParams(currentPoint, nextPoint));
             routeParts.add(routePartResponse);
         }
@@ -80,7 +77,7 @@ public class GoogleMapsClientServiceImpl implements GoogleMapsClientService {
         Map<String, String> urlParams = new HashMap<>();
         urlParams.put(LATITUDE, "" + geographicalPoint.getLatitude());
         urlParams.put(LONGTITUDE, "" + geographicalPoint.getLongtitude());
-        AddressInfo addressInfo = googleMapsRequestHelper.processGetRequest(GET_ADDRESS_INFO_FOR_COORDINATES,
+        AddressInfo addressInfo = httpRequestHelper.processGetRequest(GET_ADDRESS_INFO_FOR_COORDINATES,
                 AddressInfo.class, urlParams);
         AddressDto result = new AddressDto();
         addressInfoToDtoConverter.convert(addressInfo, result);

@@ -3,6 +3,6 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="googleMapsService" class="ua.kpi.mobiledev.service.googlemaps.GoogleMapsClientServiceImpl" autowire="byName"/>
-    <bean id="googleMapsRequestHelper" class="ua.kpi.mobiledev.service.googlemaps.GoogleMapsRequestHelper"/>
+    <bean id="httpRequestHelper" class="ua.kpi.mobiledev.service.integration.HttpRequestHelper"/>
     <bean id="addressInfoToDtoConverter" class="ua.kpi.mobiledev.service.googlemaps.AddressInfoToDtoConverter"/>
 </beans>

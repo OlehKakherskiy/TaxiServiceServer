@@ -1,4 +1,4 @@
-package ua.kpi.mobiledev.service.googlemaps;
+package ua.kpi.mobiledev.service.integration;
 
 import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
@@ -8,13 +8,9 @@ import java.util.Map;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-public class GoogleMapsRequestHelperTest {
+public class HttpRequestHelperTest {
 
     private static final String RESPONSE = "response";
     private static final String URL = "testUrl";
@@ -25,7 +21,7 @@ public class GoogleMapsRequestHelperTest {
     public void shouldMakeGetCall() {
         RestTemplate mockRestCall = mock(RestTemplate.class);
         when(mockRestCall.getForObject(URL, RESPONSE_TYPE, URL_VARIABLES)).thenReturn(RESPONSE);
-        GoogleMapsRequestHelper requestHelper = spy(new GoogleMapsRequestHelper());
+        HttpRequestHelper requestHelper = spy(new HttpRequestHelper());
         doReturn(mockRestCall).when(requestHelper).getRestTemplate();
 
         assertThat(requestHelper.processGetRequest(URL, RESPONSE_TYPE, URL_VARIABLES), is(RESPONSE));
