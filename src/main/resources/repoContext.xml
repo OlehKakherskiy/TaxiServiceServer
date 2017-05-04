@@ -66,19 +66,21 @@
             <property name="password" value="${password}"/>
             <property name="initialPoolSize" value="${initialPoolSize}"/>
             <property name="maxPoolSize" value="${maxPoolSize}"/>
-            <property name="loginTimeout" value="${loginTimeout}"/>
+            <property name="maxStatements" value="${maxStatements}"/>
+            <property name="maxIdleTime" value="${maxIdleTime}"/>
         </bean>
     </beans>
 
     <beans profile="local">
         <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
             <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-            <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/taxiservice?connectTimeout=10000&amp;cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
+            <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/taxiservice?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
             <property name="user" value="root"/>
             <property name="password" value="root"/>
             <property name="initialPoolSize" value="1"/>
-            <property name="maxPoolSize" value="1"/>
-            <property name="loginTimeout" value="5"/>
+            <property name="maxPoolSize" value="2"/>
+            <property name="maxStatements" value="100"/>
+            <property name="autoCommitOnClose" value="true"/>
         </bean>
     </beans>
 
