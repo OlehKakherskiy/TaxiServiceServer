@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.service.UserService;
+import ua.kpi.mobiledev.web.security.LoginBasedAuthenticationToken;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 
@@ -46,8 +47,10 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
             throw new HttpClientErrorException(BAD_REQUEST, "Authentication Failed. Username or Password not valid.");
         }
         User user = getFullInfoByUserName(userName);
-        UserContext userContext = new UserContext(user.getId(), userDetails.getUsername(), user.getUserType());
-        return new UsernamePasswordAuthenticationToken(userContext, null, getRoles(userDetails)); //no password
+        UserContext userContext = new UserContext(user, userDetails.getUsername(), user.getUserType());
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userContext, null, getRoles(userDetails)); //no password
+        result.setDetails(authentication.getDetails()); //added notification token
+        return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -63,7 +66,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+        return (LoginBasedAuthenticationToken.class.isAssignableFrom(authentication));
     }
 
     private UserDetails getByUserName(String userName) {

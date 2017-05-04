@@ -3,12 +3,13 @@ package ua.kpi.mobiledev.web.security.loginBasedAuthentication;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import ua.kpi.mobiledev.web.security.LoginBasedAuthenticationToken;
 import ua.kpi.mobiledev.web.security.model.LoginRequest;
 
 import javax.servlet.FilterChain;
@@ -46,11 +47,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
         if (Objects.isNull(loginRequest)) {
             throw new HttpClientErrorException(BAD_REQUEST, "Bad request. Invalid request body");
         }
-        return this.getAuthenticationManager().authenticate(mapToToken(ifValidLoginRequest(loginRequest)));
-    }
-
-    private UsernamePasswordAuthenticationToken mapToToken(LoginRequest loginRequest) {
-        return new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+        return this.getAuthenticationManager().authenticate(new LoginBasedAuthenticationToken(ifValidLoginRequest(loginRequest)));
     }
 
     private LoginRequest mapFromJson(HttpServletRequest request) throws IOException {
@@ -62,14 +59,10 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     }
 
     private LoginRequest ifValidLoginRequest(LoginRequest loginRequest) {
-        if (isEmptyOrBlank(loginRequest.getUsername()) || isEmptyOrBlank(loginRequest.getPassword())) {
+        if (StringUtils.isEmpty(loginRequest.getUsername()) || StringUtils.isEmpty(loginRequest.getPassword())) {
             throw new HttpClientErrorException(BAD_REQUEST, "Username or Password not provided");
         }
         return loginRequest;
-    }
-
-    private boolean isEmptyOrBlank(String param) {
-        return Objects.isNull(param) || param.isEmpty();
     }
 
     private boolean notPostMethod(HttpServletRequest request) {

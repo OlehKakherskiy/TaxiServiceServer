@@ -55,7 +55,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void updateUserProfile(@RequestBody @Validated({UserDto.UpdateUserCheck.class}) UserDto userDto, Authentication authentication) {
         UserContext userContext = (UserContext) authentication.getDetails();
-        Integer userId = userContext.getId();
+        Integer userId = userContext.getUser().getId();
         User user = isCustomer(userContext.getUserType()) ? new User() : new TaxiDriver();
         user.setId(userId);
         userDto.setUserType(userContext.getUserType());

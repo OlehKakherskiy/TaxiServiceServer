@@ -53,12 +53,11 @@ public class OrderController {
     @RequestMapping(value = "/order", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(OK)
     public void addOrder(@RequestBody @Validated(OrderDto.AddOrderGroup.class) OrderDto orderDto, Authentication authentication) {
-        UserContext userContext = (UserContext) authentication.getDetails();
         Order order = new Order();
         order.fillDefaultAdditionalParameters();
         order.setOrderStatus(OrderStatus.NEW);
         orderConverter.convert(orderDto, order);
-        orderService.addOrder(order, userContext.getId());
+        orderService.addOrder(order, getUserId(authentication));
     }
 
     @RequestMapping(value = "/order/routeinfo", method = RequestMethod.POST)
@@ -136,6 +135,6 @@ public class OrderController {
 
     private Integer getUserId(Authentication authentication) {
         UserContext userContext = (UserContext) authentication.getDetails();
-        return userContext.getId();
+        return userContext.getUser().getId();
     }
 }

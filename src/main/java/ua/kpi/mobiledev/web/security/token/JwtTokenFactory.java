@@ -19,7 +19,6 @@ public class JwtTokenFactory {
         Claims claims = prepareClaims(userContext, roles);
         Date currentTime = new Date();
         Date expirationTime = new Date(currentTime.getTime() + 24 * 3600 * 1000);
-        System.out.println(digestKey);
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuer("/taxiService")
@@ -34,7 +33,7 @@ public class JwtTokenFactory {
     private Claims prepareClaims(UserContext userContext, List<GrantedAuthority> roles) {
         Claims claims = Jwts.claims();
         claims.setSubject(userContext.getUsername());
-        claims.put("userId", userContext.getId());
+        claims.put("userId", userContext.getUser().getId());
         claims.put("userType", userContext.getUserType());
         claims.put("scopes", roles.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
         return claims;

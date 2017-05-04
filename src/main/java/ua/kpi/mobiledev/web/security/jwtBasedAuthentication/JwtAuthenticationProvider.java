@@ -12,12 +12,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.security.JwtAuthenticationToken;
 import ua.kpi.mobiledev.web.security.model.TokenStoreObject;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 import ua.kpi.mobiledev.web.security.service.RedisStoreService;
 import ua.kpi.mobiledev.web.security.token.RawAccessJwtToken;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private RedisStoreService<String, TokenStoreObject> redisStoreService;
+
+    @Resource(name = "userService")
+    private UserService userService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -55,7 +60,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         Integer userId = claims.get("userId", Integer.class);
         User.UserType userType = User.UserType.valueOf(claims.get("userType", String.class));
 
-        return new UserContext(userId, subject, userType);
+        return new UserContext(userService.getById(userId), subject, userType);
     }
 
     private List<String> getRoles(Claims claims) {

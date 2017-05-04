@@ -11,12 +11,14 @@ import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.repository.NotificationTokenRepository;
 import ua.kpi.mobiledev.web.security.model.TokenStoreObject;
 import ua.kpi.mobiledev.web.security.model.UserContext;
 import ua.kpi.mobiledev.web.security.service.RedisStoreService;
 import ua.kpi.mobiledev.web.security.token.AccessJwtToken;
 import ua.kpi.mobiledev.web.security.token.JwtTokenFactory;
 
+import javax.annotation.Resource;
 import javax.crypto.KeyGenerator;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +39,9 @@ public class UsernamePasswordAuthenticationSuccessHandler implements Authenticat
     private final JwtTokenFactory tokenFactory;
 
     private final RedisStoreService<String, TokenStoreObject> redisStoreService;
+
+    @Resource(name = "notificationTokenRepository")
+    private NotificationTokenRepository notificationTokenRepository;
 
     @Autowired
     private RandomGenerator randomGenerator;
@@ -64,9 +69,10 @@ public class UsernamePasswordAuthenticationSuccessHandler implements Authenticat
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        mapper.writeValue(response.getWriter(), getTokenMap(accessToken, userContext.getUserType(), userContext.getId()));
+        mapper.writeValue(response.getWriter(), getTokenMap(accessToken, userContext.getUserType(), userContext.getUser().getId()));
 
         saveToTokenStore(accessToken.getToken(), createTokenStoreObject(accessToken, digestKey));
+        saveNotificationToken(userContext.getUser(), (String) authentication.getDetails());
         clearAuthenticationAttributes(request);
     }
 
@@ -86,6 +92,10 @@ public class UsernamePasswordAuthenticationSuccessHandler implements Authenticat
         tokenMap.put("id", userId.toString());
 //        tokenMap.put("refreshToken", refreshToken.getToken());
         return tokenMap;
+    }
+
+    private void saveNotificationToken(User user, String notificationToken) {
+        notificationTokenRepository.saveNotificationToken(user, notificationToken);
     }
 
     /**

@@ -8,7 +8,7 @@ import ua.kpi.mobiledev.domain.User;
 @AllArgsConstructor
 public class UserContext {
 
-    private Integer id;
+    private User user;
 
     private String username;
 
