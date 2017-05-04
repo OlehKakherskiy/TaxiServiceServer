@@ -21,6 +21,8 @@ public class GcmNotificationService implements NotificationService {
     private static final String SEND_URL = "https://gcm-http.googleapis.com/gcm/send";
     private static final String ORDER_STATUS_KEY = "orderStatus";
     private static final String PLATE_NUMBER_KEY = "plateNumber";
+    private static final String NAME_KEY = "name";
+    private static final String ORDER_ID_KEY = "orderId";
 
     @Resource(name = "httpRequestHelper")
     private HttpRequestHelper httpRequestHelper;
@@ -59,7 +61,9 @@ public class GcmNotificationService implements NotificationService {
     private UpdateOrderStatusNotificationTemplate notifyDriver(Order order, String notificationToken) {
         return new UpdateOrderStatusNotificationTemplate()
                 .appendTo(notificationToken)
-                .appendData(ORDER_STATUS_KEY, order.getOrderStatus().name());
+                .appendData(ORDER_STATUS_KEY, order.getOrderStatus().name())
+                .appendData(NAME_KEY, order.getCustomer().getName())
+                .appendData(ORDER_ID_KEY, order.getOrderId().toString());
     }
 
     private UpdateOrderStatusNotificationTemplate notifyCustomer(Order order, String notificationToken) {

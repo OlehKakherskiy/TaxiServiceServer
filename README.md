@@ -375,7 +375,9 @@ Response body:
  {
     "data":{
         "orderStatus":"WAITING",
-        "plateNumber":"String"
+        "plateNumber":"String",
+        "name":"String",
+        "orderId":"Long"
     },
     "to":"String"
  }
@@ -384,7 +386,9 @@ Response body:
 ```json
 {
     "data":{
-        "orderStatus":"OrderStatus"
+        "orderStatus":"OrderStatus",
+        "name":"String",
+        "orderId":"Long"
     },
     "to":"String"
 }
