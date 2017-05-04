@@ -47,4 +47,8 @@
         <constructor-arg value="ua.kpi.mobiledev.repository.ResetPasswordRepository"/>
     </bean>
 
+    <bean id="notificationTokenRepository" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.repository.NotificationTokenRepository"/>
+    </bean>
+
 </beans>

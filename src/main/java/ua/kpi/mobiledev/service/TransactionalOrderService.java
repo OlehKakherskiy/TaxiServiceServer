@@ -55,6 +55,9 @@ public class TransactionalOrderService implements OrderService {
     @Resource(name = "googleMapsService")
     private GoogleMapsClientService googleMapsService;
 
+    @Resource(name = "notificationService")
+    private NotificationService notificationService;
+
     @Override
     @Transactional
     public Order addOrder(Order order, Integer userId) {
@@ -113,7 +116,11 @@ public class TransactionalOrderService implements OrderService {
     @Override
     @Transactional
     public Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus) {
-        return orderRepository.save(orderStatusManager.changeOrderStatus(getOrder(orderId), findUser(userId), orderStatus));
+        User whoChange = findUser(userId);
+        Order withChangedStatus = orderStatusManager.changeOrderStatus(getOrder(orderId), whoChange, orderStatus);
+        orderRepository.save(withChangedStatus);
+        notificationService.sendUpdateOrderNotification(withChangedStatus, whoChange);
+        return withChangedStatus;
     }
 
     @Override

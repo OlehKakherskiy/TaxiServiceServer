@@ -60,6 +60,8 @@ public class TransactionalOrderServiceTest {
     @Mock
     private GoogleMapsClientService googleMapsClientService;
     @Mock
+    private NotificationService notificationService;
+    @Mock
     private Address startPointAddressMock;
     @Mock
     private Address endPointAddressMock;
@@ -85,6 +87,7 @@ public class TransactionalOrderServiceTest {
         orderService.setPriceCalculationManager(priceCalculationManager);
         orderService.setUserService(userService);
         orderService.setGoogleMapsService(googleMapsClientService);
+        orderService.setNotificationService(notificationService);
         customer = new User(CUSTOMER_ID, "name", "email", CUSTOMER, emptyList());
         taxiDriver = new TaxiDriver(DRIVER_ID, "name", "email", emptyList(), mock(Car.class), mock(DriverLicense.class));
         startPoint = new RoutePoint(1L, startPointAddressMock, 0, 40.0, 40.0);
