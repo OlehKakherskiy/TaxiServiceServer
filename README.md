@@ -139,7 +139,8 @@ Request body:
 ```json
 {
   "email":"String",
-  "password":"String"
+  "password":"String",
+  "notificationToken":"String"
 }
 ```
 
@@ -151,6 +152,9 @@ Response body:
   "user_type":"String"
 }
 ```
+**NOTES:**
+* notification token is optional field. If present - notification feature will be switched on.
+
 ###Order API
 **_1. Get all orders (by type)_**
 ```
@@ -256,6 +260,8 @@ Request body:
 * Customer, that not an owner of the order, can't perform this operation.
 * Customer-owner of the order can only cancel the order.
 * Taxi driver can mark order as done only after accepting its servicing.
+* When customer is logged in, specified notification token and driver changes status - notification will be sent to order owner.
+* When driver is logged in, specified notification token and customer cancels order - notification will be send to driver. 
 
 **_5. Delete order_**
 ```
@@ -359,6 +365,28 @@ Response body:
 {
   "password":"String",
   "code":"String"
+}
+```
+
+**GOOGLE CLOUD MESSAGING TEMPLATES**
+* Change order status notification (for order owner):
+1. driver is waiting for customer:
+```json
+ {
+    "data":{
+        "orderStatus":"WAITING",
+        "plateNumber":"String"
+    },
+    "to":"String"
+ }
+ ```
+2. driver/customer changes status
+```json
+{
+    "data":{
+        "orderStatus":"OrderStatus"
+    },
+    "to":"String"
 }
 ```
 
