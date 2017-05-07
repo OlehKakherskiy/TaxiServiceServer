@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.repository.inmem;
 
+import lombok.Setter;
 import org.springframework.data.repository.query.Param;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
@@ -13,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 
 public class InMemOrderRepository implements OrderRepository {
 
+    @Setter
     private DBMock dbMock;
 
     @Override

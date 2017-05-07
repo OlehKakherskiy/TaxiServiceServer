@@ -17,6 +17,8 @@
         <bean id="orderRepository" class="ua.kpi.mobiledev.repository.inmem.InMemOrderRepository">
             <property name="dbMock" ref="dbMock"/>
         </bean>
+        <bean id="notificationTokenRepository" class="ua.kpi.mobiledev.repository.NotificationTokenRepositoryImpl"
+              autowire="byType"/>
     </beans>
 
     <beans profile="prod;local">
@@ -29,7 +31,8 @@
             <context:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>
         </context:component-scan>
 
-        <bean id="securityDetailsRepository" class="ua.kpi.mobiledev.web.security.service.SecurityDetailsRepositoryImpl"/>
+        <bean id="securityDetailsRepository"
+              class="ua.kpi.mobiledev.web.security.service.SecurityDetailsRepositoryImpl"/>
 
         <bean name="entityManagerFactory"
               class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -61,7 +64,8 @@
                                       ignore-unresolvable="true"/>
         <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
             <property name="driverClass" value="${driver}"/>
-            <property name="jdbcUrl" value="jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_c6f857e7f6daba9?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
+            <property name="jdbcUrl"
+                      value="jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_c6f857e7f6daba9?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
             <property name="user" value="${user}"/>
             <property name="password" value="${password}"/>
             <property name="initialPoolSize" value="${initialPoolSize}"/>
@@ -74,7 +78,8 @@
     <beans profile="local">
         <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
             <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-            <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/taxiservice?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
+            <property name="jdbcUrl"
+                      value="jdbc:mysql://localhost:3306/taxiservice?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
             <property name="user" value="root"/>
             <property name="password" value="root"/>
             <property name="initialPoolSize" value="1"/>
