@@ -27,7 +27,7 @@ public class ResetPasswordRepositoryImpl implements ResetPasswordRepository {
     @Override
     public void save(UUID id, ResetPasswordData value) {
         redisTemplate.opsForValue().set(id, value);
-        redisTemplate.expire(id, ofNullable(expireDurationInMs).orElse(DEFAULT_EXPIRE_DURATION), TimeUnit.MILLISECONDS);
+        redisTemplate.expire(id, ofNullable(expireDurationInMs).orElse(DEFAULT_EXPIRE_DURATION), TimeUnit.SECONDS);
     }
 
     @Override

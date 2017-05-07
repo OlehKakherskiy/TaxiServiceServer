@@ -20,6 +20,7 @@ public class SecurityDetailsRepositoryImpl implements CustomerUserDetailsCrudSer
     }
 
     @Override
+    @Transactional
     public void updatePassword(String email, String password) {
         SecurityDetails securityDetails = (SecurityDetails) fullLoadWithAuthorities(email);
         securityDetails.setPassword(hashPassword(password));
