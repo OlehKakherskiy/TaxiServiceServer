@@ -21,7 +21,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Order findOne(Long id) {
         Order result = entityManager.find(Order.class, id);
-        return result.getRemoved() ? null : result;
+        return (isNull(result) || result.getRemoved()) ? null : result;
     }
 
     @Override
