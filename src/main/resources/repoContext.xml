@@ -22,6 +22,8 @@
     </beans>
 
     <beans profile="prod;local">
+        <context:property-placeholder system-properties-mode="OVERRIDE" location="WEB-INF/jdbc.properties"
+                                      ignore-unresolvable="true"/>
         <jpa:repositories base-package="ua.kpi.mobiledev.repository" entity-manager-factory-ref="entityManagerFactory"
                           enable-default-transactions="false">
             <repository:exclude-filter type="regex" expression="ua\.kpi\.mobiledev\.repository\.inmem\.*"/>
@@ -36,7 +38,6 @@
 
         <bean name="entityManagerFactory"
               class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-            <property name="dataSource" ref="dataSource"/>
             <property name="jpaVendorAdapter">
                 <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
             </property>
@@ -49,43 +50,23 @@
             </property>
             <property name="jpaProperties">
                 <props>
-                    <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-                    <prop key="hibernate.show_sql">true</prop>
-                    <prop key="hibernate.format_sql">true</prop>
-                    <prop key="hibernate.validator.fail_fast">false</prop>
+                    <prop key="hibernate.dialect">${dialect}</prop>
+                    <prop key="hibernate.show_sql">${showSql}</prop>
+                    <prop key="hibernate.format_sql">${formatSql}</prop>
+                    <prop key="hibernate.validator.fail_fast">${validator.fail_fast}</prop>
+                    <prop key="hibernate.connection.provider_class">com.zaxxer.hikari.hibernate.HikariConnectionProvider</prop>
+                    <prop key="hibernate.hikari.dataSourceClassName">com.mysql.jdbc.jdbc2.optional.MysqlDataSource</prop>
+                    <prop key="hibernate.hikari.dataSource.url">${datasourceUrl}</prop>
+                    <prop key="hibernate.hikari.dataSource.user">${user}</prop>
+                    <prop key="hibernate.hikari.dataSource.password">${password}</prop>
+                    <prop key="hibernate.hikari.dataSource.cachePrepStmts">${cachePrepStmts}</prop>
+                    <prop key="hibernate.hikari.dataSource.useServerPrepStmts">${useServerPrepStmts}</prop>
+                    <prop key="hibernate.hikari.dataSource.useUnicode">${useUnicode}</prop>
+                    <prop key="hibernate.hikari.dataSource.characterEncoding">${characterEncoding}</prop>
+                    <prop key="hibernate.hikari.dataSource.prepStmtCacheSize">${prepStmtCacheSize}</prop>
+                    <prop key="hibernate.hikari.dataSource.prepStmtCacheSqlLimit">${prepStmtCacheSqlLimit}</prop>
                 </props>
             </property>
-        </bean>
-    </beans>
-
-    <beans profile="prod">
-
-        <context:property-placeholder system-properties-mode="OVERRIDE" location="WEB-INF/jdbc.properties"
-                                      ignore-unresolvable="true"/>
-        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-            <property name="driverClass" value="${driver}"/>
-            <property name="jdbcUrl"
-                      value="jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_c6f857e7f6daba9?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
-            <property name="user" value="${user}"/>
-            <property name="password" value="${password}"/>
-            <property name="initialPoolSize" value="${initialPoolSize}"/>
-            <property name="maxPoolSize" value="${maxPoolSize}"/>
-            <property name="maxStatements" value="${maxStatements}"/>
-            <property name="maxIdleTime" value="${maxIdleTime}"/>
-        </bean>
-    </beans>
-
-    <beans profile="local">
-        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-            <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-            <property name="jdbcUrl"
-                      value="jdbc:mysql://localhost:3306/taxiservice?cachePrepStmts=true&amp;useServerPrepStmts=true&amp;useUnicode=yes&amp;characterEncoding=UTF-8"/>
-            <property name="user" value="root"/>
-            <property name="password" value="root"/>
-            <property name="initialPoolSize" value="1"/>
-            <property name="maxPoolSize" value="2"/>
-            <property name="maxStatements" value="100"/>
-            <property name="autoCommitOnClose" value="true"/>
         </bean>
     </beans>
 
