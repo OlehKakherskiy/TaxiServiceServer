@@ -25,4 +25,9 @@ public class NotificationTokenRepositoryImpl implements NotificationTokenReposit
     public String getNotificationToken(User user) {
         return Objects.isNull(user) ? null : redisTemplate.opsForValue().get(user.getEmail());
     }
+
+    @Override
+    public void removeNotificationToken(User user) {
+        redisTemplate.delete(user.getEmail());
+    }
 }

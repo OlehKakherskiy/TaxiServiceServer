@@ -4,11 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import ua.kpi.mobiledev.repository.NotificationTokenRepository;
+import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.security.model.TokenStoreObject;
 import ua.kpi.mobiledev.web.security.service.RedisStoreService;
 import ua.kpi.mobiledev.web.security.token.RawAccessJwtToken;
 import ua.kpi.mobiledev.web.security.token.extractor.TokenExtractor;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +20,12 @@ import java.io.IOException;
 public class LogoutFilter extends AbstractAuthenticationProcessingFilter {
 
     private RedisStoreService<String, TokenStoreObject> redisStoreService;
+
+    @Resource(name = "notificationTokenRepository")
+    private NotificationTokenRepository notificationTokenRepository;
+
+    @Resource(name = "userService")
+    private UserService userService;
 
     private final TokenExtractor tokenExtractor;
 
@@ -35,6 +44,8 @@ public class LogoutFilter extends AbstractAuthenticationProcessingFilter {
         TokenStoreObject tokenStoreObject = redisStoreService.get(token.getToken());
         tokenStoreObject.setValid(false);
         redisStoreService.save(token.getToken(), tokenStoreObject);
+        Integer userId = (Integer) token.parseClaims(tokenStoreObject.getTokenDigestKey()).getBody().get("userId");
+        notificationTokenRepository.removeNotificationToken(userService.getById(userId));
         return null;
     }
 }
