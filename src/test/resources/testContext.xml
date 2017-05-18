@@ -20,4 +20,8 @@
     <bean id="resetPasswordService" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="ua.kpi.mobiledev.service.ResetPasswordService"/>
     </bean>
+
+    <bean id="notificationService" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.service.NotificationService"/>
+    </bean>
 </beans>

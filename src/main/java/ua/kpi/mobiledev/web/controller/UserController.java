@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.service.NotificationService;
 import ua.kpi.mobiledev.service.ResetPasswordService;
 import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.converter.CustomConverter;
@@ -17,12 +18,17 @@ import ua.kpi.mobiledev.web.security.model.UserContext;
 
 import javax.annotation.Resource;
 
+import static java.util.Objects.isNull;
+
 @RestController
 @Setter
 public class UserController {
 
     @Resource(name = "userService")
     private UserService userService;
+
+    @Resource
+    private NotificationService notificationService;
 
     @Resource(name = "userConverter")
     private CustomConverter<User, UserDto> userConverter;
@@ -72,6 +78,13 @@ public class UserController {
     @RequestMapping(path = "/user/password/{passwordToken}", method = RequestMethod.POST, consumes = "application/json")
     public void resetPasswordAction(@RequestBody @Validated ResetPasswordDto resetPasswordDto, @PathVariable String passwordToken) {
         resetPasswordService.resetPassword(resetPasswordDto, passwordToken);
+    }
+
+    @RequestMapping(path = "/user/notifications", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void toggleNotifications(@RequestParam("toggle") Boolean switchOn, Authentication authentication){
+        UserContext userContext = (UserContext) authentication.getDetails();
+        notificationService.toggleNotifications(userContext.getUser(), isNull(switchOn) ? true : switchOn);
     }
 
 }

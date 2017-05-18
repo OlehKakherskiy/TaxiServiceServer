@@ -155,6 +155,20 @@ Response body:
 **NOTES:**
 * notification token is optional field. If present - notification feature will be switched on.
 
+**_6. Toggle notifications_**
+```
+/user/notifications?toggle=<boolean_value>
+```
+
+RequestType : **POST**
+
+Request body: absent
+
+**NOTES:**
+* <boolean_value> - true/false;
+* if there's no notification token for user - no exception will be thrown;
+* if false - no notifications will be sent until switch on
+
 ###Order API
 **_1. Get all orders (by type)_**
 ```

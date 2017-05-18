@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import ua.kpi.mobiledev.domain.NotificationToken;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.repository.NotificationTokenRepository;
@@ -14,6 +14,7 @@ import ua.kpi.mobiledev.service.integration.HttpRequestHelper;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Service("notificationService")
 public class GcmNotificationService implements NotificationService {
@@ -37,10 +38,15 @@ public class GcmNotificationService implements NotificationService {
     @Override
     public void sendUpdateOrderNotification(Order order, User whoSend) {
         User notifyUser = isCustomer(whoSend) ? order.getTaxiDriver() : order.getCustomer();
-        String notificationToken = notificationTokenRepository.getNotificationToken(notifyUser);
-        if (!StringUtils.isEmpty(notificationToken)) {
-            httpRequestHelper.processPostRequest(SEND_URL, prepareHeaders(), prepareBody(order, whoSend, notificationToken));
+        NotificationToken notificationToken = notificationTokenRepository.getNotificationToken(notifyUser);
+        if (Objects.nonNull(notificationToken) && notificationToken.isSwitchOnNotification()) {
+            httpRequestHelper.processPostRequest(SEND_URL, prepareHeaders(), prepareBody(order, whoSend, notificationToken.getToken()));
         }
+    }
+
+    @Override
+    public void toggleNotifications(User user, boolean switchOn) {
+        notificationTokenRepository.toggleNotificationToken(user, switchOn);
     }
 
     private UpdateOrderStatusNotificationTemplate prepareBody(Order order, User whoSend, String notificationToken) {
