@@ -1,24 +1,27 @@
 package ua.kpi.mobiledev.service.gcm;
 
-import lombok.Data;
 import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
 @Getter
-public class UpdateOrderStatusNotificationTemplate {
+public class NotificationTemplate {
     private Map<String, String> data = new HashMap<>();
     private String to;
 
-    public UpdateOrderStatusNotificationTemplate appendData(String key, String value){
+    public NotificationTemplate appendData(String key, String value) {
         data.put(key, value);
         return this;
     }
 
-    public UpdateOrderStatusNotificationTemplate appendTo(String to){
+    public NotificationTemplate appendTo(String to) {
         this.to = to;
+        return this;
+    }
+
+    public NotificationTemplate setData(Map<String, String> data){
+        this.data = data;
         return this;
     }
 }

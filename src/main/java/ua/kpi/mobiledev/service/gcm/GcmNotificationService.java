@@ -49,7 +49,7 @@ public class GcmNotificationService implements NotificationService {
         notificationTokenRepository.toggleNotificationToken(user, switchOn);
     }
 
-    private UpdateOrderStatusNotificationTemplate prepareBody(Order order, User whoSend, String notificationToken) {
+    private NotificationTemplate prepareBody(Order order, User whoSend, String notificationToken) {
         return isCustomer(whoSend) ? notifyDriver(order, notificationToken) : notifyCustomer(order, notificationToken);
     }
 
@@ -64,16 +64,16 @@ public class GcmNotificationService implements NotificationService {
         return user.getUserType() == User.UserType.CUSTOMER;
     }
 
-    private UpdateOrderStatusNotificationTemplate notifyDriver(Order order, String notificationToken) {
-        return new UpdateOrderStatusNotificationTemplate()
+    private NotificationTemplate notifyDriver(Order order, String notificationToken) {
+        return new NotificationTemplate()
                 .appendTo(notificationToken)
                 .appendData(ORDER_STATUS_KEY, order.getOrderStatus().name())
                 .appendData(NAME_KEY, order.getCustomer().getName())
                 .appendData(ORDER_ID_KEY, order.getOrderId().toString());
     }
 
-    private UpdateOrderStatusNotificationTemplate notifyCustomer(Order order, String notificationToken) {
-        UpdateOrderStatusNotificationTemplate result = new UpdateOrderStatusNotificationTemplate()
+    private NotificationTemplate notifyCustomer(Order order, String notificationToken) {
+        NotificationTemplate result = new NotificationTemplate()
                 .appendTo(notificationToken)
                 .appendData(ORDER_STATUS_KEY, order.getOrderStatus().name());
         if (driverIsWaiting(order)) {
