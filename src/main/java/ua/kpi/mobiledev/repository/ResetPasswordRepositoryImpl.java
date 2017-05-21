@@ -19,24 +19,29 @@ public class ResetPasswordRepositoryImpl implements ResetPasswordRepository {
     private static final int DEFAULT_EXPIRE_DURATION = 3600;
 
     @Autowired
-    private RedisTemplate<UUID, ResetPasswordData> redisTemplate;
+    private RedisTemplate<String, ResetPasswordData> redisTemplate;
 
     @Value("${security.resetPasswordCodeAlive}")
     private Integer expireDurationInMs;
 
     @Override
     public void save(UUID id, ResetPasswordData value) {
-        redisTemplate.opsForValue().set(id, value);
-        redisTemplate.expire(id, ofNullable(expireDurationInMs).orElse(DEFAULT_EXPIRE_DURATION), TimeUnit.SECONDS);
+        String key = constructKey(id);
+        redisTemplate.opsForValue().set(key, value);
+        redisTemplate.expire(key, ofNullable(expireDurationInMs).orElse(DEFAULT_EXPIRE_DURATION), TimeUnit.SECONDS);
     }
 
     @Override
     public void remove(UUID id) {
-        redisTemplate.delete(id);
+        redisTemplate.delete(constructKey(id));
     }
 
     @Override
     public ResetPasswordData get(UUID resetPasswordDataId) {
-        return redisTemplate.opsForValue().get(resetPasswordDataId);
+        return redisTemplate.opsForValue().get(constructKey(resetPasswordDataId));
+    }
+
+    private String constructKey(UUID id) {
+        return "resetPasswordData:" + id.toString();
     }
 }
