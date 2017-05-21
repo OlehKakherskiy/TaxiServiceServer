@@ -169,6 +169,16 @@ Request body: absent
 * if there's no notification token for user - no exception will be thrown;
 * if false - no notifications will be sent until switch on
 
+**_7. Get notification toggle status_**
+```
+/user/notifications/toggle-position
+```
+
+RequestType: **GET**
+
+Response body: boolean
+
+
 ###Order API
 **_1. Get all orders (by type)_**
 ```
