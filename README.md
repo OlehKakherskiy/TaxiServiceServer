@@ -390,6 +390,8 @@ Response body:
     "data":{
         "orderStatus":"WAITING",
         "plateNumber":"String",
+        "model":"String",
+        "manufacturer":"String",
         "name":"String",
         "orderId":"Long"
     },

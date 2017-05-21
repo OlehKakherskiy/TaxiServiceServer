@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ua.kpi.mobiledev.domain.NotificationToken;
-import ua.kpi.mobiledev.domain.Order;
-import ua.kpi.mobiledev.domain.RoutePoint;
-import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.repository.NotificationTokenRepository;
 import ua.kpi.mobiledev.service.NotificationService;
 import ua.kpi.mobiledev.service.integration.HttpRequestHelper;
@@ -29,6 +26,8 @@ public class GcmNotificationService implements NotificationService {
     private static final String NAME_KEY = "name";
     private static final String ORDER_ID_KEY = "orderId";
     private static final String ROUTE_POINT_COORDINATES_FORMAT = "%s,%s";
+    private static final String CAR_MODEL_KEY = "model";
+    private static final String CAR_MANUFACTURER_KEY = "manufacturer";
 
     @Resource(name = "httpRequestHelper")
     private HttpRequestHelper httpRequestHelper;
@@ -82,7 +81,10 @@ public class GcmNotificationService implements NotificationService {
                 .appendTo(notificationToken)
                 .appendData(ORDER_STATUS_KEY, order.getOrderStatus().name());
         if (driverIsWaiting(order)) {
-            result.appendData(PLATE_NUMBER_KEY, order.getTaxiDriver().getCar().getPlateNumber());
+            Car car = order.getTaxiDriver().getCar();
+            result.appendData(PLATE_NUMBER_KEY, car.getPlateNumber());
+            result.appendData(CAR_MODEL_KEY, car.getModel());
+            result.appendData(CAR_MANUFACTURER_KEY, car.getManufacturer());
         }
         return result;
     }
