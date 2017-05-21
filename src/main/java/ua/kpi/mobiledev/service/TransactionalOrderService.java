@@ -61,7 +61,8 @@ public class TransactionalOrderService implements OrderService {
     @Override
     @Transactional
     public Order addOrder(Order order, Integer userId) {
-        order.setCustomer(checkIfCustomer(findUser(userId)));
+        User owner = findUser(userId);
+        order.setCustomer(checkIfCustomer(owner));
         getOrderRouteParams(order);
         for (int i = 0; i < order.getRoutePoints().size(); i++) {
             order.getRoutePoints().get(i).setRoutePointPosition(i);
@@ -69,7 +70,9 @@ public class TransactionalOrderService implements OrderService {
         order.setStartTime(ofNullable(order.getStartTime()).orElse(LocalDate.now().atStartOfDay()));
         order.setAddTime(LocalDateTime.now());
         order.setRemoved(false);
-        return orderRepository.save(order);
+        Order addedOrder = orderRepository.save(order);
+        notificationService.sendAddNewOrderNotification(addedOrder, owner);
+        return addedOrder;
     }
 
     private User checkIfCustomer(User user) {

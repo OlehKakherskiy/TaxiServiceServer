@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ua.kpi.mobiledev.domain.NotificationToken;
 import ua.kpi.mobiledev.domain.Order;
+import ua.kpi.mobiledev.domain.RoutePoint;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.repository.NotificationTokenRepository;
 import ua.kpi.mobiledev.service.NotificationService;
@@ -13,8 +14,11 @@ import ua.kpi.mobiledev.service.integration.HttpRequestHelper;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static java.lang.String.format;
 
 @Service("notificationService")
 public class GcmNotificationService implements NotificationService {
@@ -24,6 +28,7 @@ public class GcmNotificationService implements NotificationService {
     private static final String PLATE_NUMBER_KEY = "plateNumber";
     private static final String NAME_KEY = "name";
     private static final String ORDER_ID_KEY = "orderId";
+    private static final String ROUTE_POINT_COORDINATES_FORMAT = "%s,%s";
 
     @Resource(name = "httpRequestHelper")
     private HttpRequestHelper httpRequestHelper;
@@ -83,7 +88,36 @@ public class GcmNotificationService implements NotificationService {
     }
 
 
+    @Async
+    @Override
+    public void sendAddNewOrderNotification(Order order, User whoSend) {
+        NotificationTemplate template = prepareAddNotificationTemplate(order);
+        notificationTokenRepository.getDriverTokens()
+                .forEach(notificationToken -> sendAddNewOrderNotification(template, notificationToken));
+    }
+
     private boolean driverIsWaiting(Order order) {
         return order.getOrderStatus() == Order.OrderStatus.WAITING;
+    }
+
+    private NotificationTemplate prepareAddNotificationTemplate(Order order){
+        List<RoutePoint> routePoints = order.getRoutePoints();
+        int firstElementIndex = 0;
+        int lastElementIndex = routePoints.size() - 1;
+        RoutePoint startPoint = routePoints.get(firstElementIndex);
+        RoutePoint endPoint = routePoints.get(lastElementIndex);
+
+        return new NotificationTemplate()
+                .appendData(ORDER_ID_KEY, order.getOrderId().toString())
+                .appendData("startPoint", format(ROUTE_POINT_COORDINATES_FORMAT, startPoint.getLatitude(), startPoint.getLongtitude()))
+                .appendData("endPoint", format(ROUTE_POINT_COORDINATES_FORMAT, endPoint.getLatitude(), endPoint.getLongtitude()))
+                .appendData("startTime", order.getStartTime().toString())
+                .appendData("price", order.getPrice().toString());
+
+    }
+
+    private void sendAddNewOrderNotification(NotificationTemplate notificationTemplate, NotificationToken sendTo) {
+        NotificationTemplate completedTemplate = new NotificationTemplate().setData(notificationTemplate.getData()).appendTo(sendTo.getToken());
+        httpRequestHelper.processPostRequest(SEND_URL, prepareHeaders(), completedTemplate);
     }
 }
