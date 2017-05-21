@@ -66,6 +66,12 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     private List<Order> getForDriverWithStatus(Order.OrderStatus orderStatus, User user) {
+        if(orderStatus == Order.OrderStatus.NEW){
+            return entityManager.createQuery("Select o from Order o where o.removed = false " +
+                    "And o.orderStatus = :orderStatus")
+                    .setParameter("orderStatus", orderStatus)
+                    .getResultList();
+        }
         return entityManager.createQuery("Select o from Order o where o.removed = false " +
                 "And o.taxiDriver.id = :driverId And o.orderStatus = :orderStatus")
                 .setParameter("driverId", user.getId())
