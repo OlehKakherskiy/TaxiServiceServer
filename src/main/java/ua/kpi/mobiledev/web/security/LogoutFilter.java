@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import ua.kpi.mobiledev.repository.NotificationTokenRepository;
 import ua.kpi.mobiledev.service.UserService;
 import ua.kpi.mobiledev.web.security.model.TokenStoreObject;
 import ua.kpi.mobiledev.web.security.service.RedisStoreService;
@@ -20,9 +19,6 @@ import java.io.IOException;
 public class LogoutFilter extends AbstractAuthenticationProcessingFilter {
 
     private RedisStoreService<String, TokenStoreObject> redisStoreService;
-
-    @Resource(name = "notificationTokenRepository")
-    private NotificationTokenRepository notificationTokenRepository;
 
     @Resource(name = "userService")
     private UserService userService;
@@ -44,8 +40,6 @@ public class LogoutFilter extends AbstractAuthenticationProcessingFilter {
         TokenStoreObject tokenStoreObject = redisStoreService.get(token.getToken());
         tokenStoreObject.setValid(false);
         redisStoreService.save(token.getToken(), tokenStoreObject);
-        Integer userId = (Integer) token.parseClaims(tokenStoreObject.getTokenDigestKey()).getBody().get("userId");
-        notificationTokenRepository.removeNotificationToken(userService.getById(userId));
         return null;
     }
 }
