@@ -87,4 +87,10 @@ public class UserController {
         notificationService.toggleNotifications(userContext.getUser(), isNull(switchOn) ? true : switchOn);
     }
 
+    @RequestMapping(path = "/user/notifications/toggle-position", method = RequestMethod.GET)
+    public Boolean getNotificationTokenTogglePosition(Authentication authentication) {
+        UserContext userContext = (UserContext) authentication.getDetails();
+        return notificationService.getNotificationTogglePosition(userContext.getUser());
+    }
+
 }

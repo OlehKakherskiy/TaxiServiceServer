@@ -8,5 +8,7 @@ public interface NotificationService {
 
     void toggleNotifications(User user, boolean switchOn);
 
+    boolean getNotificationTogglePosition(User user);
+
     void sendAddNewOrderNotification(Order order, User whoSend);
 }

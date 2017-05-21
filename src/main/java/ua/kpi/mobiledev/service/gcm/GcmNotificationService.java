@@ -16,9 +16,9 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 
 @Service("notificationService")
 public class GcmNotificationService implements NotificationService {
@@ -44,7 +44,7 @@ public class GcmNotificationService implements NotificationService {
     public void sendUpdateOrderNotification(Order order, User whoSend) {
         User notifyUser = isCustomer(whoSend) ? order.getTaxiDriver() : order.getCustomer();
         NotificationToken notificationToken = notificationTokenRepository.getNotificationToken(notifyUser);
-        if (Objects.nonNull(notificationToken) && notificationToken.isSwitchOnNotification()) {
+        if (nonNull(notificationToken) && notificationToken.isSwitchOnNotification()) {
             httpRequestHelper.processPostRequest(SEND_URL, prepareHeaders(), prepareBody(order, whoSend, notificationToken.getToken()));
         }
     }
@@ -119,5 +119,11 @@ public class GcmNotificationService implements NotificationService {
     private void sendAddNewOrderNotification(NotificationTemplate notificationTemplate, NotificationToken sendTo) {
         NotificationTemplate completedTemplate = new NotificationTemplate().setData(notificationTemplate.getData()).appendTo(sendTo.getToken());
         httpRequestHelper.processPostRequest(SEND_URL, prepareHeaders(), completedTemplate);
+    }
+
+    @Override
+    public boolean getNotificationTogglePosition(User user) {
+        NotificationToken notificationToken = notificationTokenRepository.getNotificationToken(user);
+        return nonNull(notificationToken) && notificationToken.isSwitchOnNotification();
     }
 }
