@@ -420,7 +420,19 @@ Response body:
 }
 ```
 
-
+* Add order notification
+```json
+{
+    "data":{
+        "orderId":"Long",
+        "startPoint":"String",
+        "endPoint":"String",
+        "startTime":"price",
+        "price":"Double"
+    },
+    "to":"String"
+}
+```
 **EXCEPTION RESPONSE TEMPLATES**
 
 *Request validation error template:*
