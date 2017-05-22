@@ -182,7 +182,7 @@ Response body: boolean
 ###Order API
 **_1. Get all orders (by type)_**
 ```
-/order?orderStatus='actualOrderStatus'
+/order?orderStatus='actualOrderStatus'&use-coordinates='boolean'
 ```
 **orderStatus** = "OrderStatus" + ALL
 
@@ -202,6 +202,24 @@ Response:
 ```
 **NOTES:**
 * Only a taxi driver is allowed to perform operation
+* **use-coordinates** is optional parameter, default value - false. If true, json structure will be the next:
+
+```json
+[{
+    "orderId" : "Long",
+    "startTime" : "DateTime",
+    "startPointCoordinates" : {
+        "longtitude": "Double",
+        "latitude" : "Double"
+    },
+    "endPointCoordinates" : {
+        "longtitude": "Double",
+        "latitude" : "Double"
+    },
+    "price" : "Double",
+    "status":"OrderStatus"
+}]
+```
 
 **_2. Get order with specific id_**
 ```

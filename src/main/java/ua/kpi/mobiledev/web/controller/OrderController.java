@@ -19,6 +19,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Function;
 
 import static java.util.Arrays.stream;
 import static java.util.Objects.nonNull;
@@ -46,6 +47,9 @@ public class OrderController {
 
     @Resource(name = "simpleOrderDtoConverter")
     private CustomConverter<Order, OrderSimpleDto> orderToSimpleOrderDtoConverter;
+
+    @Resource(name = "simpleOrderDtoConverterWithCoordinates")
+    private CustomConverter<Order, OrderSimpleDto> orderToSimpleOrderDtoWithCoordinatesConverter;
 
     @Resource(name = "orderService")
     private OrderService orderService;
@@ -80,19 +84,26 @@ public class OrderController {
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     @ResponseStatus(OK)
-    public List<OrderSimpleDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus, Authentication authentication) {
+    public List<OrderSimpleDto> readAllOrders(@NotNull @RequestParam("orderStatus") String orderStatus, @RequestParam(value = "use-coordinates", defaultValue = "false") Boolean useCoordinates, Authentication authentication) {
         String uppercaseOrderStatus = orderStatus.toUpperCase();
         OrderStatus status = uppercaseOrderStatus.equals("ALL") ? null : getFromName(uppercaseOrderStatus);
-        return mapToDto(orderService.getOrderList(status, getUserId(authentication)));
+        return mapToDto(orderService.getOrderList(status, getUserId(authentication)), useCoordinates);
     }
 
-    private List<OrderSimpleDto> mapToDto(List<Order> orderList) {
-        return orderList.stream().map(this::convertToDto).collect(toList());
+    private List<OrderSimpleDto> mapToDto(List<Order> orderList, boolean useCoordinates) {
+        Function<Order, OrderSimpleDto> mapperFunction = useCoordinates ? this::convertToDtoWithCoordinates : this::convertToDto;
+        return orderList.stream().map(mapperFunction).collect(toList());
     }
 
     private OrderSimpleDto convertToDto(Order order) {
         OrderSimpleDto orderSimpleDto = new OrderSimpleDto();
         orderToSimpleOrderDtoConverter.convert(order, orderSimpleDto);
+        return orderSimpleDto;
+    }
+
+    private OrderSimpleDto convertToDtoWithCoordinates(Order order){
+        OrderSimpleDto orderSimpleDto = new OrderSimpleDto();
+        orderToSimpleOrderDtoWithCoordinatesConverter.convert(order, orderSimpleDto);
         return orderSimpleDto;
     }
 
