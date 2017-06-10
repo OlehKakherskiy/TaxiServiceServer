@@ -3,11 +3,7 @@ package ua.kpi.mobiledev.web.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.web.localDateTimeMapper.LocalDateTimeDeserializer;
@@ -33,7 +29,7 @@ import java.util.List;
 public class OrderDto {
 
     public interface AddOrderGroup extends RoutePointDto.FullRoutePointCheck,
-            AddReqSimpleDto.AdditionalRequirementCheck{
+            AddReqSimpleDto.AdditionalRequirementCheck, FutureTimeMandatoryCheck{
     }
 
     public interface UpdateOrderGroup extends OptionalComment, OptionalStartTime,
@@ -44,6 +40,9 @@ public class OrderDto {
     }
 
     public interface OptionalStartTime {
+    }
+
+    public interface  FutureTimeMandatoryCheck{
     }
 
     private Long orderId;
@@ -70,7 +69,8 @@ public class OrderDto {
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @FutureTime(message = "startTime.notFuture", groups = OptionalStartTime.class)
+    @NotNull(groups = FutureTimeMandatoryCheck.class)
+    @FutureTime(message = "startTime.notFuture", groups = {FutureTimeMandatoryCheck.class, OptionalStartTime.class})
     private LocalDateTime startTime;
 
     private Boolean quickRequest = false;
