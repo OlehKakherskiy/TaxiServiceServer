@@ -144,7 +144,7 @@ public class TransactionalOrderServiceTest {
 
         //then
         assertNotNull(updatedOrder);
-        verify(orderRepository).findOne(anyLong());
+        verify(orderRepository, atLeast(1)).findOne(anyLong());
         verify(orderRepository).save(any(Order.class));
         verify(userService).getById(anyInt());
         verify(transitionManager).changeOrderStatus(any(), any(), eq(mockStatus));

@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.RoutePoint;
+import ua.kpi.mobiledev.domain.TaxiDriver;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
+import ua.kpi.mobiledev.domain.orderprocessability.OrderServiceAbilityDecisionManager;
 import ua.kpi.mobiledev.domain.priceCalculationManagement.PriceCalculationManager;
 import ua.kpi.mobiledev.exception.ForbiddenOperationException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
@@ -57,6 +59,9 @@ public class TransactionalOrderService implements OrderService {
 
     @Resource(name = "notificationService")
     private NotificationService notificationService;
+
+    @Resource
+    private OrderServiceAbilityDecisionManager orderServiceAbilityDecisionManager;
 
     @Override
     @Transactional
@@ -120,10 +125,19 @@ public class TransactionalOrderService implements OrderService {
     @Transactional
     public Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus) {
         User whoChange = findUser(userId);
+        Order order = getOrder(orderId);
+        checkIfDriverGetsOrderForProcessing(order, whoChange, orderStatus);
         Order withChangedStatus = orderStatusManager.changeOrderStatus(getOrder(orderId), whoChange, orderStatus);
         orderRepository.save(withChangedStatus);
         notificationService.sendUpdateOrderNotification(withChangedStatus, whoChange);
         return withChangedStatus;
+    }
+
+    private void checkIfDriverGetsOrderForProcessing(Order order, User user, Order.OrderStatus orderStatus) {
+        if (orderStatus != Order.OrderStatus.ACCEPTED || user.getUserType() != TAXI_DRIVER) {
+            return;
+        }
+        orderServiceAbilityDecisionManager.checkDriverAbilityToProcessOrder(order, (TaxiDriver) user);
     }
 
     @Override

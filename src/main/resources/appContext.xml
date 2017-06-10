@@ -61,6 +61,20 @@
             <property name="startPrice" value="${startPrice}"/>
         </bean>
 
+        <bean id="orderServiceAbilityDecisionManager"
+              class="ua.kpi.mobiledev.domain.orderprocessability.OrderServiceAbilityDecisionManagerImpl">
+            <property name="checkAbilityStrategies">
+                <util:list list-class="java.util.ArrayList"
+                           value-type="ua.kpi.mobiledev.domain.orderprocessability.OrderServiceAbilityDecisionStrategy">
+                    <bean class="ua.kpi.mobiledev.domain.orderprocessability.HasCompatibleCarTypeDecisionStrategy"/>
+                    <bean class="ua.kpi.mobiledev.domain.orderprocessability.DriverHasNoOrderInProcessingDecisionStrategy">
+                        <property name="orderService" ref="orderService"/>
+                    </bean>
+                    <bean class="ua.kpi.mobiledev.domain.orderprocessability.HasEnoughPlaceDecisionStrategy"/>
+                </util:list>
+            </property>
+        </bean>
+
         <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
             <property name="host" value="${email.host}"/>
             <property name="port" value="${email.port}"/>
