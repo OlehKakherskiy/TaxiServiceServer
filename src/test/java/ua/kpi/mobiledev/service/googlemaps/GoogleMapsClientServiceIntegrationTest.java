@@ -32,7 +32,7 @@ public class GoogleMapsClientServiceIntegrationTest {
                 YANHELYA_STREET
         );
 
-        assertThat(googleMapsClientService.calculateDistance(points).getDistance(), is(257429));
+        assertThat(googleMapsClientService.calculateDistance(points).getDistance(), is(257406));
     }
 
     @Test
