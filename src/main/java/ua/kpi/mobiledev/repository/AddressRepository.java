@@ -11,4 +11,7 @@ public interface AddressRepository extends CrudRepository<Address, Long> {
 
     @Query("Select addr from Address addr where addr.houseNumber = :houseNumber and addr.street.streetName = :streetName")
     Address customGet(@Param("streetName") String streetName, @Param("houseNumber") String houseNumber);
+
+    @Query("Select rp.address from RoutePoint rp where rp.latitude = :latitude and rp.longtitude = :longtitude")
+    Address getByCoordinates(@Param("latitude") double latitude, @Param("longtitude") double longtitude);
 }

@@ -5,15 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "district")
@@ -53,7 +45,7 @@ public class District {
     @Override
     public int hashCode() {
         int result = districtId != null ? districtId.hashCode() : 0;
-        result = 31 * result + districtName.hashCode();
+        result = districtName != null ? 31 * result + districtName.hashCode() : result;
         result = 31 * result + city.hashCode();
         return result;
     }

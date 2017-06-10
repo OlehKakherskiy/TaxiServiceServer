@@ -17,6 +17,10 @@
         <constructor-arg value="ua.kpi.mobiledev.facade.AddressFacade"/>
     </bean>
 
+    <bean id="addressService" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="ua.kpi.mobiledev.service.AddressService"/>
+    </bean>
+
     <bean id="resetPasswordService" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="ua.kpi.mobiledev.service.ResetPasswordService"/>
     </bean>

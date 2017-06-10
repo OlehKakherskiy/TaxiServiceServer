@@ -2,18 +2,15 @@ package ua.kpi.mobiledev.web.converter;
 
 import lombok.Setter;
 import org.springframework.stereotype.Component;
-import ua.kpi.mobiledev.domain.Address;
-import ua.kpi.mobiledev.domain.AdministrationArea;
-import ua.kpi.mobiledev.domain.City;
-import ua.kpi.mobiledev.domain.RoutePoint;
-import ua.kpi.mobiledev.domain.Street;
+import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.facade.AddressFacade;
+import ua.kpi.mobiledev.service.AddressService;
 import ua.kpi.mobiledev.web.dto.RoutePointDto;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 import static java.lang.Double.parseDouble;
-import static java.util.Objects.isNull;
 
 @Component("routePointConverter")
 @Setter
@@ -22,13 +19,25 @@ public class RoutePointConverter implements CustomConverter<RoutePointDto, Route
     @Resource(name = "addressFacade")
     private AddressFacade addressFacade;
 
+    @Resource(name = "addressService")
+    private AddressService addressService;
+
     @Override
     public void convert(RoutePointDto routePointDto, RoutePoint routePoint) {
         routePoint.setRoutePointId(routePointDto.getRoutePointId());
         routePoint.setRoutePointPosition(routePointDto.getRoutePointIndex());
         routePoint.setLatitude(routePointDto.getLatitude() == null ? null : parseDouble(routePointDto.getLatitude()));
         routePoint.setLongtitude(routePointDto.getLongtitude() == null ? null : parseDouble(routePointDto.getLongtitude()));
-        routePoint.setAddress(addressFacade.createAndGet(routePoint.getLatitude(), routePoint.getLongtitude()));
+        Optional<Address> addressOptional = tryGetExistedAddress(routePoint);
+        routePoint.setAddress(addressOptional.isPresent() ? addressOptional.get() : createAndGetAddress(routePoint));
+    }
+
+    private Optional<Address> tryGetExistedAddress(RoutePoint routePoint) {
+        return addressService.getAddress(routePoint.getLatitude(), routePoint.getLongtitude());
+    }
+
+    private Address createAndGetAddress(RoutePoint routePoint) {
+        return addressFacade.createAndGet(routePoint.getLatitude(), routePoint.getLongtitude());
     }
 
     @Override

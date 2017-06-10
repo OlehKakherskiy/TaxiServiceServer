@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.repository.inmem;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.Address;
 import ua.kpi.mobiledev.repository.AddressRepository;
@@ -14,6 +15,11 @@ public class InMemAddressRepository implements AddressRepository {
 
     @Override
     public Address customGet(String streetName, String houseNumber) {
+        return null;
+    }
+
+    @Override
+    public Address getByCoordinates(@Param("latitude") double latitude, @Param("longtitude") double longtitude) {
         return null;
     }
 

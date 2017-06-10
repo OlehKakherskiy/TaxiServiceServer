@@ -23,6 +23,11 @@ public class TransactionalAddressService implements AddressService {
         return ofNullable(addressRepository.customGet(streetName, houseNumber));
     }
 
+    @Override
+    public Optional<Address> getAddress(Double latitude, Double longtitude) {
+        return ofNullable(addressRepository.getByCoordinates(latitude, longtitude));
+    }
+
     @Transactional
     @Override
     public Address addAddress(Address address) {
