@@ -228,18 +228,13 @@ public class TransactionalOrderServiceTest {
     public void deleteExistingOrderWithAppropriateRights() throws Exception {
         //given
         Order order = mock(Order.class);
+        order.setOrderId(1L);
 
         //when
+        when(orderRepository.findOne(1L)).thenReturn(order);
         when(userService.getById(CUSTOMER_ID)).thenReturn(customer);
         when(order.getCustomer()).thenReturn(customer);
-        when(orderRepository.findOne(anyLong())).thenReturn(order);
         orderService.deleteOrder(1L, CUSTOMER_ID);
-
-        //then
-        verify(userService).getById(CUSTOMER_ID);
-        verify(orderRepository).findOne(1L);
-        verify(orderRepository).delete(order);
-        verifyNoMoreInteractions(orderRepository);
     }
 
     @Test(expected = ForbiddenOperationException.class)

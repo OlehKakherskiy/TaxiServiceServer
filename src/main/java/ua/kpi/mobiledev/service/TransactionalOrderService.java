@@ -162,7 +162,7 @@ public class TransactionalOrderService implements OrderService {
         Order order = getOrder(orderId);
         checkIfOrderOwner(order, userId);
 
-        orderRepository.delete(order);
+        orderRepository.delete(changeOrderStatus(orderId, userId, Order.OrderStatus.CANCELLED));
     }
 
     private void checkIfOrderOwner(Order order, Integer userId) {
