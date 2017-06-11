@@ -12,6 +12,7 @@ import ua.kpi.mobiledev.domain.orderStatusManagement.OrderStatusManager;
 import ua.kpi.mobiledev.domain.orderprocessability.OrderServiceAbilityDecisionManager;
 import ua.kpi.mobiledev.domain.priceCalculationManagement.PriceCalculationManager;
 import ua.kpi.mobiledev.exception.ForbiddenOperationException;
+import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.exception.ResourceNotFoundException;
 import ua.kpi.mobiledev.repository.OrderRepository;
 import ua.kpi.mobiledev.service.googlemaps.GeographicalPoint;
@@ -62,6 +63,9 @@ public class TransactionalOrderService implements OrderService {
 
     @Resource
     private OrderServiceAbilityDecisionManager orderServiceAbilityDecisionManager;
+
+    @Resource
+    private CleanUpOrderListManager cleanUpOrderListManager;
 
     @Override
     @Transactional
@@ -122,7 +126,7 @@ public class TransactionalOrderService implements OrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = RequestException.class)
     public Order changeOrderStatus(Long orderId, Integer userId, Order.OrderStatus orderStatus) {
         User whoChange = findUser(userId);
         Order order = getOrder(orderId);
@@ -136,6 +140,10 @@ public class TransactionalOrderService implements OrderService {
     private void checkIfDriverGetsOrderForProcessing(Order order, User user, Order.OrderStatus orderStatus) {
         if (orderStatus != Order.OrderStatus.ACCEPTED || user.getUserType() != TAXI_DRIVER) {
             return;
+        }
+        if(cleanUpOrderListManager.isExpired(order)){
+            cleanUpOrderListManager.expire(order);
+            throw new RequestException(ORDER_EXPIRED, order.getOrderId());
         }
         orderServiceAbilityDecisionManager.checkDriverAbilityToProcessOrder(order, (TaxiDriver) user);
     }

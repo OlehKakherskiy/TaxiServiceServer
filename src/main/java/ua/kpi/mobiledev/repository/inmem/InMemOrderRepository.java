@@ -6,6 +6,7 @@ import ua.kpi.mobiledev.domain.Order;
 import ua.kpi.mobiledev.domain.User;
 import ua.kpi.mobiledev.repository.OrderRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,6 +45,16 @@ public class InMemOrderRepository implements OrderRepository {
         } else {
             return isNull(orderStatus) ? getAllForDriver(user) : getAllForDriver(orderStatus, user);
         }
+    }
+
+    @Override
+    public List<Order> getExpiredOrders(LocalDateTime tillTime) {
+        return null;
+    }
+
+    @Override
+    public List<Order> getExpiredQuickRequests(long quickRequestMinutesOffset) {
+        return null;
     }
 
     private List<Order> getAllForCustomer(User user) {

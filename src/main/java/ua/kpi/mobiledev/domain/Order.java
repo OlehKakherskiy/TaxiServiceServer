@@ -90,7 +90,8 @@ public class Order {
         CANCELLED,
         DONE,
         WAITING,
-        PROCESSING
+        PROCESSING,
+        EXPIRED
     }
 
     public enum PaymentMethod {

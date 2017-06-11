@@ -36,5 +36,7 @@ public enum ErrorCode {
     DRIVER_HAS_ORDERS_IN_PROCESSING,
     HAS_NOT_ENOUGH_SEAT_NUMBER,
 
+    ORDER_EXPIRED,
+
     TEST_CODE
 }

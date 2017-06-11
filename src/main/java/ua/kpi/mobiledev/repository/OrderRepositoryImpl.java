@@ -8,9 +8,14 @@ import ua.kpi.mobiledev.domain.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 
 @Repository("orderRepository")
 public class OrderRepositoryImpl implements OrderRepository {
@@ -27,7 +32,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Order save(Order entity) {
         entity.getRoutePoints().forEach(this::reattachAddress);
-        entityManager.persist(entity);
+        if (nonNull(entity.getOrderId())) {
+            entityManager.merge(entity);
+        } else {
+            entityManager.persist(entity);
+        }
         return entity;
     }
 
@@ -50,6 +59,32 @@ public class OrderRepositoryImpl implements OrderRepository {
         } else {
             return isNull(orderStatus) ? getForDriverWithoutStatus(user) : getForDriverWithStatus(orderStatus, user);
         }
+    }
+
+    @Override
+    public List<Order> getExpiredOrders(LocalDateTime tillTime) {
+        return entityManager.createQuery("Select o from Order o where o.removed = false " +
+                "and o.orderStatus = :newOrderStatus and " +
+                "o.startTime <> :currentDateStart AND o.startTime < :toTime")
+                .setParameter("newOrderStatus", Order.OrderStatus.NEW)
+                .setParameter("currentDateStart", LocalDate.now().atStartOfDay())
+                .setParameter("toTime", tillTime)
+                .getResultList();
+    }
+
+    @Override
+    public List<Order> getExpiredQuickRequests(long quickRequestMinutesOffset) {
+        List<Order> quickRequests = entityManager.createQuery("Select o from Order o " +
+                "where o.removed = false " +
+                "and o.orderStatus = :newOrderStatus " +
+                "and o.startTime = :currentDateStart")
+                .setParameter("newOrderStatus", Order.OrderStatus.NEW)
+                .setParameter("currentDateStart", LocalDate.now().atStartOfDay())
+                .getResultList();
+        LocalDateTime now = now();
+        return quickRequests.stream()
+                .filter(order -> order.getAddTime().plusMinutes(quickRequestMinutesOffset).isBefore(now))
+                .collect(toList());
     }
 
     private boolean isCustomer(User user) {

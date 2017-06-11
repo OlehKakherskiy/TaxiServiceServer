@@ -11,12 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.isNull;
-import static ua.kpi.mobiledev.domain.Order.OrderStatus.ACCEPTED;
-import static ua.kpi.mobiledev.domain.Order.OrderStatus.CANCELLED;
-import static ua.kpi.mobiledev.domain.Order.OrderStatus.DONE;
-import static ua.kpi.mobiledev.domain.Order.OrderStatus.NEW;
-import static ua.kpi.mobiledev.domain.Order.OrderStatus.PROCESSING;
-import static ua.kpi.mobiledev.domain.Order.OrderStatus.WAITING;
+import static ua.kpi.mobiledev.domain.Order.OrderStatus.*;
 import static ua.kpi.mobiledev.domain.User.UserType.CUSTOMER;
 import static ua.kpi.mobiledev.domain.User.UserType.TAXI_DRIVER;
 import static ua.kpi.mobiledev.exception.ErrorCode.ILLEGAL_ORDER_STATUS_TRANSITION;
@@ -39,6 +34,8 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
         customerFromNewTransitions.put(CANCELLED, new CloseOrder());
         Map<OrderStatus, OrderStatusTransition> customerFromAcceptedTransitions = new HashMap<>();
         customerFromAcceptedTransitions.put(CANCELLED, new CloseOrder());
+        Map<OrderStatus, OrderStatusTransition> customerFromExpiredTransitions = new HashMap<>();
+        customerFromExpiredTransitions.put(NEW, new RefreshOrderProcessing());
 
         customerTransitions.put(NEW, customerFromNewTransitions);
         customerTransitions.put(ACCEPTED, customerFromAcceptedTransitions);
@@ -46,6 +43,7 @@ public class OrderStatusTransitionManager implements OrderStatusManager {
         customerTransitions.put(PROCESSING, Collections.emptyMap());
         customerTransitions.put(WAITING, Collections.emptyMap());
         customerTransitions.put(CANCELLED, Collections.emptyMap());
+        customerTransitions.put(EXPIRED, customerFromExpiredTransitions);
 
         Map<OrderStatus, OrderStatusTransition> taxiDriverFromNewTransitions = new HashMap<>();
         taxiDriverFromNewTransitions.put(ACCEPTED, new AcceptOrderServicing());
