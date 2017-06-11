@@ -289,7 +289,7 @@ Request body:
 ```
 /order/{orderId}/status
 ```
-Request type: **PUT**
+Request type: **PATCH**
 
 Request body:
 
