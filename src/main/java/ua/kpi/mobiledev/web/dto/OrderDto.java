@@ -69,7 +69,6 @@ public class OrderDto {
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @NotNull(groups = FutureTimeMandatoryCheck.class)
     @FutureTime(message = "startTime.notFuture", groups = {FutureTimeMandatoryCheck.class, OptionalStartTime.class})
     private LocalDateTime startTime;
 
