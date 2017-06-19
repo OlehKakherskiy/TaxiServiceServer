@@ -38,7 +38,7 @@ public class UserDto {
     public interface DriverAddMandatoryParams {
     }
 
-    @NotNull(message = "user.name.required", groups = {AddUserCheck.class, NameCheck.class})
+    @NotNull(message = "user.name.required", groups = {AddUserCheck.class})
     @Size(min = 1, max = 45, message = "user.name.invalidSize", groups = {AddUserCheck.class, NameCheck.class})
     private String name;
 
