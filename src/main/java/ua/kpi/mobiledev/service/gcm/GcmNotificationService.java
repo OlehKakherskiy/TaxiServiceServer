@@ -54,7 +54,7 @@ public class GcmNotificationService implements NotificationService {
     }
 
     private NotificationTemplate prepareBody(Order order, User whoSend, String notificationToken) {
-        return isCustomer(whoSend) ? notifyDriver(order, notificationToken) : notifyCustomer(order, notificationToken);
+        return isCustomer(whoSend) ? notifyDriver(order, notificationToken) : notifyCustomer(order, (TaxiDriver) whoSend, notificationToken);
     }
 
     private Map<String, String> prepareHeaders() {
@@ -76,10 +76,12 @@ public class GcmNotificationService implements NotificationService {
                 .appendData(ORDER_ID_KEY, order.getOrderId().toString());
     }
 
-    private NotificationTemplate notifyCustomer(Order order, String notificationToken) {
+    private NotificationTemplate notifyCustomer(Order order, TaxiDriver whoSend, String notificationToken) {
         NotificationTemplate result = new NotificationTemplate()
                 .appendTo(notificationToken)
-                .appendData(ORDER_STATUS_KEY, order.getOrderStatus().name());
+                .appendData(ORDER_STATUS_KEY, order.getOrderStatus().name())
+                .appendData(NAME_KEY, whoSend.getName())
+                .appendData(ORDER_ID_KEY, order.getOrderId().toString());
         if (driverIsWaiting(order)) {
             Car car = order.getTaxiDriver().getCar();
             result.appendData(PLATE_NUMBER_KEY, car.getPlateNumber());
