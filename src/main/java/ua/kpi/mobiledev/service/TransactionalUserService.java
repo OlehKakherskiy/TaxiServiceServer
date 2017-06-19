@@ -15,6 +15,7 @@ import ua.kpi.mobiledev.web.security.model.Role;
 import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -88,7 +89,7 @@ public class TransactionalUserService implements UserService {
     }
 
     private SecurityDetails prepareSecurityDetails(User user, String password) {
-        return new SecurityDetails(user.getEmail(), password, "", true,
+        return new SecurityDetails(user.getEmail(), password, LocalDateTime.now(),
                 asList(new Role(new SimpleGrantedAuthority("ROLE_" + user.getUserType().name()))));
     }
 

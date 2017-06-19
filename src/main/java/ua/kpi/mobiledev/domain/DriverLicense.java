@@ -5,17 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @NoArgsConstructor
@@ -37,14 +30,10 @@ public class DriverLicense {
     @Column(name = "expiration_time")
     private LocalDate expirationTime;
 
-    @Lob
-    @Column(name = "front_side_scan")
-    @Basic(fetch = LAZY)
+    @Transient
     private byte[] frontSideScan;
 
-    @Lob
-    @Column(name = "back_side_scan")
-    @Basic(fetch = LAZY)
+    @Transient
     private byte[] backSideScan;
 
     @Override

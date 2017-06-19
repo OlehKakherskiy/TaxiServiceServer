@@ -10,11 +10,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ua.kpi.mobiledev.domain.Car;
-import ua.kpi.mobiledev.domain.DriverLicense;
-import ua.kpi.mobiledev.domain.MobileNumber;
-import ua.kpi.mobiledev.domain.TaxiDriver;
-import ua.kpi.mobiledev.domain.User;
+import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.exception.RequestException;
 import ua.kpi.mobiledev.exception.SystemException;
 import ua.kpi.mobiledev.repository.UserRepository;
@@ -25,22 +21,16 @@ import ua.kpi.mobiledev.web.security.model.SecurityDetails;
 import ua.kpi.mobiledev.web.security.service.CustomUserDetailsService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Category(UnitTest.class)
 @RunWith(MockitoJUnitRunner.class)
@@ -55,6 +45,7 @@ public class TransactionalUserServiceTest {
     private static final String TAXI_DRIVER_NAME = "taxiDriverName";
     private static final String TAXI_DRIVER_EMAIL = "taxiDriverEmail";
     private static final int CAR_ID = 1;
+    private static final LocalDateTime NOW = LocalDateTime.now();
 
     @Mock
     private UserRepository userRepositoryMock;
@@ -289,7 +280,7 @@ public class TransactionalUserServiceTest {
     }
 
     private SecurityDetails createUserDetails(User user, String password) {
-        return new SecurityDetails(user.getEmail(), password, "", true,
+        return new SecurityDetails(user.getEmail(), password, NOW,
                 singletonList(new Role(new SimpleGrantedAuthority(user.getUserType().name()))));
     }
 

@@ -7,14 +7,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,11 +28,8 @@ public class SecurityDetails implements UserDetails {
     @Setter
     private String password;
 
-    @Column(name = "salt")
-    private String salt;
-
-    @Column(name = "enabled")
-    private boolean isEnabled;
+    @Column(name = "update_time")
+    private LocalDateTime updateTime;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "authority", joinColumns = @JoinColumn(name = "username"))
@@ -76,6 +67,6 @@ public class SecurityDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return true;
     }
 }
