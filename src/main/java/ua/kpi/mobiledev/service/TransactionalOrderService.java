@@ -141,7 +141,7 @@ public class TransactionalOrderService implements OrderService {
         if (orderStatus != Order.OrderStatus.ACCEPTED || user.getUserType() != TAXI_DRIVER) {
             return;
         }
-        if(cleanUpOrderListManager.isExpired(order)){
+        if (cleanUpOrderListManager.isExpired(order)) {
             cleanUpOrderListManager.expire(order);
             throw new RequestException(ORDER_EXPIRED, order.getOrderId());
         }
@@ -169,8 +169,10 @@ public class TransactionalOrderService implements OrderService {
         checkIfCustomer(userService.getById(userId));
         Order order = getOrder(orderId);
         checkIfOrderOwner(order, userId);
-
-        orderRepository.delete(changeOrderStatus(orderId, userId, Order.OrderStatus.CANCELLED));
+        if (order.getOrderStatus() != Order.OrderStatus.DONE) {
+            order = changeOrderStatus(orderId, userId, Order.OrderStatus.CANCELLED);
+        }
+        orderRepository.delete(order);
     }
 
     private void checkIfOrderOwner(Order order, Integer userId) {
