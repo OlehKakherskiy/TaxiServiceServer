@@ -93,8 +93,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     private List<Order> getForDriverWithoutStatus(User user) {
         return entityManager.createQuery("Select o from Order o where o.removed = false " +
-                "And o.orderStatus = :newOrderStatus " +
-                "OR (o.orderStatus <> :newOrderStatus And o.taxiDriver.id = :driverId)")
+                "And (o.orderStatus = :newOrderStatus " +
+                "OR (o.orderStatus <> :newOrderStatus And o.taxiDriver.id = :driverId))")
                 .setParameter("newOrderStatus", Order.OrderStatus.NEW)
                 .setParameter("driverId", user.getId())
                 .getResultList();
