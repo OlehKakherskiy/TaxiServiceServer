@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.service;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -10,10 +11,13 @@ import ua.kpi.mobiledev.repository.OrderRepository;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 
 @Component("cleanUpOrderListManager")
 public class CleanUpOrderListManagerImpl implements CleanUpOrderListManager {
+
+    private static final Logger LOGGER = Logger.getLogger(CleanUpOrderListManagerImpl.class);
 
     @Value("${order.cleanup.quickRequestExpirationMinutes}")
     private Integer quickRequestExpirationSlotMinutes = 60;
@@ -46,6 +50,9 @@ public class CleanUpOrderListManagerImpl implements CleanUpOrderListManager {
     @Transactional
     public void closeExpiredOrders() {
         List<Order> orderList = orderRepository.getExpiredOrders(now());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(format("Clean up manager is expiring '%s' planned orders since last run", orderList.size()));
+        }
         orderList.forEach(this::expire);
     }
 
@@ -53,6 +60,10 @@ public class CleanUpOrderListManagerImpl implements CleanUpOrderListManager {
     @Transactional
     @Scheduled(cron = "${order.cleanup.cleanupQuickRequestsCron}")
     public void closeExpiredQuickRequests() {
-        orderRepository.getExpiredQuickRequests(quickRequestExpirationSlotMinutes).forEach(this::expire);
+        List<Order> orderList = orderRepository.getExpiredQuickRequests(quickRequestExpirationSlotMinutes);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(format("Clean up manager is expiring '%s' quick requests since last run", orderList.size()));
+        }
+        orderList.forEach(this::expire);
     }
 }

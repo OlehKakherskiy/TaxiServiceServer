@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.web.converter;
 
 import lombok.Setter;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import ua.kpi.mobiledev.domain.*;
 import ua.kpi.mobiledev.facade.AddressFacade;
@@ -16,6 +17,8 @@ import static java.lang.Double.parseDouble;
 @Setter
 public class RoutePointConverter implements CustomConverter<RoutePointDto, RoutePoint> {
 
+    private static final Logger LOGGER = Logger.getLogger(RoutePointConverter.class);
+
     @Resource(name = "addressFacade")
     private AddressFacade addressFacade;
 
@@ -29,6 +32,9 @@ public class RoutePointConverter implements CustomConverter<RoutePointDto, Route
         routePoint.setLatitude(routePointDto.getLatitude() == null ? null : parseDouble(routePointDto.getLatitude()));
         routePoint.setLongtitude(routePointDto.getLongtitude() == null ? null : parseDouble(routePointDto.getLongtitude()));
         Optional<Address> addressOptional = tryGetExistedAddress(routePoint);
+        if (addressOptional.isPresent()) {
+            LOGGER.info(String.format("address for coordinates [%s,%s] was found in the local storage", routePoint.getLatitude(), routePoint.getLongtitude()));
+        }
         routePoint.setAddress(addressOptional.isPresent() ? addressOptional.get() : createAndGetAddress(routePoint));
     }
 

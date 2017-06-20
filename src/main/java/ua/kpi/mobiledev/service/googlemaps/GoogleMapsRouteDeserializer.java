@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 public class GoogleMapsRouteDeserializer extends JsonDeserializer<GoogleMapsRouteResponse> {
+
+    private static final Logger LOG = Logger.getLogger(GoogleMapsRouteDeserializer.class);
 
     private static final String ROWS = "rows";
     private static final String ELEMENTS = "elements";
@@ -20,7 +23,11 @@ public class GoogleMapsRouteDeserializer extends JsonDeserializer<GoogleMapsRout
 
     @Override
     public GoogleMapsRouteResponse deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        TreeNode rowsElement = jsonParser.getCodec().readTree(jsonParser).get(ROWS);
+        TreeNode tree = jsonParser.getCodec().readTree(jsonParser);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(tree);
+        }
+        TreeNode rowsElement = tree.get(ROWS);
         ArrayNode elementsNode = (ArrayNode) rowsElement.get(FIRST_NODE).get(ELEMENTS);
         ObjectNode elementNode = (ObjectNode) elementsNode.get(FIRST_NODE);
         return new GoogleMapsRouteResponse(getDistance(elementNode), getDuration(elementNode));

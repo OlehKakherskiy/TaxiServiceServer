@@ -1,20 +1,11 @@
 package ua.kpi.mobiledev.facade;
 
 import lombok.Setter;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ua.kpi.mobiledev.domain.Address;
-import ua.kpi.mobiledev.domain.AdministrationArea;
-import ua.kpi.mobiledev.domain.City;
-import ua.kpi.mobiledev.domain.Country;
-import ua.kpi.mobiledev.domain.District;
-import ua.kpi.mobiledev.domain.Street;
-import ua.kpi.mobiledev.service.AddressService;
-import ua.kpi.mobiledev.service.AdministrationAreaService;
-import ua.kpi.mobiledev.service.CityService;
-import ua.kpi.mobiledev.service.CountryService;
-import ua.kpi.mobiledev.service.DistrictService;
-import ua.kpi.mobiledev.service.StreetService;
+import ua.kpi.mobiledev.domain.*;
+import ua.kpi.mobiledev.service.*;
 import ua.kpi.mobiledev.service.googlemaps.AddressBuilder;
 import ua.kpi.mobiledev.service.googlemaps.AddressDto;
 import ua.kpi.mobiledev.service.googlemaps.GeographicalPoint;
@@ -28,6 +19,8 @@ import static java.util.Objects.isNull;
 @Component("addressFacade")
 @Setter
 public class AddressFacadeImpl implements AddressFacade {
+
+    private static final Logger LOGGER = Logger.getLogger(AddressFacadeImpl.class);
 
     @Resource(name = "addressService")
     private AddressService addressService;
@@ -53,14 +46,22 @@ public class AddressFacadeImpl implements AddressFacade {
     @Transactional
     @Override
     public Address createAndGet(Double latitude, Double longtitude) {
+        LOGGER.info(String.format("Parsing address from Google Maps for coordinates: [%s,%s] ...", latitude, longtitude));
         if (isNull(latitude) || isNull(longtitude)) {
+            LOGGER.info("coordinates are absent");
             return null;
         }
         AddressDto addressPrototype = googleMapsClientService.getAddressDto(new GeographicalPoint(latitude, longtitude));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("Parsed address for coordinates [%s,%s]: %s", latitude, longtitude, addressPrototype));
+        }
 
         Optional<Address> address = addressService.getAddress(addressPrototype.getStreetName(), addressPrototype.getHouseNumber());
         if (address.isPresent()) {
             return address.get();
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No prepared address in DB for DTO: " + addressPrototype);
         }
 
         AddressBuilder addressBuilder = new AddressBuilder();
@@ -70,11 +71,17 @@ public class AddressFacadeImpl implements AddressFacade {
         if (street.isPresent()) {
             return addressService.addAddress(addressBuilder.withStreet(street.get()).build());
         }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No prepared street in DB for DTO: " + addressPrototype);
+        }
         addressBuilder.withStreetName(addressPrototype.getStreetName());
 
         Optional<District> district = districtService.get(addressPrototype.getDistrictName(), addressPrototype.getCityName());
         if (district.isPresent()) {
             return addressService.addAddress(addressBuilder.withDistrict(district.get()).build());
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No prepared district in DB for DTO: " + addressPrototype);
         }
         addressBuilder.withDistrictName(addressPrototype.getDistrictName());
 
@@ -82,17 +89,26 @@ public class AddressFacadeImpl implements AddressFacade {
         if (city.isPresent()) {
             return addressService.addAddress(addressBuilder.withCity(city.get()).build());
         }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No prepared city in DB for DTO: " + addressPrototype);
+        }
         addressBuilder.withCityName(addressPrototype.getCityName());
 
         Optional<AdministrationArea> administrationArea = administrationAreaService.getAdministrationArea(addressPrototype.getAdminAreaName());
         if (administrationArea.isPresent()) {
             return addressService.addAddress(addressBuilder.withAdminArea(administrationArea.get()).build());
         }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No prepared admin area in DB for DTO: " + addressPrototype);
+        }
         addressBuilder.withAdminAreaName(addressPrototype.getAdminAreaName());
 
         Optional<Country> country = countryService.getCountry(addressPrototype.getCountryName());
         if (country.isPresent()) {
             return addressService.addAddress(addressBuilder.withCountry(country.get()).build());
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No prepared country in DB for DTO: " + addressPrototype);
         }
         return addressService.addAddress(addressBuilder.withCountryName(addressPrototype.getCountryName()).build());
     }

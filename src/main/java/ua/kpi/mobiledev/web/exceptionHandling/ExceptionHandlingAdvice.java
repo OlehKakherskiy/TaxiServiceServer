@@ -1,5 +1,6 @@
 package ua.kpi.mobiledev.web.exceptionHandling;
 
+import org.apache.log4j.Logger;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -23,6 +24,8 @@ import static ua.kpi.mobiledev.exception.ErrorCode.DEFAULT_VALIDATION_EXCEPTION_
 
 @ControllerAdvice
 public class ExceptionHandlingAdvice {
+
+    private static final Logger LOG = Logger.getLogger(ExceptionHandlingAdvice.class.getName());
 
     private static final String DEFAULT_EXCEPTION_CODE = DEFAULT_EXCEPTION_MESSAGE.name();
     private static final String DEFAULT_VALIDATION_MESSAGE = DEFAULT_VALIDATION_EXCEPTION_MESSAGE.name();
@@ -53,6 +56,9 @@ public class ExceptionHandlingAdvice {
         try {
             exceptionMessage = messageSource.getMessage(fieldError.getDefaultMessage(), fieldError.getArguments(), locale);
         } catch (NoSuchMessageException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("No message in message source for field with code = '%s'", fieldError.getDefaultMessage()));
+            }
             exceptionMessage = messageSource.getMessage(DEFAULT_VALIDATION_MESSAGE, new String[]{fieldError.getField()}, locale);
         }
         return new CustomFieldError(fieldError.getField().trim(), fieldError.getDefaultMessage().trim(), exceptionMessage.trim());
@@ -65,6 +71,7 @@ public class ExceptionHandlingAdvice {
     @RequestMapping(produces = "application/json")
     @ExceptionHandler(SystemException.class)
     public ResponseEntity<ErrorMessage> handleSystemException(SystemException ex) {
+        LOG.error(ex.getCause());
         return buildResponse(INTERNAL_SERVER_ERROR, ex);
     }
 
@@ -77,6 +84,9 @@ public class ExceptionHandlingAdvice {
     @RequestMapping(produces = "application/json")
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorMessage> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(ex.getCause());
+        }
         return buildResponse(NOT_FOUND, ex);
     }
 
@@ -97,6 +107,9 @@ public class ExceptionHandlingAdvice {
         try {
             resultMessage = exceptionMessageSource.getMessage(errorCode, ex.getParams(), locale);
         } catch (NoSuchMessageException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(String.format("No message in message source for field with code = '%s'", errorCode));
+            }
             resultMessage = exceptionMessageSource.getMessage(DEFAULT_EXCEPTION_CODE, new String[]{errorCode}, locale);
         }
         return new ErrorMessage(resultMessage.trim());
