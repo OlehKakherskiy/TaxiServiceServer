@@ -1,6 +1,7 @@
 package ua.kpi.mobiledev.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class DriverLicenseDto {
     @NotNull(groups = UserDto.AddUserCheck.class, message = "driverLicense.code.required")
     @Pattern(regexp = "^[\u0410-\u042f]{3} \\d{6}$",
             groups = {UserDto.AddUserCheck.class, DriverLicenseCodeCheck.class}, message = "driverLicense.code.invalidFormat")
+    @JsonProperty("driverLicense")
     private String code;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
